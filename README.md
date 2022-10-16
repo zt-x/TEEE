@@ -34,4 +34,5 @@
 ![image](https://user-images.githubusercontent.com/73433437/195984673-8d42d395-702d-4522-b265-ce04ca274914.png)
 
 ## 功能设计 & 项目进度 
-**https://note.youdao.com/s/dWM5WAZE**
+**功能模块：https://www.processon.com/view/link/634bc2e2637689070a563fe8**<br/>
+**进度Note: https://note.youdao.com/s/dWM5WAZE**
