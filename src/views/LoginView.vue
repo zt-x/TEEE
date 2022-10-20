@@ -1,5 +1,37 @@
 <template>
 	<div id="body">
+		<v-overlay
+				:absolute="absolute"
+				:value="overlay"
+				v-if="loading"
+			>
+				<v-progress-circular
+					indeterminate
+					color="primary"
+				></v-progress-circular>
+				<div class="text-center">Loading...</div>
+			</v-overlay>
+		<div class="text-center">
+			<v-dialog
+			v-model="dialog"
+			width="200"
+			>
+			<v-card>
+				<v-card-title v-text="loginMsg" class="headline brown--text text-body-1"></v-card-title>
+				<v-divider></v-divider>
+				<v-card-actions>
+				<v-spacer></v-spacer>
+					<v-btn
+						color="primary"
+						text
+						@click="dialog = false"
+					>
+						ok
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+			</v-dialog>
+		</div>
 		<div id="page" class="site">
 			<div class="container">
 				<div class="login">
@@ -11,14 +43,14 @@
 				<div class="main">
 					<form action="" onsubmit="return false">
 						<p>
-							<input type="text" v-model="username" placeholder="学号">
+							<input type="text" v-model="uid" placeholder="学号">
 						</p>
 						<p class="password">
 							<input :type="type" v-model="pwd" placeholder="密码">
 							<i @click="changeType()" :class="icon_class" aria-hidden="true"></i>
 						</p>
 						<p>
-							<input type="button" @click="login(username,pwd)" class="submit" value="Sign In">
+							<input type="button" @click="login()" class="submit" value="Sign In">
 						</p>
 					</form>
 				</div>
@@ -28,17 +60,39 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
 	data: () => ({
 		Msg: '注册通道暂未开启, 若无账号请联系管理员获取',
-		username: null,
+		uid: null,
 		pwd: null,
 		type: 'password',
 		icon_class: 'fa fa-eye-slash',
+		dialog: false,
+		loginMsg: 'nulllll',
+		loading: false,
 	}),
 	methods: {
-		login(username, pwd) {
-			alert("用户" + username);
+		login() {
+			let _this = this;
+			this.loading = true;
+			axios.post('/api/login', { "uid": parseInt(_this.uid), "pwd": _this.pwd })
+				.then((resp) => {
+					let _data = resp.data;
+					this.loading = false;
+					// 登录通过
+					if (_data.code == 20001) {
+						localStorage.setItem('token', JSON.stringify(_data));
+						_this.$router.replace({path:'/Course'})
+					} else {
+						this.loginMsg = _data.msg;
+						this.dialog = true;
+					}
+				}).catch((err) => {
+					this.loginMsg = "发生了一些错误QAQ, 请联系管理员修复" + err.message
+					this.loading = false;
+					this.dialog = true;
+				})
 		},
 		changeType() {
 			if (this.type === 'password') {
@@ -128,12 +182,17 @@ export default {
 	}
 	.main{
 		flex: 1 0 33.3333%;
+		flex-direction: row;
+		flex-wrap:nowrap;
 
 	}
 	.main form{
 		display: flex;
+		/* flex-direction: column; */
 		flex-direction: column;
+		flex-wrap:nowrap;
 		gap:30px;
+		min-width: 200px;
 	}
 	.main form p{
 		position: relative;

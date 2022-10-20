@@ -1,8 +1,17 @@
 <template>
 	<!-- background-color: aqua; -->
-  <v-app style="background: #f4f5fc; ">
+  <v-app style="background: #f4f5fc;">
+
 	<SideBar/>
 	<Navbar/>
+	<v-snackbar
+		v-model="snackbar"
+		top
+		color="brown"
+		dense
+		>
+		欢迎回来, sb
+	</v-snackbar>
 	<v-main style="overflow:auto">
 		<router-view></router-view>
 	</v-main>
@@ -20,6 +29,25 @@ export default {
 		SideBar,
 		Navbar
 	},
+	data() {
+		return {
+			token: '',
+			snackbar: false,
+
+		}
+	},
+	created() {
+		JSON.parse(window.localStorage.getItem('token')).data
+		
+		setTimeout(() => {
+			this.snackbar = true;
+			setTimeout(() => {
+				this.snackbar = false;
+				
+			}, 2000)
+		},500)
+	
+	}
 }
 
 </script>

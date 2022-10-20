@@ -14,6 +14,8 @@
 
 			</v-col>
 			<v-col cols="12" sm="4">
+				<CourseTable/>
+				v-s
 				<TodoList/>
 			</v-col>
 
@@ -33,6 +35,7 @@
 <script>
 import Course from "../../components/Course.vue";
 import TodoList from "@/components/TodoList.vue";
+import CourseTable from "@/components/CourseTable.vue";
   export default {
     data: () => ({
 		  courses: [
@@ -44,7 +47,7 @@ import TodoList from "@/components/TodoList.vue";
 			// {Name:'软件工程2002', id:5, TeacherName:'许正韬', Time:'2022/07/20 - 2023/07/21'}
 		]
     }),
-    components: { Course, TodoList }
+    components: { Course, TodoList, CourseTable }
 }
 </script>
 

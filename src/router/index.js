@@ -30,7 +30,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes
+	base:'/TEEE',
+  	routes
 })
 
 export default router
