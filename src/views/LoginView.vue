@@ -2,7 +2,6 @@
 	<div id="body">
 		<v-overlay
 				:absolute="absolute"
-				:value="overlay"
 				v-if="loading"
 			>
 				<v-progress-circular
@@ -12,25 +11,9 @@
 				<div class="text-center">Loading...</div>
 			</v-overlay>
 		<div class="text-center">
-			<v-dialog
-			v-model="dialog"
-			width="200"
-			>
-			<v-card>
-				<v-card-title v-text="loginMsg" class="headline brown--text text-body-1"></v-card-title>
-				<v-divider></v-divider>
-				<v-card-actions>
-				<v-spacer></v-spacer>
-					<v-btn
-						color="primary"
-						text
-						@click="dialog = false"
-					>
-						ok
-					</v-btn>
-				</v-card-actions>
-			</v-card>
-			</v-dialog>
+			<v-snackbar dense timeout="1000" v-model="snackbar" top>
+				{{ loginMsg }}
+			</v-snackbar>
 		</div>
 		<div id="page" class="site">
 			<div class="container">
@@ -43,10 +26,10 @@
 				<div class="main">
 					<form action="" onsubmit="return false">
 						<p>
-							<input type="text" v-model="uid" placeholder="学号">
+							<input type="text" v-model="uid" placeholder="学号" @keypress.enter="login()">
 						</p>
 						<p class="password">
-							<input :type="type" v-model="pwd" placeholder="密码">
+							<input :type="type" v-model="pwd" placeholder="密码" @keypress.enter="login()">
 							<i @click="changeType()" :class="icon_class" aria-hidden="true"></i>
 						</p>
 						<p>
@@ -68,13 +51,18 @@ export default {
 		pwd: null,
 		type: 'password',
 		icon_class: 'fa fa-eye-slash',
-		dialog: false,
-		loginMsg: 'nulllll',
 		loading: false,
+		loginMsg: 'nullll',
+		snackbar: false
 	}),
 	methods: {
 		login() {
 			let _this = this;
+			if (this.uid == null || this.pwd == null) {
+				this.loginMsg = '请输入用户名和密码';
+				this.snackbar = true;
+				return;
+			}
 			this.loading = true;
 			axios.post('/api/login', { "uid": parseInt(_this.uid), "pwd": _this.pwd })
 				.then((resp) => {
@@ -86,12 +74,12 @@ export default {
 						_this.$router.replace({path:'/Course'})
 					} else {
 						this.loginMsg = _data.msg;
-						this.dialog = true;
+						this.snackbar = true;
 					}
 				}).catch((err) => {
-					this.loginMsg = "发生了一些错误QAQ, 请联系管理员修复" + err.message
 					this.loading = false;
-					this.dialog = true;
+					this.loginMsg = "发生了一些错误QAQ, 请联系管理员修复" + err.message
+					this.snackbar = true;
 				})
 		},
 		changeType() {

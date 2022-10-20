@@ -15,7 +15,8 @@
 			</v-col>
 			<v-col cols="12" sm="4">
 				<CourseTable/>
-				v-s
+				<div style="height:20px"></div> 
+				
 				<TodoList/>
 			</v-col>
 

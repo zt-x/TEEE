@@ -29,6 +29,27 @@ const routes = [
 	},
 ]
 
+// router.beforeEach((to, from, next) => {
+// 	if (to.path.startsWith('/login')) {
+// 		window.localStorage.removeItem('token');
+// 		next();
+// 	} else {
+// 		let token = JSON.parse(window.localStorage.getItem('token')).data;
+// 		if (!token) {
+// 			next({path: '/login'})
+// 		} else {
+// 			axios({
+// 				url: '/api/checkToken',
+// 				method: 'get',
+// 				header: {
+// 					token:token
+// 				}
+// 			})
+// 		}
+// 	}
+// })
+
+
 const router = new VueRouter({
 	base:'/TEEE',
   	routes

@@ -9,6 +9,7 @@
 		top
 		color="brown"
 		dense
+		timeout="2000"
 		>
 		欢迎回来, sb
 	</v-snackbar>
@@ -22,6 +23,7 @@
 
 import SideBar from '@/components/SideBar.vue';
 import Navbar from '@/components/Navbar.vue';
+import axios from 'axios'
 export default {
 	name: 'Home',
 
@@ -33,20 +35,28 @@ export default {
 		return {
 			token: '',
 			snackbar: false,
-
+			user: {
+				uid: 0,
+				username: '',
+				avatar: '',
+			},
 		}
 	},
 	created() {
-		JSON.parse(window.localStorage.getItem('token')).data
-		
-		setTimeout(() => {
-			this.snackbar = true;
-			setTimeout(() => {
-				this.snackbar = false;
-				
-			}, 2000)
-		},500)
-	
+		this.snackbar = true;
+		let token = JSON.parse(window.localStorage.getItem('token')).data;
+		const _axios = axios.create();
+		_axios.interceptors.request.use(
+			function (config) {
+				config.headers = {
+					Authorization: token
+				}
+				return config;
+			}
+		);
+		_axios.post('/api/h').then((res) => {
+			
+		})
 	}
 }
 

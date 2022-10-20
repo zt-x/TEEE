@@ -2,24 +2,12 @@
 	<v-card max-height="800px" style="overflow-y: auto;overflow-x: hidden;">
 		<v-row>
 			
-			<v-card-title class="mx-auto">
-				<!-- <i class="fa fa-list-ul" aria-hidden="true"></i> -->
+			<v-card-title class="mx-auto overline">
 				<v-icon left small color="black">fa fa-calendar-check</v-icon>
 				 Todo List</v-card-title>
 		</v-row>
-		<!-- <div class="mx-auto" style="width:80%;text-align: center;">-----</div> -->
 		<v-divider></v-divider>
-		<!-- <v-row></v-row> -->
 		<div class="mx-auto mt-5" style="width:100%;">
-			<!-- <v-subheader>
-				<v-icon
-					left
-					small
-					color="red"
-				>
-					fa fa-pencil
-				</v-icon>
-				考试</v-subheader> -->
 			<TodoListItem v-for="(item, i) in TodoDatas" v-bind:key="i" :TodoData="TodoDatas[i]"/>
 		</div>
 

@@ -27,7 +27,7 @@
 	<div style="position:absolute;bottom:20px;margin-left:auto;margin-right: auto;left:0;right:0;text-align: center;">
 		<v-icon color="white" class="mb-5">fas fa-cog</v-icon>
 		<br />
-		<v-icon color="white">fas fa-info-circle</v-icon>
+		<v-icon color="white" @click="aboutUS()" hover>fas fa-info-circle</v-icon>
 	</div>
   </v-navigation-drawer>
 </template>
@@ -35,12 +35,14 @@
 <script>
 export default {
 	data: () => ({
+		aboutView:false,
 		mini_variant:true,
 		selectedItem:2,
 		drawer: null,
 		items: [
 			{icon: "fas fa fa-list-alt",name:'我的课程'},
 			{icon: "fas fa-bar-chart",name:'数据统计'},
+			{icon: "fas fa-bar-chart",name:'数据统计2'},
 		],
 		src_logo: {
 			small: 'logo.png',
@@ -50,14 +52,17 @@ export default {
 		}
 	}),
 	methods: {
-		test() {
-			console.log("click")
+		aboutUS() {
+			
 		}
 	}
 }
 </script>
 
 <style scoped>
+.border{
+	background-color: #875438;
+}
 .v-list-item{
 	margin:12px;
 	text-decoration: none;
