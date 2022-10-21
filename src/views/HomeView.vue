@@ -1,8 +1,8 @@
 <template>
 	<!-- background-color: aqua; -->
-  <v-app style="background: #f4f5fc;">
+  <v-app style="background: #f4f5fc; background-color: aqua;">
 
-	<SideBar/>
+	<SideBar :key="new Date().getTime()"/>
 	<Navbar/>
 	<v-snackbar
 		v-model="snackbar"
@@ -11,7 +11,7 @@
 		dense
 		timeout="2000"
 		>
-		欢迎回来, sb
+		欢迎回来，{{user.username}}
 	</v-snackbar>
 	<v-main style="overflow:auto">
 		<router-view></router-view>
@@ -23,7 +23,10 @@
 
 import SideBar from '@/components/SideBar.vue';
 import Navbar from '@/components/Navbar.vue';
+import { mapState } from 'vuex';
+import {resetRouter, setRouter} from '@/router'
 import axios from 'axios'
+
 export default {
 	name: 'Home',
 
@@ -41,10 +44,19 @@ export default {
 				avatar: '',
 			},
 		}
+	},	
+	computed: mapState([
+		"userInfo"
+	]),
+	mounted() {
+
+
 	},
 	created() {
-		this.snackbar = true;
-		let token = JSON.parse(window.localStorage.getItem('token')).data;
+		let _this = this;
+		//配置路由
+		resetRouter();
+		let token = window.localStorage.getItem('token');
 		const _axios = axios.create();
 		_axios.interceptors.request.use(
 			function (config) {
@@ -54,10 +66,23 @@ export default {
 				return config;
 			}
 		);
-		_axios.post('/api/h').then((res) => {
-			
+
+		// 初始化用户信息
+		_axios.post('/api/power').then((res) => {
+			let data_ = res.data;
+			console.log(data_);
+			_this.$store.commit('updateUserInfo', JSON.stringify({username:data_.data.username, role:data_.data.role, avatar:data_.data.role}));
+			let routers = eval('(' + data_.data.routers + ')');
+			sessionStorage.setItem('serverRoutes', JSON.stringify(routers));
+			setRouter(routers);
+			console.log("userInfo:" + this.userInfo);
+			let u = JSON.parse(this.userInfo);
+			_this.user.username = u.username;
+			_this.user.avatr = u.avatar;
+			_this.snackbar = true;
+
 		})
-	}
+	} 
 }
 
 </script>

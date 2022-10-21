@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-
+import NProgress from "nprogress"
+import 'nprogress/nprogress.css'
 Vue.use(VueRouter)
 
 const routes = [
@@ -14,45 +15,87 @@ const routes = [
 		name: 'home',
 		component: () => import('../views/HomeView.vue'),
 		children: [
-			//课程页面 
-			{
-				path: 'Course',
-				name: 'Course',
-				component:()=>import('../views/HomeView/CourseView.vue')
-			},
-			{
-				path: 'Statistics',
-				name: 'Statistics',
-				component:()=>import('../views/HomeView/StatisticsView.vue')
-			},
+			// //课程页面 
+			// {
+			// 	path: 'Course',
+			// 	name: 'Course',
+			// 	component:()=>import('../views/HomeView/CourseView.vue')
+			// },
+			// {
+			// 	path: 'Statistics',
+			// 	name: 'Statistics',
+			// 	component:()=>import('../views/HomeView/StatisticsView.vue')
+			// },
 		]
 	},
+	{
+		path:'/404',
+		name: '404 Not Found',
+		component:()=>import('@/views/404.vue')
+	},
+	{
+		path: '*',
+		redirect:'/404',
+	}
 ]
-
-// router.beforeEach((to, from, next) => {
-// 	if (to.path.startsWith('/login')) {
-// 		window.localStorage.removeItem('token');
-// 		next();
-// 	} else {
-// 		let token = JSON.parse(window.localStorage.getItem('token')).data;
-// 		if (!token) {
-// 			next({path: '/login'})
-// 		} else {
-// 			axios({
-// 				url: '/api/checkToken',
-// 				method: 'get',
-// 				header: {
-// 					token:token
-// 				}
-// 			})
-// 		}
-// 	}
-// })
-
 
 const router = new VueRouter({
 	base:'/TEEE',
   	routes
 })
+const serverRoutes = sessionStorage.getItem('serverRoutes');
+if (serverRoutes) {
+	const arr = JSON.parse(serverRoutes);
+	setRouter(arr);
+}
+
+router.beforeEach((to, from, next) => {
+	//验证token存在，则进入该页面
+	NProgress.start();
+	if (to.path == '/login') {
+		localStorage.setItem('token', '');
+		sessionStorage.setItem('serverRoutes', '');
+	}
+	if (localStorage.getItem('token')) {
+		next();
+	} else { 
+		if (to.path === "/login") {
+			next();
+		} else {
+			next("/login");
+		}
+	}
+	NProgress.set(1);
+});
+
+router.afterEach((to,from,nex)=>{
+	NProgress.set(1);
+})
+
+
+export function resetRouter() {
+	router.matcher = new VueRouter({routes}).matcher
+}
+export function setRouter(routers) {
+	for (const { name, path, component, icon } of routers) {
+		console.log(component);
+		if (path != null) {
+			router.addRoute('home', {
+				path: path,
+				name: name,
+				component: () => import(`@/views/HomeView/${component}`),
+				// component: (resolve) => require([`@/views/HomeView/${component}`], resolve)
+				
+			});
+			// let item = {
+			// 	name:name,
+			// 	path:path,
+			// 	component:component,
+			// 	icon:icon,
+			// }
+		}
+	}
+	console.log(router.getRoutes());
+}
 
 export default router

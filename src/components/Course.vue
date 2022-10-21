@@ -4,7 +4,7 @@
 		max-width="300"
 		min-width="100"
 		max-height="300px"
-		hover="8"
+		:hover="hover"
 		ripple
 	>
 		<v-img
@@ -47,7 +47,7 @@
 export default {
 	props: ['Course'],
 	data: () => ({
-		
+		hover: true,
 	}),
 }
 </script>

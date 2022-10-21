@@ -6,7 +6,7 @@
 		<template v-slot:activator>
 			<v-list-item-subtitle><span style="color:#875438;	font-weight: 700;">★</span> 考试</v-list-item-subtitle>
 		</template>
-		<v-list-item v-for="(Exams) in TodoData.Exams" v-bind:key="Exams.examID" v-ripple="{class:'warning--text'}" class="item">
+		<v-list-item v-for="Exams in TodoData.Exams" :key="Exams.examID" v-ripple="{class:'warning--text'}" class="item">
 			<v-list-item-icon>
 				<v-icon right small>fa fa-pencil</v-icon>
 			</v-list-item-icon>

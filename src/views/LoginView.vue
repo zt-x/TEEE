@@ -1,7 +1,6 @@
 <template>
 	<div id="body">
 		<v-overlay
-				:absolute="absolute"
 				v-if="loading"
 			>
 				<v-progress-circular
@@ -70,12 +69,15 @@ export default {
 					this.loading = false;
 					// 登录通过
 					if (_data.code == 20001) {
-						localStorage.setItem('token', JSON.stringify(_data));
-						_this.$router.replace({path:'/Course'})
+						window.localStorage.setItem('token', _data.data)
+						_this.$router.replace({ path: '/' })
 					} else {
 						this.loginMsg = _data.msg;
 						this.snackbar = true;
 					}
+
+
+
 				}).catch((err) => {
 					this.loading = false;
 					this.loginMsg = "发生了一些错误QAQ, 请联系管理员修复" + err.message

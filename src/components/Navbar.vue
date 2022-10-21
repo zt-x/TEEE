@@ -14,7 +14,7 @@
 		<v-card>
 			<v-card-title style="font-size:medium">请输入课程邀请码</v-card-title>
 			<v-card-subtitle>
-				<input type="text" v-model="username" placeholder="Course Key"/>
+				<input type="text" v-model="CourseKey" placeholder="Course Key"/>
 			</v-card-subtitle>
 			<v-card-actions>
 				<v-spacer></v-spacer>

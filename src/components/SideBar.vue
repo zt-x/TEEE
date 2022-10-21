@@ -9,7 +9,7 @@
 
 	<v-list flat class="mt-16">
 		<v-list-item-group v-model="selectedItem" color="primary">
-			<v-list-item v-for="(item, i) in items" :key="i" active-class="border" v-ripple="{ class: `brown--text` }" @click="test()">
+			<v-list-item v-for="(item, i) in items" v-bind:key="i" active-class="border" v-ripple="{ class: `brown--text` }" @click="changePage(item.path)">
 				<v-tooltip right>
 					<template v-slot:activator="{ on, attrs }">
 						<v-list-item-icon v-bind="attrs" v-on="on">
@@ -40,9 +40,9 @@ export default {
 		selectedItem:2,
 		drawer: null,
 		items: [
-			{icon: "fas fa fa-list-alt",name:'我的课程'},
-			{icon: "fas fa-bar-chart",name:'数据统计'},
-			{icon: "fas fa-bar-chart",name:'数据统计2'},
+			// {icon: "fas fa fa-list-alt",name:'我的课程', path:'/Course'},
+			// {icon: "fas fa-bar-chart",name:'数据统计', path:'/Statistics'},
+			// {icon: "fas fa-bar-chart",name:'数据统计2', path:''},
 		],
 		src_logo: {
 			small: 'logo.png',
@@ -54,8 +54,23 @@ export default {
 	methods: {
 		aboutUS() {
 			
+		},
+		changePage(url) {
+
+			this.$router.push(url).catch((err) => {
+				this.$router.push('/404');
+			})
+
 		}
-	}
+	},
+
+	created() {
+
+	},
+	mounted() {
+		this.items = JSON.parse(sessionStorage.getItem('serverRoutes'))
+	},
+
 }
 </script>
 
