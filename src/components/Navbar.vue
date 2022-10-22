@@ -4,11 +4,11 @@
 	<v-spacer></v-spacer>
 	<h4 class="brown--text text--lighten">User info</h4>
 	<v-icon x-small color="red" class="ml-2 mr-2">fas fa-caret-down</v-icon>
-	<v-btn color="#a36645" class="withoutupercase" @click.stop="dialog = true">
+	<v-btn color="#a36645" class="withoutupercase" @click.stop="openCourseDialog()">
 		<v-icon left>fas fa-plus</v-icon>Add Course
 	</v-btn> 
 	<v-dialog
-      v-model="dialog"
+      v-model="dialog_stu"
       max-width="290"
     >
 		<v-card>
@@ -28,14 +28,12 @@
 				<v-btn
 					color="brown darken-1"
 					text
-					@click="dialog=false"
+					@click="dialog_stu=false"
 				>
 					取消
 				</v-btn>
 			</v-card-actions>
 			<v-overlay
-				:absolute="absolute"
-				:value="overlay"
 				v-if="loading"
 			>
 				<v-progress-circular
@@ -47,39 +45,136 @@
 
 		</v-card>
 	</v-dialog>                                                                                                                                                                     
+	<v-dialog
+      v-model="dialog_tea"
+      max-width="290"
+    >
+		<v-card>
+			<v-card-title style="font-size:medium">创建新课程</v-card-title>
+			<v-card-subtitle>
+				<input type="text" v-model="CourseKey" placeholder="Course Key"/>
+			</v-card-subtitle>
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn
+					color="brown darken-1"
+					text
+					@click="createCourse()"
+				>
+					创建
+				</v-btn>
+				<v-btn
+					color="brown darken-1"
+					text
+					@click="dialog_tea=false"
+				>
+					取消
+				</v-btn>
+			</v-card-actions>
+			<v-overlay
+				v-if="loading"
+			>
+				<v-progress-circular
+					indeterminate
+					color="primary"
+				></v-progress-circular>
+				<div class="mx-auto">{{loadingText}}</div>
+			</v-overlay>
+
+		</v-card>
+	</v-dialog>
 	<v-badge dot overlap color="green" class="ml-3 mr-2" dark>
-		<v-avatar tile color="#ffe9b3">
+		<v-avatar color="#ffe9b3">
 			<v-icon color="#875438">fas fa-bell</v-icon>
 		</v-avatar>
 	</v-badge>
-	<v-avatar tile color="#e5f1ff">
-		<v-img src="dog.png" width="40px"></v-img>
+	<v-avatar color="#e5f1ff" :key="new Date().getTime()">
+		<v-img :src="_avatar" width="40px"></v-img>
 	</v-avatar>
+	<v-snackbar 
+		v-model="snackbar"
+		top
+		:color="snackbar_color"
+		dense="true"
+		timeout="2000">
+		{{msg}}
+	</v-snackbar>
   </v-app-bar>
 </template>
 
 <script>
+import axios from 'axios'
+const _axios = axios.create();
+const token = window.localStorage.getItem('token');
+
 export default {
+	props:['role', '_avatar'],
 	data: () => ({
-		dialog: false,
+		dialog_stu: false,
+		dialog_tea: false,
 		CourseKey: '',
 		loading: false,
 		loadingText: '',
 		snackbar: false,
-		user: {
-			uid:'',
-			username:''
-		}
+		snackbar_color:'success',
+		msg:''
 	}),
 	methods: {
-		AddCourse(CourseKey) {
+		
+		AddCourse() {
 			this.loadingText = 'Loading ...'
 			this.loading = true;
-			setTimeout(() => {
-				this.loading = false;
-			},3000)
+			let _this = this;
+			if (this.CourseKey.length > 0) {
+				const form = new FormData();
+				form.append('cid', this.CourseKey);
+				_axios.post('/api/Course/addCourse', form).then((res) => {
+					_this.msg = res.data.msg;
+					if (res.data.code == 2) {
+						_this.snackbar_color = 'success';
+					} else {
+						_this.snackbar_color = 'error';	
+					}
+					_this.loading = false;
+					_this.snackbar = true;
+				}).catch((err) => {
+					
+				});
+			} else {
+				_this.loading = false;
+				_this.snackbar_color = 'warning';
+				_this.msg = "请输入Course Key";
+				_this.snackbar = true;
+			}
+
+		},
+		openCourseDialog() {
+			if (this.role === 'teacher') {
+				this.dialog_tea = true;
+			} else if (this.role === 'student') {
+				this.dialog_stu = true;
+				
+			} else if (this.role === 'admin') {
+				alert('You are admin');
+			} else {
+				alert("未知身份错误" + this.role);
+				this.$router.replace('/login');
+			}
+		},
+		createCourse() {
+			
 		}
 	},
+	created() {
+		_axios.interceptors.request.use(
+			function (config) {
+				config.headers = {
+					Authorization: token
+				}
+				return config;
+			}
+		);
+	}
 
 }
 </script>
