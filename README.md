@@ -1,5 +1,5 @@
 # <img width="25px" src="https://user-images.githubusercontent.com/73433437/195987108-7c6d832b-cf98-4967-a18b-f191f5374f29.png"></img> TEEE学习平台
-
+**【*】此为前端部分，后端部分仓库地址https://github.com/DearXuZ/TEEE_-**
 界面简洁且功能完善，更符合使用场景的作业管理系统<br/>
 
 基于SSM架构，Nginx做反向代理和负载均衡,<br/> 使用SpringCache配合Redis、主从SQL 缓存减轻数据库压力,<br/> 
