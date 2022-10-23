@@ -56,11 +56,11 @@ export default {
 			
 		},
 		changePage(url) {
-
 			this.$router.push(url).catch((err) => {
-				this.$router.push('/404');
+				if (err.message.indexOf("Avoided redundant navigation to current location") == -1) {
+					this.$router.push('/404');	
+				}
 			})
-
 		}
 	},
 
