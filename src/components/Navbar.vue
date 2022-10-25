@@ -19,7 +19,6 @@
             class="mt-5"
             label="课程ID"
             hint="请输入教师提供的课程ID"
-            dense
           ></v-text-field>
         </v-card-subtitle>
         <v-card-actions>
@@ -220,8 +219,8 @@ export default {
             }
             _this.loading = false;
             _this.dialog_stu = false;
-
             _this.snackbar = true;
+            _this.$router.replace({ path: "/Flush", params: { path: "/Course" } });
           })
           .catch((err) => {
             _this.msg = "ERR: " + err;
@@ -229,6 +228,7 @@ export default {
             _this.loading = false;
             _this.snackbar = true;
             _this.dialog_stu = false;
+            _this.$router.replace({ path: "/Flush", params: { path: "/Course" } });
           });
       } else {
         _this.loading = false;
@@ -262,7 +262,6 @@ export default {
           startTime: _this.form_startTime,
           endTime: _this.form_endTime,
         };
-        console.log(d);
         _axios.post("/api/Course/createCourse", d).then((res) => {
           let _res = res.data;
           if (_res.code == 2) {
@@ -285,17 +284,6 @@ export default {
       return config;
     });
   },
-  mounted() {
-    if (this.role === "teacher") {
-      this.$router.replace("/CourseAdmin");
-    } else if (this.role === "student") {
-      this.$router.replace("/Course");
-    } else if (this.role === "admin") {
-      // this.$router.replace('/login');
-    } else {
-      this.$router.replace("/login");
-    }
-  },
 };
 </script>
 
@@ -303,29 +291,4 @@ export default {
 .v-btn.withoutupercase {
   text-transform: none !important;
 }
-/* input{
-	margin-top: 15px;
-	font: inherit;
-	font-size: 14px;
-	width:100%;
-	border: 0;
-	outline: 0;
-	line-height: 30px;
-	border-radius: 10px;
-	padding-left: 20px;
-	box-shadow: #a36645 0 5px 5px -1px;
-
-}
-input:hover{
-	transition: all .5s;
-	box-shadow: #a36645 0 3px 5px -1px;
-
-}
-input::placeholder{
-	color: grey;
-	font-size: inherit;
-}
-input:not(.submit){
-	background-color: hsl(43, 36%, 86%);
-} */
 </style>

@@ -15,17 +15,16 @@ const routes = [
 		name: 'home',
 		component: () => import('../views/HomeView.vue'),
 		children: [
-			// //课程页面 
-			// {
-			// 	path: 'Course',
-			// 	name: 'Course',
-			// 	component:()=>import('../views/HomeView/CourseView.vue')
-			// },
-			// {
-			// 	path: 'Statistics',
-			// 	name: 'Statistics',
-			// 	component:()=>import('../views/HomeView/StatisticsView.vue')
-			// },
+			{
+				path: 'Start',
+				name: 'Start',
+				component:()=>import('../views/HomeView/WelcomeView.vue')
+			},
+			{
+				path:'/Flush',
+				name: 'flush',
+				component:()=>import('@/views/Flush.vue')
+			},
 		]
 	},
 	{
@@ -33,6 +32,7 @@ const routes = [
 		name: '404 Not Found',
 		component:()=>import('@/views/404.vue')
 	},
+
 	{
 		path: '*',
 		redirect:'/404',
@@ -43,6 +43,8 @@ const router = new VueRouter({
 	base:'/TEEE',
   	routes
 })
+
+
 const serverRoutes = sessionStorage.getItem('serverRoutes');
 if (serverRoutes) {
 	const arr = JSON.parse(serverRoutes);
@@ -78,7 +80,6 @@ export function resetRouter() {
 }
 export function setRouter(routers) {
 	for (const { name, path, component, icon } of routers) {
-		console.log(component);
 		if (path != null) {
 			router.addRoute('home', {
 				path: path,
@@ -95,7 +96,6 @@ export function setRouter(routers) {
 			// }
 		}
 	}
-	console.log(router.getRoutes());
 }
 
 export default router
