@@ -3,8 +3,8 @@
 		<v-col></v-col>
 	</v-row> -->
 	<!-- <Course  :CourseName="course.name" :CourseID="course.id"></Course> -->
-	<v-container>
-		<v-row>
+	<v-container style="margin-left:0">
+		<v-row style="min-width:980px">
 			<v-col cols="12" sm="8">
 				<v-row>
 					<v-col v-for="(course, i) in courses" v-bind:key="i" cols="12" sm="4">
@@ -14,10 +14,10 @@
 
 			</v-col>
 			<v-col cols="12" sm="4">
-				<CourseTable/>
+				<CourseTable style="min-width:400px"/>
 				<div style="height:20px"></div> 
 				
-				<TodoList/>
+				<TodoList style="min-width:400px"/>
 			</v-col>
 
 		</v-row>

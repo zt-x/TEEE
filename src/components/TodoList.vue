@@ -1,5 +1,5 @@
 <template>
-	<v-card max-height="800px" style="overflow-y: auto;overflow-x: hidden;">
+	<v-card max-height="400px" style="overflow-y: auto;overflow-x: hidden;">
 		<v-row>
 			
 			<v-card-title class="mx-auto overline">

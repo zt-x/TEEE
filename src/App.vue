@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <router-view/>
+      <router-view style="overflow-x:auto"/>
     </v-main>
   </v-app>
 </template>

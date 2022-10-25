@@ -1,21 +1,23 @@
 <template>
 	<!-- background-color: aqua; -->
-  <v-app style="background: #f4f5fc; background-color: aqua;">
+  <v-app style="background: #f4f5fc;">
 
-	<SideBar :key="new Date().getTime()"/>
-	<Navbar/>
+	<SideBar :key="new Date().getTime()" v-if="nb"/>
+	<Navbar :role="user.role" :_avatar="user.avatar" v-if="sb" :key="new Date().getTime()"/>
 	<v-snackbar
 		v-model="snackbar"
 		top
-		color="brown"
-		dense
+		color="success"
+		dense="true"
 		timeout="2000"
 		>
 		欢迎回来，{{user.username}}
 	</v-snackbar>
-	<v-main style="overflow:auto">
+	<v-main style="min-width:1200px">
 		<router-view></router-view>
 	</v-main>
+	<v-btn fixed small right bottom fab>
+	</v-btn>
   </v-app>                 
 </template>
 
@@ -43,15 +45,14 @@ export default {
 				username: '',
 				avatar: '',
 			},
+			nb: false,
+			sb: false,
 		}
 	},	
+
 	computed: mapState([
 		"userInfo"
 	]),
-	mounted() {
-
-
-	},
 	created() {
 		let _this = this;
 		//配置路由
@@ -71,18 +72,21 @@ export default {
 		_axios.post('/api/power').then((res) => {
 			let data_ = res.data;
 			console.log(data_);
-			_this.$store.commit('updateUserInfo', JSON.stringify({username:data_.data.username, role:data_.data.role, avatar:data_.data.role}));
+			_this.$store.commit('updateUserInfo', JSON.stringify({ username: data_.data.username, role: data_.data.role, avatar: data_.data.avatar }));
+			// sessionStorage.setItem('userInfo')
 			let routers = eval('(' + data_.data.routers + ')');
 			sessionStorage.setItem('serverRoutes', JSON.stringify(routers));
 			setRouter(routers);
 			console.log("userInfo:" + this.userInfo);
 			let u = JSON.parse(this.userInfo);
 			_this.user.username = u.username;
-			_this.user.avatr = u.avatar;
+			_this.user.avatar = u.avatar;
+			_this.user.role = u.role;
 			_this.snackbar = true;
-
+			_this.nb = true;
+			_this.sb = true;
 		})
-	} 
+	},
 }
 
 </script>
