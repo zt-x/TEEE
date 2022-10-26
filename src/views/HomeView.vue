@@ -1,6 +1,6 @@
 <template>
   <!-- background-color: aqua; -->
-  <v-app style="background: #f4f5fc; background-color: aqua">
+  <v-app style="background: #f4f5fc;">
     <SideBar :key="new Date().getTime() + 1" v-if="nb" />
     <Navbar
       :role="user.role"
@@ -19,7 +19,7 @@
     >
       欢迎回来，{{ user.username }}
     </v-snackbar>
-    <v-main style="min-width: 1200px">
+    <v-main style="min-width: 1200px;padding: 64px">
       <router-view></router-view>
     </v-main>
     <v-btn fixed small right bottom fab></v-btn>
@@ -81,7 +81,8 @@ export default {
       );
       // sessionStorage.setItem('userInfo')
       let routers = eval("(" + data_.data.routers + ")");
-      sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
+		sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
+		console.log(routers);
       setRouter(routers);
       let u = JSON.parse(this.userInfo);
       _this.user.username = u.username;

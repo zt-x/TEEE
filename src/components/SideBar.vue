@@ -92,7 +92,6 @@ export default {
   mounted() {
     this.items = JSON.parse(sessionStorage.getItem("serverRoutes"));
     this.items = this.items.filter((item) => {
-      console.log(this.items);
       return item.hide == "true";
     });
   },
