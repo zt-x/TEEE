@@ -153,6 +153,7 @@
         </v-overlay>
       </v-card>
     </v-dialog>
+
     <v-badge dot overlap color="green" class="ml-3 mr-2" dark>
       <v-avatar color="#ffe9b3">
         <v-icon color="#875438">fas fa-bell</v-icon>
@@ -176,7 +177,7 @@
 <script>
 import axios from "axios";
 const _axios = axios.create();
-const token = window.localStorage.getItem("token");
+let token = window.localStorage.getItem("token");
 
 export default {
   props: ["role", "_avatar"],
@@ -200,6 +201,9 @@ export default {
     form_startTime: "",
     form_endTime: "",
   }),
+  created() {
+    token = localStorage.getItem("token");
+  },
   methods: {
     AddCourse() {
       this.loadingText = "Loading ...";
@@ -220,7 +224,7 @@ export default {
             _this.loading = false;
             _this.dialog_stu = false;
             _this.snackbar = true;
-            _this.$router.replace({ path: "/Flush", params: { path: "/Course" } });
+            // _this.$router.replace({ path: "Flush", params: { path: "Course" } });
           })
           .catch((err) => {
             _this.msg = "ERR: " + err;
@@ -228,7 +232,6 @@ export default {
             _this.loading = false;
             _this.snackbar = true;
             _this.dialog_stu = false;
-            _this.$router.replace({ path: "/Flush", params: { path: "/Course" } });
           });
       } else {
         _this.loading = false;
@@ -251,6 +254,7 @@ export default {
     },
     createCourse() {
       let _this = this;
+      this.loading = true;
       let bool = this.$refs.form.validate();
       if (!bool) {
         return;
@@ -262,17 +266,29 @@ export default {
           startTime: _this.form_startTime,
           endTime: _this.form_endTime,
         };
-        _axios.post("/api/Course/createCourse", d).then((res) => {
-          let _res = res.data;
-          if (_res.code == 2) {
-            _this.snackbar_color = "success";
-          } else {
+
+        _axios
+          .post("/api/Course/createCourse", d)
+          .then((res) => {
+            let _res = res.data;
+            if (_res.code == 2) {
+              _this.snackbar_color = "success";
+            } else {
+              _this.snackbar_color = "error";
+            }
+            _this.loading = false;
+            _this.dialog_tea = false;
+            _this.msg = _res.msg;
+            _this.snackbar = true;
+            _this.$router.replace({ path: "/Flush", params: { path: "/Course" } });
+          })
+          .catch((err) => {
+            _this.msg = "ERR: " + err;
             _this.snackbar_color = "error";
-          }
-          _this.dialog_tea = false;
-          _this.msg = _res.msg;
-          _this.snackbar = true;
-        });
+            _this.loading = false;
+            _this.snackbar = true;
+            _this.dialog_stu = false;
+          });
       }
     },
   },

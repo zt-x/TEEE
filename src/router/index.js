@@ -21,9 +21,9 @@ const routes = [
 				component:()=>import('../views/HomeView/WelcomeView.vue')
 			},
 			{
-				path:'/Flush',
+				path:'Flush',
 				name: 'flush',
-				component:()=>import('@/views/Flush.vue')
+				component:()=>import('../views/Flush.vue')
 			},
 		]
 	},
@@ -32,11 +32,10 @@ const routes = [
 		name: '404 Not Found',
 		component:()=>import('@/views/404.vue')
 	},
-
-	{
-		path: '*',
-		redirect:'/404',
-	}
+	// {
+	// 	path: '*',
+	// 	redirect:'/404',
+	// }
 ]
 
 const router = new VueRouter({

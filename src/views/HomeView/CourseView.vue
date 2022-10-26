@@ -28,7 +28,7 @@ import TodoList from "@/components/TodoList.vue";
 import CourseTable from "@/components/CourseTable.vue";
 import axios from "axios";
 const _axios = axios.create();
-const token = window.localStorage.getItem("token");
+let token = window.localStorage.getItem("token");
 export default {
   data: () => ({
     courses: [
@@ -46,6 +46,7 @@ export default {
   methods: {},
   mounted() {},
   created() {
+    token = window.localStorage.getItem("token");
     let _this = this;
     // init axios
     _axios.interceptors.request.use(function (config) {

@@ -1,14 +1,22 @@
 <template>
   <!-- background-color: aqua; -->
-  <v-app style="background: #f4f5fc">
-    <SideBar :key="new Date().getTime()" v-if="nb" />
+  <v-app style="background: #f4f5fc; background-color: aqua">
+    <SideBar :key="new Date().getTime() + 1" v-if="nb" />
     <Navbar
       :role="user.role"
       :_avatar="user.avatar"
       v-if="sb"
-      :key="new Date().getTime()"
+      :key="new Date().getTime() + 2"
     />
-    <v-snackbar v-model="snackbar" top color="success" dense="true" timeout="2000">
+    <v-snackbar
+      v-model="snackbar"
+      style="margin-top: 64px"
+      top
+      right
+      color="success"
+      dense="true"
+      timeout="11 00"
+    >
       欢迎回来，{{ user.username }}
     </v-snackbar>
     <v-main style="min-width: 1200px">
@@ -82,6 +90,7 @@ export default {
       _this.snackbar = true;
       _this.nb = true;
       _this.sb = true;
+      console.log(_this.$router.getRoutes());
     });
   },
 };

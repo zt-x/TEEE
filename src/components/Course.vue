@@ -22,7 +22,7 @@
     </v-card-text>
 
     <v-card-actions>
-      <v-btn color="orange" text> 进入课程 </v-btn>
+      <v-btn color="orange" text @click="InterCourse(Course.id)"> 进入课程 </v-btn>
 
       <v-btn color="orange" text> 查看统计 </v-btn>
     </v-card-actions>
@@ -35,6 +35,11 @@ export default {
   data: () => ({
     hover: true,
   }),
+  methods: {
+    InterCourse(cid) {
+      this.$router.push({ name: "CourseContent", params: { courseID: cid } });
+    },
+  },
 };
 </script>
 
