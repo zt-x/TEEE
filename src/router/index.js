@@ -87,12 +87,6 @@ export function setRouter(routers) {
 				// component: (resolve) => require([`@/views/HomeView/${component}`], resolve)
 				
 			});
-			// let item = {
-			// 	name:name,
-			// 	path:path,
-			// 	component:component,
-			// 	icon:icon,
-			// }
 		}
 	}
 }

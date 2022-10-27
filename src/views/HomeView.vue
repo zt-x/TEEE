@@ -1,13 +1,15 @@
 <template>
   <!-- background-color: aqua; -->
   <v-app style="background: #f4f5fc; background-color: aqua">
-    <SideBar :key="new Date().getTime() + 1" v-if="nb" />
-    <Navbar
+    <!-- <SideBar :key="new Date().getTime() + 1" v-if="nb" /> -->
+    <SideBar />
+    <!-- <Navbar
       :role="user.role"
       :_avatar="user.avatar"
       v-if="sb"
       :key="new Date().getTime() + 2"
-    />
+    /> -->
+    <Navbar :role="user.role" :_avatar="user.avatar" />
     <v-snackbar
       v-model="snackbar"
       style="margin-top: 64px"
@@ -19,7 +21,7 @@
     >
       欢迎回来，{{ user.username }}
     </v-snackbar>
-    <v-main style="min-width: 1200px">
+    <v-main style="min-width: 1200px; padding: 64px">
       <router-view></router-view>
     </v-main>
     <v-btn fixed small right bottom fab></v-btn>
