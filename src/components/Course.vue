@@ -37,7 +37,7 @@ export default {
   }),
   methods: {
     InterCourse(cid) {
-      this.$router.push({ name: "CourseContent", params: { courseID: cid } });
+      this.$router.push({ name: "CourseContent", params: { cid: cid } });
     },
   },
 };
