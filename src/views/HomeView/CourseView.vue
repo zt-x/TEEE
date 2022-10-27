@@ -27,6 +27,8 @@ import Course from "../../components/Course.vue";
 import TodoList from "@/components/TodoList.vue";
 import CourseTable from "@/components/CourseTable.vue";
 import axios from "axios";
+import NProgress from "nprogress"
+import 'nprogress/nprogress.css'
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
@@ -46,6 +48,8 @@ export default {
   methods: {},
   mounted() {},
   created() {
+	  NProgress.start();
+	  NProgress.configure({ parent: '#main' });
     token = window.localStorage.getItem("token");
     let _this = this;
     // init axios
@@ -54,12 +58,15 @@ export default {
         Authorization: token,
       };
       return config;
-    });
+	});
+	
     // getCourses
-    _axios.post("/api/Course/getMyCourse").then((res) => {
+	  _axios.post("/api/Course/getMyCourse").then((res) => {
+		NProgress.set(0.8);
       let coursesData = res.data.data;
       let coursesData_arr = eval(coursesData);
-      _this.courses = coursesData_arr;
+		_this.courses = coursesData_arr;
+		NProgress.set(1);
     });
   },
   components: { Course, TodoList, CourseTable },
