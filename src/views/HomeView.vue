@@ -19,7 +19,7 @@
     >
       欢迎回来，{{ user.username }}
     </v-snackbar>
-    <v-main style="min-width: 1200px;padding: 64px">
+    <v-main style="min-width: 1200px;padding: 64px" id="main">
       <router-view></router-view>
     </v-main>
     <v-btn fixed small right bottom fab></v-btn>

@@ -4,11 +4,32 @@
 		<!-- Course WorkPlace -->
 		<v-col cols="12" sm="8">
 			<v-card> 
-				<v-tabs v-model="tabs" centered>
-					<v-tab>作业</v-tab>
-					<v-tab>考试</v-tab>
-					<v-tab>公告</v-tab>
-				</v-tabs>
+				<v-tabs
+					v-model="tab"
+					background-color="transparent"
+					color="basil"
+					>
+					<v-tab
+						v-for="item in items"
+						:key="item"
+					>
+						{{ item }}
+					</v-tab>
+					</v-tabs>
+
+					<v-tabs-items v-model="tab">
+					<v-tab-item
+						v-for="item in items"
+						:key="item"
+					>
+						<v-card
+						color="basil"
+						flat
+						>
+						<v-card-text>{{ text }}</v-card-text>
+						</v-card>
+					</v-tab-item>
+					</v-tabs-items>
 			</v-card>			
 		</v-col>
 		<!-- Course Info -->
@@ -24,7 +45,11 @@
 export default {
 	data() {
 		return {
-			tabs:3,
+			tab: null,
+        items: [
+          '作业', '考试', '公告'
+        ],
+        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
 		}
 	}
 };
