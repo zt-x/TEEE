@@ -11,9 +11,19 @@
           </v-tabs>
 
           <v-tabs-items v-model="tab">
-            <v-tab-item v-for="item in items" :key="item">
+            <v-tab-item :key="item">
               <v-card color="basil" flat>
-                <v-card-text>{{ text }}</v-card-text>
+                <WorksView />
+              </v-card>
+            </v-tab-item>
+            <v-tab-item>
+              <v-card color="basil" flat>
+                <examsView />
+              </v-card>
+            </v-tab-item>
+            <v-tab-item>
+              <v-card color="basil" flat>
+                <Announcement />
               </v-card>
             </v-tab-item>
           </v-tabs-items>
@@ -28,13 +38,16 @@
 </template>
 
 <script>
+import Announcement from "@/components/CourseContentChildren/announcement.vue";
+import examsView from "@/components/CourseContentChildren/examsView.vue";
+import WorksView from "@/components/CourseContentChildren/worksView.vue";
 export default {
+  components: { examsView, Announcement, WorksView },
   data() {
     return {
       tab: null,
       items: ["作业", "考试", "公告"],
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      item_content: ["作业", "考试", "公告"],
     };
   },
 };

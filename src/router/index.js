@@ -78,17 +78,44 @@ export function resetRouter() {
 	router.matcher = new VueRouter({routes}).matcher
 }
 export function setRouter(routers) {
+	let bool_setCourseChildren = false;
 	for (const { name, path, component, icon } of routers) {
 		if (path != null) {
 			router.addRoute('home', {
 				path: path,
 				name: name,
-				component: () => import(`@/views/HomeView/${component}`),
-				// component: (resolve) => require([`@/views/HomeView/${component}`], resolve)
-				
+				component: () => import(`@/views/HomeView/${component}`),	
 			});
 		}
+		// if (name == '我的课程' && bool_setCourseChildren == false) {
+		// 	bool_setCourseChildren = true;
+		// 	router.addRoute('我的课程', {
+		// 		path: "/CourseContent",
+		// 		name: 'CourseContent',
+		// 		component: () => import(`@/views/HomeView/CourseContent.vue`),	
+				
+		// 	});
+		// 	router.addRoute('CourseContent', {
+		// 		path: "/announcement",
+		// 		name: 'announcement',
+		// 		component: () => import(`@/views/HomeView/CourseContentChildren/announcement.vue`),	
+				
+		// 	});
+		// 	router.addRoute('我的课程', {
+		// 		path: "/examsView",
+		// 		name: 'examsView',
+		// 		component: () => import(`@/views/HomeView/CourseContentChildren/examsView.vue`),	
+				
+		// 	});
+		// 	router.addRoute('我的课程', {
+		// 		path: "/worksView",
+		// 		name: 'worksView',
+		// 		component: () => import(`@/views/HomeView/CourseContentChildren/worksView.vue`),	
+				
+		// 	});
+		// }
 	}
+	
 }
 
 export default router

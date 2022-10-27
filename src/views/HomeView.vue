@@ -3,7 +3,7 @@
 
   <v-app style="background: #f4f5fc; background-color: aqua">
     <!-- <SideBar :key="new Date().getTime() + 1" v-if="nb" /> -->
-    <SideBar />
+    <SideBar :key="new Date().getTime() + 1" v-if="nb" />
     <Navbar :role="user.role" :_avatar="user.avatar" />
     <v-snackbar
       v-model="snackbar"
@@ -80,7 +80,6 @@ export default {
       // sessionStorage.setItem('userInfo')
       let routers = eval("(" + data_.data.routers + ")");
       sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
-      console.log(routers);
       setRouter(routers);
       let u = JSON.parse(this.userInfo);
       _this.user.username = u.username;
@@ -89,7 +88,6 @@ export default {
       _this.snackbar = true;
       _this.nb = true;
       _this.sb = true;
-      console.log(_this.$router.getRoutes());
     });
   },
 };
