@@ -1,9 +1,9 @@
 <template>
   <v-card
     class="mx-auto"
-    max-width="300"
+    max-width="400"
     min-width="100"
-    max-height="300px"
+    max-height="400px"
     :hover="hover"
     ripple
   >
