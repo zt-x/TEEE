@@ -13,41 +13,17 @@
 </template>
 
 <script>
-import axios from "axios";
-let token = window.localStorage.getItem("token");
+
 
 export default {
-  props: ["cid"],
+  props: ["works"],
   data() {
 	  return {
-		  works: [
-			{
-				"id": 2,
-				"isExam": 0,
-				"deadline": "veniam ipsum consectetur",
-				"workName": "低至响",
-				"totalScore": 56.0,
-				"workId": 68,
-				"cid": 25
-			}
-		]
+
 	};
-	},
+  },
 	created() {
-		const _axios = axios.create();
-		token = window.localStorage.getItem("token");
-		_axios.interceptors.request.use(function (config) {
-		config.headers = {
-			Authorization: token,
-		};
-		return config;
-		});
-		const form = new FormData();
-		form.append("cid", this.cid);
-		_axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
-			console.log(res.data.data);
-			this.works = res.data.data;
-		});
+
     }
 };
 </script>
