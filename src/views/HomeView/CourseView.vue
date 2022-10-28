@@ -4,6 +4,15 @@
 	</v-row> -->
   <!-- <Course  :CourseName="course.name" :CourseID="course.id"></Course> -->
   <v-container fluid>
+	<v-overlay :value="prepareing_overlay">
+	  <v-chip>
+		<v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
+		<v-spacer></v-spacer>
+	 	<span>正在准备内容 ...</span>
+	  </v-chip>
+
+	  <!-- <v-text>正在准备内容 ... </v-text> -->
+    </v-overlay>
     <v-row style="min-width: 980px">
       <v-col cols="12" sm="8">
         <v-row>
@@ -43,7 +52,8 @@ export default {
       //     IMG: "https://cdn.vuetifyjs.com/images/cards/docks.jpg",
       //   },
       // {Name:'软件工程2002', id:5, TeacherName:'许正韬', Time:'2022/07/20 - 2023/07/21'}
-    ],
+		],
+		prepareing_overlay: true,
   }),
   methods: {},
   mounted() {},
@@ -65,7 +75,8 @@ export default {
       NProgress.set(0.8);
       let coursesData = res.data.data;
       let coursesData_arr = eval(coursesData);
-      _this.courses = coursesData_arr;
+		_this.courses = coursesData_arr;
+		_this.prepareing_overlay = false;
       NProgress.set(1);
     });
   },

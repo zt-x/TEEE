@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="white" app dark flat>
+  <v-app-bar color="white" app dark>
     <v-chip @click="$router.go(-1)" small class="ma-2" color="warn" text-color="white"
       ><v-icon small left>fa fa-reply</v-icon>返回上一级</v-chip
     >
