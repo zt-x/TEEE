@@ -13,17 +13,20 @@
           <v-tabs-items v-model="tab">
             <v-tab-item :key="items[0]">
               <v-card color="basil" flat>
-                <WorksView :works="works" v-if="loading_workview"/>
+                <WorksView :works="works" v-if="loading_workview" />
               </v-card>
             </v-tab-item>
             <v-tab-item>
               <v-card color="basil" flat>
-                <ExamsView :exams="exams" v-if="loading_examview"/>
+                <ExamsView :exams="exams" v-if="loading_examview" />
               </v-card>
             </v-tab-item>
             <v-tab-item>
               <v-card color="basil" flat>
-                <Announcement :announcement="announcement" v-if="loading_announcementview"/>
+                <Announcement
+                  :announcement="announcement"
+                  v-if="loading_announcementview"
+                />
               </v-card>
             </v-tab-item>
           </v-tabs-items>
@@ -56,43 +59,42 @@ export default {
     return {
       tab: null,
       items: ["作业", "考试", "公告"],
-		cid: 0,
-		loading_workview: false,
-		loading_examview: false,
-		loading_announcementview: false,
-	  works: [],
-	  exams: [],
-	  announcements: [],
+      cid: 0,
+      loading_workview: false,
+      loading_examview: false,
+      loading_announcementview: false,
+      works: [],
+      exams: [],
+      announcements: [],
     };
   },
   created() {
-	  this.cid = this.$route.params.cid;
-	  const _axios = axios.create();
-	  let _this = this;
-		token = window.localStorage.getItem("token");
-		_axios.interceptors.request.use(function (config) {
-		config.headers = {
-			Authorization: token,
-		};
-		return config;
-		});
-		const form = new FormData();
-		form.append("cid", this.cid);
-		_axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
-			let dt = res.data.data;
-			_this.works = dt.filter((item) => {
-				return item.isExam == 0
-			});
-			_this.exams = dt.filter((item) => {
-				return item.isExam == 1
-			});
-			_this.works = res.data.data;
-			console.log(_this.works);
-			_this.loading_announcementview = true;
-			_this.loading_workview= true;
-			_this.loading_examview = true;
-
-		});
+    this.cid = this.$route.params.cid;
+    const _axios = axios.create();
+    let _this = this;
+    token = window.localStorage.getItem("token");
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
+    const form = new FormData();
+    form.append("cid", this.cid);
+    _axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
+      let dt = res.data.data;
+      _this.works = dt.filter((item) => {
+        return item.isExam == 0;
+      });
+      _this.exams = dt.filter((item) => {
+        return item.isExam == 1;
+      });
+      _this.works = res.data.data;
+      console.log(_this.works);
+      _this.loading_announcementview = true;
+      _this.loading_workview = true;
+      _this.loading_examview = true;
+    });
   },
 };
 </script>
