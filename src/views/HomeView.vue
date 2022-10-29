@@ -1,7 +1,7 @@
 <template>
   <!-- background-color: aqua; -->
 
-  <v-app style="background: #f4f5fc">
+  <v-app style="background: #f4f5fc; background-color: #d3d3d3">
     <!-- <SideBar :key="new Date().getTime() + 1" v-if="nb" /> -->
     <SideBar :key="new Date().getTime() + 1" v-if="nb" />
     <Navbar :role="user.role" :_avatar="user.avatar" />
@@ -20,7 +20,6 @@
     <v-main style="min-width: 1200px; padding: 64px" id="main">
       <router-view></router-view>
     </v-main>
-    <v-btn fixed small right bottom fab></v-btn>
   </v-app>
 </template>
 

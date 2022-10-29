@@ -3,34 +3,51 @@
     <v-row>
       <!-- Course WorkPlace -->
       <v-col cols="12" sm="8">
-        <v-card>
-          <v-tabs v-model="tab" background-color="transparent" color="basil">
-            <v-tab v-for="item in items" :key="item">
-              {{ item }}
-            </v-tab>
-          </v-tabs>
-
-          <v-tabs-items v-model="tab">
-            <v-tab-item :key="items[0]">
-              <v-card color="basil" flat>
-                <WorksView :works="works" v-if="loading_workview" />
-              </v-card>
-            </v-tab-item>
-            <v-tab-item>
-              <v-card color="basil" flat>
-                <ExamsView :exams="exams" v-if="loading_examview" />
-              </v-card>
-            </v-tab-item>
-            <v-tab-item>
-              <v-card color="basil" flat>
-                <Announcement
-                  :announcement="announcement"
-                  v-if="loading_announcementview"
-                />
-              </v-card>
-            </v-tab-item>
-          </v-tabs-items>
-        </v-card>
+        <v-row v-if="isTeacher">
+          <v-col cols="12">
+            <v-card rounded="true" style="padding: 10px">
+              <v-chip label @click="ReleaseWork()" color="#b97a57">
+                <v-icon color="white" small left>fa fa-paper-plane</v-icon>
+                <span style="color: white">发布新作业 / 考试</span>
+              </v-chip>
+              <v-chip label @click="ReleaseAnnouncement()" color="#b97a57" class="ml-5">
+                <v-icon color="white" small left>mdi-clipboard-outline</v-icon>
+                <span style="color: white">发布公告</span>
+              </v-chip>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-card>
+              <v-tabs v-model="tab" background-color="transparent" color="basil">
+                <v-tab v-for="item in items" :key="item">
+                  {{ item }}
+                </v-tab>
+              </v-tabs>
+              <v-tabs-items v-model="tab">
+                <v-tab-item :key="items[0]">
+                  <v-card color="basil" flat>
+                    <WorksView :works="works" v-if="loading_workview" />
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item>
+                  <v-card color="basil" flat>
+                    <ExamsView :exams="exams" v-if="loading_examview" />
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item>
+                  <v-card color="basil" flat>
+                    <Announcement
+                      :announcement="announcement"
+                      v-if="loading_announcementview"
+                    />
+                  </v-card>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
       <!-- Course Info -->
       <v-col cols="12" sm="4">
@@ -66,6 +83,7 @@ export default {
       works: [],
       exams: [],
       announcements: [],
+      isTeacher: true,
     };
   },
   created() {
