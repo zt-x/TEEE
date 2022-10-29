@@ -49,6 +49,7 @@
               close-on-click
               close-on-content-click
               offset-y
+              transition="slide-x-transition"
               v-if="workContentRadio == 'createNewWork'"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -58,17 +59,23 @@
                 </v-chip>
               </template>
               <v-list>
-                <v-list-item>
+                <v-list-item @click="addChoicQue()">
                   <v-list-item-title> > 添加选择题</v-list-item-title>
                 </v-list-item>
                 <v-list-item>
-                  <v-list-item-title> > 添加填空题</v-list-item-title>
+                  <v-list-item-title @click="addFillInQue()">
+                    > 添加填空题</v-list-item-title
+                  >
                 </v-list-item>
                 <v-list-item>
-                  <v-list-item-title> > 添加简答题</v-list-item-title>
+                  <v-list-item-title @click="addTextQue()">
+                    > 添加简答题</v-list-item-title
+                  >
                 </v-list-item>
                 <v-list-item>
-                  <v-list-item-title> > 从题库中选取 ...</v-list-item-title>
+                  <v-list-item-title @click="addQueFromQBank()">
+                    > 从题库中选取 ...</v-list-item-title
+                  >
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -137,6 +144,11 @@ export default {
     close() {
       this.$emit("close", true);
     },
+    addChoicQue() {},
+    addFillInQue() {},
+    addTextQue() {},
+    addQueFromQBank() {},
+    openWorkBank() {},
   },
 };
 </script>
