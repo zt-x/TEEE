@@ -1,15 +1,25 @@
 <template>
   <v-container fluid>
+    <v-dialog persistent v-model="releaseWorkDialog" width="800px">
+      <release-work @close="close($event)" />
+    </v-dialog>
     <v-row>
       <!-- Course WorkPlace -->
       <v-col cols="12" sm="8">
         <v-row v-if="isTeacher">
           <v-col cols="12">
             <v-card rounded="true" style="padding: 10px">
-              <v-chip label @click="ReleaseWork()" color="#b97a57">
+              <v-chip
+                label
+                @click="releaseWorkDialog = true"
+                color="#b97a57"
+                v-bind="attrs"
+                v-on="on"
+              >
                 <v-icon color="white" small left>fa fa-paper-plane</v-icon>
                 <span style="color: white">发布新作业 / 考试</span>
               </v-chip>
+
               <v-chip label @click="ReleaseAnnouncement()" color="#b97a57" class="ml-5">
                 <v-icon color="white" small left>mdi-clipboard-outline</v-icon>
                 <span style="color: white">发布公告</span>
@@ -69,9 +79,10 @@ import Announcement from "@/components/CourseContentChildren/announcement.vue";
 import ExamsView from "@/components/CourseContentChildren/examsView.vue";
 import WorksView from "@/components/CourseContentChildren/worksView.vue";
 import axios from "axios";
+import ReleaseWork from "@/components/CourseContentChildren/work/releaseWork.vue";
 let token = window.localStorage.getItem("token");
 export default {
-  components: { ExamsView, Announcement, WorksView },
+  components: { ExamsView, Announcement, WorksView, ReleaseWork },
   data() {
     return {
       tab: null,
@@ -84,7 +95,13 @@ export default {
       exams: [],
       announcements: [],
       isTeacher: true,
+      releaseWorkDialog: true,
     };
+  },
+  methods: {
+    async close() {
+      this.releaseWorkDialog = false;
+    },
   },
   created() {
     this.cid = this.$route.params.cid;
@@ -112,6 +129,7 @@ export default {
       _this.loading_announcementview = true;
       _this.loading_workview = true;
       _this.loading_examview = true;
+      _this.$vuetify.goTo(0);
     });
   },
 };

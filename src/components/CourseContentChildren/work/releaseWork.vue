@@ -1,0 +1,144 @@
+<template>
+  <v-card class="font-weight-black">
+    <v-card-title class="headline">
+      <v-icon left>fa fa-paper-plane</v-icon>
+      <span class="font-weight-black" style="color: #757575">发布作业</span>
+      <v-spacer></v-spacer>
+      <v-chip small color="red" @click="close()">
+        <v-icon small center color="white">fa fa-times</v-icon>
+      </v-chip>
+    </v-card-title>
+    <v-card-text>
+      <v-form>
+        <v-row>
+          <v-col cols="3">
+            <v-text-field color="#875438" label="作业标题"></v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              color="#875438"
+              label="分数"
+              v-model="totalScore"
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="3">
+            <v-text-field color="#875438" label="截止时间"></v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-checkbox
+              v-model="releaseWork_isExam"
+              color="#875438"
+              label="设为考试"
+            ></v-checkbox>
+          </v-col>
+
+          <v-col cols="12">
+            作业内容:
+            <v-radio-group mandatory dense row v-model="workContentRadio">
+              <v-radio label="创建新作业" color="#875438" value="createNewWork"></v-radio>
+              <v-radio
+                label="从作业库中选取"
+                color="#875438"
+                value="searchFromBank"
+              ></v-radio>
+            </v-radio-group>
+          </v-col>
+          <v-col cols="12">
+            <v-menu
+              close-on-click
+              close-on-content-click
+              offset-y
+              v-if="workContentRadio == 'createNewWork'"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip class="white--text" color="green" v-bind="attrs" v-on="on">
+                  <v-icon small left>fa fa-plus</v-icon>
+                  添加题目
+                </v-chip>
+              </template>
+              <v-list>
+                <v-list-item>
+                  <v-list-item-title> > 添加选择题</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title> > 添加填空题</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title> > 添加简答题</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title> > 从题库中选取 ...</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+
+            <v-chip
+              class="white--text"
+              color="green"
+              v-if="workContentRadio == 'searchFromBank'"
+              @click="openWorkBank()"
+            >
+              <v-icon small left>fa fa-folder-open</v-icon>
+              打开作业库
+            </v-chip>
+            <v-chip class="ml-5"> 总分 {{ totalScore }}分 </v-chip>
+            <v-chip v-if="choiceQue != 0" class="ml-3"> 选择题 {{ choiceQue }}题 </v-chip>
+            <v-chip v-if="FillInQue != 0" class="ml-3"> 填空题 {{ FillInQue }}题 </v-chip>
+            <v-chip class="ml-3"> Rate {{ Rate }} </v-chip>
+          </v-col>
+          <v-col cols="12">
+            <v-textarea outlined label="" value="11" readonly> </v-textarea>
+            <v-row class="ml-0">
+              <v-checkbox
+                row
+                v-model="autoReadoverChoice"
+                color="#875438"
+                label="自动批改选择题"
+              ></v-checkbox>
+              <v-checkbox
+                class="ml-5"
+                v-model="autoReadoverFillIn"
+                color="#875438"
+                label="自动批改填空题"
+              ></v-checkbox>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="green darken-1" text @click="close()">算了</v-btn>
+      <v-btn color="green darken-1" min-width="60px" class="white--text" @click="close()"
+        >发布</v-btn
+      >
+    </v-card-actions>
+  </v-card>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      releaseWork_isExam: false,
+      workContentRadio: "",
+      createNewWork: "",
+      searchFromBank: "",
+      totalScore: 100,
+      choiceQue: 5,
+      FillInQue: 5,
+      Rate: 0.32,
+      autoReadoverChoice: false,
+      autoReadoverFillIn: false,
+    };
+  },
+  methods: {
+    close() {
+      this.$emit("close", true);
+    },
+  },
+};
+</script>
+
+<style></style>

@@ -11,11 +11,13 @@ export default new Vuex.Store({
 		getUserInfo: state => {
 			return state.userInfo
 		},
+
 	},
 	mutations: {
 		updateUserInfo(state, uf) {
 			state.userInfo = uf;
 		},
+
   	},
 	actions: {
 	},
