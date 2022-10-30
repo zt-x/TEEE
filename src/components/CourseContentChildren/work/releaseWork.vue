@@ -1,5 +1,8 @@
 <template>
   <v-card class="font-weight-black">
+    <v-dialog persistent v-model="dialog_addChoicQue" width="600px">
+      <add-choic-que @closeAddChoicQue="closeAddChoicQue($event)" />
+    </v-dialog>
     <v-card-title class="headline">
       <v-icon left>fa fa-paper-plane</v-icon>
       <span class="font-weight-black" style="color: #757575">发布作业</span>
@@ -12,10 +15,11 @@
       <v-form>
         <v-row>
           <v-col cols="3">
-            <v-text-field color="#875438" label="作业标题"></v-text-field>
+            <v-text-field clearable color="#875438" label="作业标题"></v-text-field>
           </v-col>
           <v-col cols="3">
             <v-text-field
+              clearable
               color="#875438"
               label="分数"
               v-model="totalScore"
@@ -23,7 +27,7 @@
           </v-col>
 
           <v-col cols="3">
-            <v-text-field color="#875438" label="截止时间"></v-text-field>
+            <v-text-field clearable color="#875438" label="截止时间"></v-text-field>
           </v-col>
           <v-col cols="3">
             <v-checkbox
@@ -95,7 +99,7 @@
             <v-chip class="ml-3"> Rate {{ Rate }} </v-chip>
           </v-col>
           <v-col cols="12">
-            <v-textarea outlined label="" value="11" readonly> </v-textarea>
+            <v-textarea outlined label="" value="扣1送地狱火" readonly> </v-textarea>
             <v-row class="ml-0">
               <v-checkbox
                 row
@@ -125,7 +129,9 @@
 </template>
 
 <script>
+import addChoicQue from "./addQuestion/addChoicQue.vue";
 export default {
+  components: { addChoicQue },
   data() {
     return {
       releaseWork_isExam: false,
@@ -138,19 +144,45 @@ export default {
       Rate: 0.32,
       autoReadoverChoice: false,
       autoReadoverFillIn: false,
+      dialog_addChoicQue: false,
     };
   },
   methods: {
     close() {
       this.$emit("close", true);
     },
-    addChoicQue() {},
+    addChoicQue() {
+      this.dialog_addChoicQue = true;
+    },
     addFillInQue() {},
     addTextQue() {},
     addQueFromQBank() {},
     openWorkBank() {},
+    closeAddChoicQue(val) {
+      this.dialog_addChoicQue = val;
+    },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+  background-color: #f5f5f5;
+}
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: #a36645;
+}
+</style>

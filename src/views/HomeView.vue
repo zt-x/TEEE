@@ -1,7 +1,7 @@
 <template>
   <!-- background-color: aqua; -->
 
-  <v-app style="background: #f4f5fc; background-color: #d3d3d3">
+  <v-app style="background: #f4f5fc">
     <!-- <SideBar :key="new Date().getTime() + 1" v-if="nb" /> -->
     <SideBar :key="new Date().getTime() + 1" v-if="nb" />
     <Navbar :role="user.role" :_avatar="user.avatar" />
