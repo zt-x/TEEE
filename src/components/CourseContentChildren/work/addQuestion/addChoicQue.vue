@@ -10,40 +10,63 @@
             clearable
             no-resize
             rows="10"
+			v-model="ans_text"
           ></v-textarea>
         </v-col>
       </v-row>
-      <v-row align-content="center">
-        <v-col cols="5">
+      <v-row justify="center">
+        <v-col cols="6">
           <v-text-field
             label="添加正确答案"
             dense
-            prepend-icon="fas fa-plus"
+            append-icon="fas fa-plus"
             v-model="a_ans"
-            @click:prepend="addCorrAns()"
+			hint="按下回车键或右侧加号添加"
+			@keypress.enter="addCorrAns()"
+            @click:append="addCorrAns()"
+			color="success"
           ></v-text-field>
         </v-col>
-        <v-col cols="5">
+        <v-col cols="6">
           <v-text-field
             label="添加错误答案"
             dense
-            prepend-icon="fas fa-plus"
+            append-icon="fas fa-plus"
+			hint="按下回车键或右侧加号添加"
             v-model="a_err_ans"
-            @click:prepend="addErrAns()"
+            @click:append="addErrAns()"
+			@keypress.enter="addErrAns()"
+			color="error"
           ></v-text-field>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row align="center">
         <v-col cols="6" v-for="(ans, i) in qans" :key="i">
-          <v-chip close :color="ans.isCorr ? `success` : `error`">
-            {{ ans.ans }}
+          <v-chip label close :color="ans.isCorr ? `success` : `error`" @click:close="removeAns(i)">
+			<span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+				{{ ans.ans }}
+			</span>
           </v-chip>
         </v-col>
       </v-row>
     </v-container>
-    <v-card-action>
-      <v-btn @click="close()">111</v-btn>
-    </v-card-action>
+    <v-card-actions>
+		<div style="width:100px">
+			<v-text-field
+            label="分值"
+            solo
+			dense
+			hint="请输入一个整数或Float"
+			v-model="ans_score"
+          ></v-text-field>
+		</div>
+      <v-spacer></v-spacer>
+
+      <v-btn color="green darken-1" text @click="close()">算了</v-btn>
+      <v-btn color="green darken-1" min-width="60px" class="white--text" @click="add()"
+        >添加</v-btn
+      >
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -53,7 +76,9 @@ export default {
     return {
       qans: [],
       a_ans: "",
-      a_err_ans: "",
+		a_err_ans: "",
+		ans_score: 0,
+		ans_text:"",
     };
   },
   methods: {
@@ -64,19 +89,45 @@ export default {
       // 返回JSON
       //{qtype: 30010, qscore: 2.0,
       //qtext: "1111", qans: ["", "", "", ""], cans: [0]}
-    },
+		let _qans = [];
+		let _cans = [];
+		let newQue = {};
+		console.log(this.qans);
+		for (let i = 0; i < this.qans.length; i++) {
+			_qans.push(this.qans[i].ans);
+			if (this.qans[i].isCorr == true) {
+				_cans.push(i)
+			}
+		}
+		newQue.qtype = 30010;
+		newQue.qscore = this.ans_score;
+		newQue.qtext = this.ans_text;
+		newQue.qans = _qans;
+		newQue.cans = _cans;
+		this.qans = [];
+		this.a_ans = '';
+		this.a_err_ans = '';
+		this.ans_score = 0;
+		this.ans_text = '';
+		this.$emit("addChoicQue", newQue);
+	  },
     addCorrAns() {
       let data = {};
       data.ans = this.a_ans;
       data.isCorr = true;
-      this.qans.push(data);
+	  this.qans.push(data);
+	  this.a_ans = ""; 
     },
     addErrAns() {
       let data = {};
       data.ans = this.a_err_ans;
       data.isCorr = false;
+	  this.a_err_ans = "";
       this.qans.push(data);
-    },
+	  },
+	removeAns(i) {
+		  this.qans.splice(i, 1);
+	}
   },
 };
 </script>

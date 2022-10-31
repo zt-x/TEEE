@@ -1,7 +1,7 @@
 <template>
   <v-card class="font-weight-black">
     <v-dialog persistent v-model="dialog_addChoicQue" width="600px">
-      <add-choic-que @closeAddChoicQue="closeAddChoicQue($event)" />
+      <add-choic-que @closeAddChoicQue="closeAddChoicQue($event)" @addChoicQue=" returnChoicQue($event)"/>
     </v-dialog>
     <v-card-title class="headline">
       <v-icon left>fa fa-paper-plane</v-icon>
@@ -99,7 +99,7 @@
             <v-chip class="ml-3"> Rate {{ Rate }} </v-chip>
           </v-col>
           <v-col cols="12">
-            <v-textarea outlined label="" value="扣1送地狱火" readonly> </v-textarea>
+            <v-textarea outlined label="" v-model="questions" readonly no-resize> </v-textarea>
             <v-row class="ml-0">
               <v-checkbox
                 row
@@ -144,7 +144,8 @@ export default {
       Rate: 0.32,
       autoReadoverChoice: false,
       autoReadoverFillIn: false,
-      dialog_addChoicQue: false,
+	  dialog_addChoicQue: false,
+	  questions:"",
     };
   },
   methods: {
@@ -160,7 +161,11 @@ export default {
     openWorkBank() {},
     closeAddChoicQue(val) {
       this.dialog_addChoicQue = val;
-    },
+	  },
+	  returnChoicQue(newQue) {
+		  this.questions = this.questions + "\n" + JSON.stringify(newQue);
+		  this.dialog_addChoicQue = false;
+	  }
   },
 };
 </script>
