@@ -1,9 +1,11 @@
 <template>
-  <div>123</div>
+  <div>{{ announcement }}</div>
 </template>
 
 <script>
-export default {};
+export default {
+  props: ["announcement"],
+};
 </script>
 
 <style></style>

@@ -9,18 +9,12 @@
         <v-row v-if="isTeacher">
           <v-col cols="12">
             <v-card rounded="true" style="padding: 10px">
-              <v-chip
-                label
-                @click="releaseWorkDialog = true"
-                color="#b97a57"
-                v-bind="attrs"
-                v-on="on"
-              >
+              <v-chip label @click="releaseWorkDialog = true" color="#b97a57">
                 <v-icon color="white" small left>fa fa-paper-plane</v-icon>
                 <span style="color: white">发布新作业 / 考试</span>
               </v-chip>
 
-              <v-chip label @click="ReleaseAnnouncement()" color="#b97a57" class="ml-5">
+              <v-chip label color="#b97a57" class="ml-5">
                 <v-icon color="white" small left>mdi-clipboard-outline</v-icon>
                 <span style="color: white">发布公告</span>
               </v-chip>
