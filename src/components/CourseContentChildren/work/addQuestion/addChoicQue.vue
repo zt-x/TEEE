@@ -117,6 +117,15 @@ export default {
       // 返回JSON
       //{qtype: 30010, qscore: 2.0,
       //qtext: "1111", qans: ["", "", "", ""], cans: [0]}
+      let _qans = [];
+      let _cans = [];
+      let newQue = {};
+      for (let i = 0; i < this.qans.length; i++) {
+        _qans.push(this.qans[i].ans);
+        if (this.qans[i].isCorr == true) {
+          _cans.push(i);
+        }
+      }
       if (this.ans_score == "") {
         this.msg = "分值不能为空";
         return;
@@ -130,16 +139,7 @@ export default {
         this.msg = "请添加正确选项!";
         return;
       }
-      let _qans = [];
-      let _cans = [];
-      let newQue = {};
-      console.log(this.qans);
-      for (let i = 0; i < this.qans.length; i++) {
-        _qans.push(this.qans[i].ans);
-        if (this.qans[i].isCorr == true) {
-          _cans.push(i);
-        }
-      }
+
       newQue.qtype = 30010;
       newQue.qscore = this.ans_score;
       newQue.qtext = this.ans_text;

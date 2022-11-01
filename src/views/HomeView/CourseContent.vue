@@ -87,7 +87,7 @@ export default {
       loading_announcementview: false,
       works: [],
       exams: [],
-      announcements: [],
+      announcement: [],
       isTeacher: true,
       releaseWorkDialog: true,
     };
@@ -119,7 +119,6 @@ export default {
         return item.isExam == 1;
       });
       _this.works = res.data.data;
-      console.log(_this.works);
       _this.loading_announcementview = true;
       _this.loading_workview = true;
       _this.loading_examview = true;

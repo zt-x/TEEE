@@ -25,7 +25,14 @@
         ></v-text-field>
       </div>
       <v-spacer></v-spacer>
-
+      <div style="width: 300px">
+        <v-text-field
+          label="正确答案"
+          dense
+          hint="用于自动批改"
+          v-model="cans"
+        ></v-text-field>
+      </div>
       <span class="red--text">{{ this.msg }}</span>
       <v-spacer></v-spacer>
 
@@ -55,6 +62,7 @@ export default {
       this.ans_score = "";
       this.ans_text = "";
       this.msg = "";
+      this.cans = "";
       this.$emit("closeAddFillInQue", false);
     },
     add() {
@@ -67,7 +75,9 @@ export default {
       } else if (this.ans_text == "") {
         this.msg = "题目内容不能为空";
         return;
-      } else if (cans == "") {
+      } else if (this.cans == "") {
+        this.msg = "请输入正确答案！若无标准答案，请发布简答题";
+        return;
       }
       let newQue = {};
       newQue.qtype = 30011;

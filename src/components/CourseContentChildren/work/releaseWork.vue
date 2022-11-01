@@ -6,10 +6,16 @@
         @addChoicQue="returnChoicQue($event)"
       />
     </v-dialog>
-    <v-dialog persistent v-model="dialog_addFileInQue" width="600px">
+    <v-dialog persistent v-model="dialog_addFillInQue" width="600px">
       <add-fill-in-que
         @closeAddFillInQue="closeAddFillInQue($event)"
-        @addChoicQue="returnChoicQue($event)"
+        @addFillInQue="returnFillInQue($event)"
+      />
+    </v-dialog>
+    <v-dialog persistent v-model="dialog_addFillInQue" width="600px">
+      <add-fill-in-que
+        @closeAddFillInQue="closeAddFillInQue($event)"
+        @addFillInQue="returnFillInQue($event)"
       />
     </v-dialog>
     <v-card-title class="headline">
@@ -80,20 +86,14 @@
                 <v-list-item @click="addChoicQue()">
                   <v-list-item-title> > 添加选择题</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
-                  <v-list-item-title @click="addFillInQue()">
-                    > 添加填空题</v-list-item-title
-                  >
+                <v-list-item @click="addFillInQue()">
+                  <v-list-item-title> > 添加填空题</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
-                  <v-list-item-title @click="addTextQue()">
-                    > 添加简答题</v-list-item-title
-                  >
+                <v-list-item @click="addTextQue()">
+                  <v-list-item-title> > 添加简答题</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
-                  <v-list-item-title @click="addQueFromQBank()">
-                    > 从题库中选取 ...</v-list-item-title
-                  >
+                <v-list-item @click="addQueFromQBank()">
+                  <v-list-item-title> > 从题库中选取</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -161,7 +161,7 @@ export default {
       autoReadoverChoice: false,
       autoReadoverFillIn: false,
       dialog_addChoicQue: false,
-      dialog_addFileInQue: false,
+      dialog_addFillInQue: false,
       dialog_addTextQue: false,
       dialog_addQueFromBank: false,
       questions: "",
@@ -177,21 +177,36 @@ export default {
     addChoicQue() {
       this.dialog_addChoicQue = true;
     },
-    addFillInQue() {},
-    addTextQue() {},
+    addFillInQue() {
+      this.dialog_addFillInQue = true;
+    },
+    addTextQue() {
+      this.dialog_addTextQue = true;
+    },
     addQueFromQBank() {},
     openWorkBank() {},
     closeAddChoicQue(val) {
       this.dialog_addChoicQue = val;
     },
     closeAddFillInQue(val) {
-      this.dialog_addFileInQue = val;
+      this.dialog_addFillInQue = val;
+    },
+    closeAddTextQue(val) {
+      this.dialog_addTextQue = val;
+    },
+    closeQueFromBank(val) {
+      this.dialog_addQueFromBank = val;
     },
     returnChoicQue(newQue) {
       this.questions = this.questions + "\n" + JSON.stringify(newQue);
       this.dialog_addChoicQue = false;
+    },
+    returnFillInQue(newQue) {
+      this.questions = this.questions + "\n" + JSON.stringify(newQue);
       this.dialog_addFillInQue = false;
-      this.dialog_addTextQue = false;
+    },
+    returnTextQue(newQue) {
+      this.questions = this.questions + "\n" + JSON.stringify(newQue);
       this.dialog_addQueFromBank = false;
     },
   },
