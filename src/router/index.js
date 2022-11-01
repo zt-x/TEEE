@@ -52,7 +52,9 @@ if (serverRoutes) {
 
 router.beforeEach((to, from, next) => {
 	//验证token存在，则进入该页面
-	NProgress.start();
+	try {
+		NProgress.start();	
+	} finally {}
 	if (to.path == '/login') {
 		localStorage.setItem('token', '');
 		sessionStorage.setItem('serverRoutes', '');
@@ -66,7 +68,10 @@ router.beforeEach((to, from, next) => {
 			next("/login");
 		}
 	}
-	NProgress.set(1);
+	try {
+		NProgress.set(1);
+	
+	} finally {}
 });
 
 router.afterEach((to,from,nex)=>{

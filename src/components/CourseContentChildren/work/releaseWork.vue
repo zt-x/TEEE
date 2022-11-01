@@ -12,10 +12,10 @@
         @addFillInQue="returnFillInQue($event)"
       />
     </v-dialog>
-    <v-dialog persistent v-model="dialog_addFillInQue" width="600px">
-      <add-fill-in-que
-        @closeAddFillInQue="closeAddFillInQue($event)"
-        @addFillInQue="returnFillInQue($event)"
+    <v-dialog persistent v-model="dialog_addTextQue" width="600px">
+      <add-text-que
+        @closeAddTextQue="closeAddTextQue($event)"
+        @addTextQue="returnTextQue($event)"
       />
     </v-dialog>
     <v-card-title class="headline">
@@ -146,10 +146,11 @@
 <script>
 import addChoicQue from "./addQuestion/addChoicQue.vue";
 import AddFillInQue from "./addQuestion/addFillInQue.vue";
+import AddTextQue from './addQuestion/addTextQue.vue';
 export default {
-  components: { addChoicQue, AddFillInQue },
+  components: { addChoicQue, AddFillInQue, AddTextQue},
   data() {
-    return {
+     return {
       releaseWork_isExam: false,
       workContentRadio: "",
       createNewWork: "",
@@ -207,7 +208,7 @@ export default {
     },
     returnTextQue(newQue) {
       this.questions = this.questions + "\n" + JSON.stringify(newQue);
-      this.dialog_addQueFromBank = false;
+      this.dialog_addTextQue = false;
     },
   },
 };
