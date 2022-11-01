@@ -17,7 +17,7 @@
       欢迎回来，{{ user.username }}
     </v-snackbar>
 
-    <v-main style="min-width: 1200px; padding: 64px; overflow: auto" id="main">
+    <v-main style="min-width: 1550px; padding: 64px; overflow: auto" id="main">
       <router-view></router-view>
     </v-main>
   </v-app>

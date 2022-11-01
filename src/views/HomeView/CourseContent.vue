@@ -58,10 +58,37 @@
         <v-card>
           <v-card-title>CourseName{{ this.cid }}</v-card-title>
           <v-card-subtitle>2022/ 09/ 01 - 20</v-card-subtitle>
-          <v-card-text>TEXT1</v-card-text>
-          <v-card-text>TEXT2</v-card-text>
-          <v-card-text>TEXT3</v-card-text>
-          <v-card-text>TEXT4</v-card-text>
+          <v-divider class="mb-5"></v-divider>
+          <v-container>
+            <v-row>
+              <v-col cols="5">
+                <v-card class="pl-5 pt-6" style="height: 200px">
+                  <span>任课教师：许正韬</span>
+                  <v-divider></v-divider>
+
+                  <span>班级人数: 5人</span>
+                  <v-divider></v-divider>
+
+                  <span>作业次数: 12次</span>
+                  <v-divider></v-divider>
+                </v-card>
+              </v-col>
+              <v-col cols="7">
+                <Chart_sex />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
+        <v-card class="mt-5">
+          <v-card-title>学情分析</v-card-title>
+          <v-divider></v-divider>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <Chart_workScroe />
+              </v-col>
+            </v-row>
+          </v-container>
         </v-card>
       </v-col>
     </v-row>
@@ -74,9 +101,19 @@ import ExamsView from "@/components/CourseContentChildren/examsView.vue";
 import WorksView from "@/components/CourseContentChildren/worksView.vue";
 import axios from "axios";
 import ReleaseWork from "@/components/CourseContentChildren/work/releaseWork.vue";
+import Chart_sex from "@/components/CourseContentChildren/charts/chart_sex.vue";
+import Chart_workScroe from "@/components/CourseContentChildren/charts/chart_workScroe.vue";
+
 let token = window.localStorage.getItem("token");
 export default {
-  components: { ExamsView, Announcement, WorksView, ReleaseWork },
+  components: {
+    ExamsView,
+    Announcement,
+    WorksView,
+    ReleaseWork,
+    Chart_sex,
+    Chart_workScroe,
+  },
   data() {
     return {
       tab: null,
@@ -89,7 +126,7 @@ export default {
       exams: [],
       announcement: [],
       isTeacher: true,
-      releaseWorkDialog: true,
+      releaseWorkDialog: false,
     };
   },
   methods: {
@@ -97,6 +134,7 @@ export default {
       this.releaseWorkDialog = false;
     },
   },
+  mounted() {},
   created() {
     this.cid = this.$route.params.cid;
     const _axios = axios.create();
