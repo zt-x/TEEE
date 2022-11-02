@@ -1,15 +1,29 @@
 <template>
   <v-card class="font-weight-black">
-	<v-dialog persistent v-model="dialog_ifSaveAsWorkBank" width="400px">
-		<v-card>
-			<v-card-title>保存到作业库</v-card-title>
-			<v-text-field v-model="work_name" label="作业库名称" hint="作业库中的作业可以重复使用。若不想保存至作业库, 可不填" solo></v-text-field>
-			<v-card-actions>
-				<v-spacer></v-spacer>
-				<v-btn color="green darken-1" text @click="isTemp = false">不保存, 直接发布</v-btn>
-				<v-btn color="green darken-1" @click="saveAsWork()" class="white--text">保存</v-btn>
-			</v-card-actions>
-		</v-card>
+    <Dialog_msg
+      :dialog_msg="dialog_msg"
+      :msg="dialog_msg_msg"
+      @closeFunc="closeFunc($event)"
+    />
+    <v-dialog persistent v-model="dialog_ifSaveAsWorkBank" width="400px">
+      <v-card>
+        <v-card-title>保存到作业库</v-card-title>
+        <v-text-field
+          v-model="work_name"
+          label="作业库名称"
+          hint="作业库中的作业可以重复使用。若不想保存至作业库, 可不填"
+          solo
+        ></v-text-field>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="releaseWork(true)"
+            >不保存, 直接发布</v-btn
+          >
+          <v-btn color="green darken-1" @click="releaseWork(false)" class="white--text"
+            >保存</v-btn
+          >
+        </v-card-actions>
+      </v-card>
     </v-dialog>
     <v-dialog persistent v-model="dialog_addChoicQue" width="600px">
       <add-choic-que
@@ -47,6 +61,7 @@
               color="#875438"
               label="作业标题"
               :rules="[rules.required]"
+              v-model="workTitle"
             ></v-text-field>
           </v-col>
           <v-col cols="3">
@@ -59,7 +74,12 @@
           </v-col>
 
           <v-col cols="3">
-            <v-text-field clearable color="#875438" v-model="deadline" label="截止时间"></v-text-field>
+            <v-text-field
+              clearable
+              color="#875438"
+              v-model="deadline"
+              label="截止时间"
+            ></v-text-field>
           </v-col>
           <v-col cols="3">
             <v-checkbox
@@ -148,7 +168,11 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="green darken-1" text @click="close()">算了</v-btn>
-      <v-btn color="green darken-1" min-width="60px" class="white--text" @click="releaseWork()"
+      <v-btn
+        color="green darken-1"
+        min-width="60px"
+        class="white--text"
+        @click="dialog_ifSaveAsWorkBank = true"
         >发布</v-btn
       >
     </v-card-actions>
@@ -158,31 +182,38 @@
 <script>
 import addChoicQue from "./addQuestion/addChoicQue.vue";
 import AddFillInQue from "./addQuestion/addFillInQue.vue";
-import AddTextQue from './addQuestion/addTextQue.vue';
+import AddTextQue from "./addQuestion/addTextQue.vue";
+import axios from "axios";
+import Dialog_msg from "@/components/dialog_msg.vue";
+let token = window.localStorage.getItem("token");
+
 export default {
-  components: { addChoicQue, AddFillInQue, AddTextQue },
-  props:["cid"],
+  components: { addChoicQue, AddFillInQue, AddTextQue, Dialog_msg },
+  props: ["cid"],
   data() {
-     return {
+    return {
       releaseWork_isExam: false,
+      workTitle: "",
       workContentRadio: "",
       createNewWork: "",
       searchFromBank: "",
       totalScore: 100,
       choiceQue: 5,
       FillInQue: 5,
-		 Rate: 0.32,
-	  deadline:"",
+      Rate: 0.32,
+      deadline: "",
       autoReadoverChoice: false,
       autoReadoverFillIn: false,
       dialog_addChoicQue: false,
       dialog_addFillInQue: false,
       dialog_addTextQue: false,
-		 dialog_addQueFromBank: false,
-		 dialog_ifSaveAsWorkBank: false,
-		 questions: "",
-		 work_name: "",
-	  isTemp:false,
+      dialog_addQueFromBank: false,
+      dialog_ifSaveAsWorkBank: false,
+      dialog_msg: false,
+      dialog_msg_msg: "",
+      questions: "",
+      work_name: "",
+      isTemp: false,
       rules: {
         required: (value) => !!value || "不能为空！",
       },
@@ -226,28 +257,59 @@ export default {
     returnTextQue(newQue) {
       this.questions = this.questions + JSON.stringify(newQue);
       this.dialog_addTextQue = false;
-	  },
-	  saveAsWork() {
-		  if (this.work_name == "") {
-			alert("请输入本次作业在作业库中的名称")
-		  } else {
-			this.isTemp = true;
-		  }
-
-	  },
-	  releaseWork() {
-		  this.dialog_ifSaveAsWorkBank = true;
-		  let aWork = {};
-		  let work = {};
-		  aWork.cid = this.cid;
-		  aWork.deadline = this.deadline;
-		  aWork.totalScore = this.totalScore;
-		  aWork.autoReadoverChoice = this.autoReadoverChoice;
-		  aWork.autoReadoverFillIn = this.autoReadoverFillIn;
-		  work.work_name = this.work_name;
-		  work.questions = this.questions;
-		  isTemp = (this.isTemp) ? true : false;
-	}
+    },
+    saveAsWork() {},
+    releaseWork(isTemp) {
+      if (isTemp == false) {
+        //保存到作业库
+        if (this.work_name == "") {
+          alert("请输入本次作业在作业库中的名称");
+          return;
+        } else {
+          this.isTemp = false;
+        }
+      }
+      let aWork = {};
+      let work = {};
+      aWork.cid = this.cid;
+      aWork.deadline = this.deadline;
+      aWork.totalScore = this.totalScore;
+      aWork.workName = this.workTitle;
+      aWork.autoReadoverChoice = this.autoReadoverChoice ? 1 : 0;
+      aWork.autoReadoverFillIn = this.autoReadoverFillIn ? 1 : 0;
+      aWork.workId = 0;
+      work.workName = this.work_name;
+      work.questions = this.questions;
+      work.isTemp = isTemp ? 1 : 0;
+      const _axios = axios.create();
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      let _this = this;
+      _axios
+        .post("/api/Bank/addWorkBank", work)
+        .then((res) => {
+          console.log(res.data);
+          aWork.workId = res.data.data;
+          _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
+            console.log(res2.data);
+            _this.dialog_msg_msg = res2.data.msg;
+            _this.dialog_msg = true;
+          });
+        })
+        .catch((err) => {
+          _this.dialog_msg_msg = err;
+          _this.dialog_msg = true;
+        });
+    },
+    closeFunc(val) {
+      alert("close2!");
+      this.dialog_ifSaveAsWorkBank = val;
+      this.close();
+    },
   },
 };
 </script>

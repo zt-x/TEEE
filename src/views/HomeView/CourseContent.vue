@@ -1,6 +1,5 @@
 <template>
   <v-container fluid>
-
     <v-dialog persistent v-model="releaseWorkDialog" width="800px">
       <release-work :cid="cid" @close="close($event)" />
     </v-dialog>
@@ -133,36 +132,40 @@ export default {
   methods: {
     async close() {
       this.releaseWorkDialog = false;
+      this.created();
+    },
+    flushContent() {
+      this.cid = this.$route.params.cid;
+      let _this = this;
+      token = window.localStorage.getItem("token");
+      const _axios = axios.create();
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      const form = new FormData();
+      form.append("cid", this.cid);
+      _axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
+        let dt = res.data.data;
+        _this.works = dt.filter((item) => {
+          return item.isExam == 0;
+        });
+        _this.exams = dt.filter((item) => {
+          return item.isExam == 1;
+        });
+        _this.works = res.data.data;
+        _this.loading_announcementview = true;
+        _this.loading_workview = true;
+        _this.loading_examview = true;
+        _this.$vuetify.goTo(0);
+      });
     },
   },
   mounted() {},
   created() {
-    this.cid = this.$route.params.cid;
-    const _axios = axios.create();
-    let _this = this;
-    token = window.localStorage.getItem("token");
-    _axios.interceptors.request.use(function (config) {
-      config.headers = {
-        Authorization: token,
-      };
-      return config;
-    });
-    const form = new FormData();
-    form.append("cid", this.cid);
-    _axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
-      let dt = res.data.data;
-      _this.works = dt.filter((item) => {
-        return item.isExam == 0;
-      });
-      _this.exams = dt.filter((item) => {
-        return item.isExam == 1;
-      });
-      _this.works = res.data.data;
-      _this.loading_announcementview = true;
-      _this.loading_workview = true;
-      _this.loading_examview = true;
-      _this.$vuetify.goTo(0);
-    });
+    this.flushContent();
   },
 };
 </script>
