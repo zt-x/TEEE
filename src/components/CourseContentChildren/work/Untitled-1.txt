@@ -1,0 +1,17 @@
+{
+	cid:,
+	deadline:,
+	totalScore:,
+	autoReadoverChoice:,
+	autoReadoverFillIn:,
+	work:{
+		work_name:,
+		questions:[
+			{
+
+			}
+		],
+		owner:
+		isTemp:
+	}
+}

@@ -1,5 +1,16 @@
 <template>
   <v-card class="font-weight-black">
+	<v-dialog persistent v-model="dialog_ifSaveAsWorkBank" width="400px">
+		<v-card>
+			<v-card-title>保存到作业库</v-card-title>
+			<v-text-field v-model="work_name" label="作业库名称" hint="作业库中的作业可以重复使用。若不想保存至作业库, 可不填" solo></v-text-field>
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn color="green darken-1" text @click="isTemp = false">不保存, 直接发布</v-btn>
+				<v-btn color="green darken-1" @click="saveAsWork()" class="white--text">保存</v-btn>
+			</v-card-actions>
+		</v-card>
+    </v-dialog>
     <v-dialog persistent v-model="dialog_addChoicQue" width="600px">
       <add-choic-que
         @closeAddChoicQue="closeAddChoicQue($event)"
@@ -18,6 +29,7 @@
         @addTextQue="returnTextQue($event)"
       />
     </v-dialog>
+
     <v-card-title class="headline">
       <v-icon left>fa fa-paper-plane</v-icon>
       <span class="font-weight-black" style="color: #757575">发布作业</span>
@@ -47,7 +59,7 @@
           </v-col>
 
           <v-col cols="3">
-            <v-text-field clearable color="#875438" label="截止时间"></v-text-field>
+            <v-text-field clearable color="#875438" v-model="deadline" label="截止时间"></v-text-field>
           </v-col>
           <v-col cols="3">
             <v-checkbox
@@ -136,7 +148,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="green darken-1" text @click="close()">算了</v-btn>
-      <v-btn color="green darken-1" min-width="60px" class="white--text" @click="close()"
+      <v-btn color="green darken-1" min-width="60px" class="white--text" @click="releaseWork()"
         >发布</v-btn
       >
     </v-card-actions>
@@ -148,7 +160,8 @@ import addChoicQue from "./addQuestion/addChoicQue.vue";
 import AddFillInQue from "./addQuestion/addFillInQue.vue";
 import AddTextQue from './addQuestion/addTextQue.vue';
 export default {
-  components: { addChoicQue, AddFillInQue, AddTextQue},
+  components: { addChoicQue, AddFillInQue, AddTextQue },
+  props:["cid"],
   data() {
      return {
       releaseWork_isExam: false,
@@ -158,14 +171,18 @@ export default {
       totalScore: 100,
       choiceQue: 5,
       FillInQue: 5,
-      Rate: 0.32,
+		 Rate: 0.32,
+	  deadline:"",
       autoReadoverChoice: false,
       autoReadoverFillIn: false,
       dialog_addChoicQue: false,
       dialog_addFillInQue: false,
       dialog_addTextQue: false,
-      dialog_addQueFromBank: false,
-      questions: "",
+		 dialog_addQueFromBank: false,
+		 dialog_ifSaveAsWorkBank: false,
+		 questions: "",
+		 work_name: "",
+	  isTemp:false,
       rules: {
         required: (value) => !!value || "不能为空！",
       },
@@ -199,17 +216,38 @@ export default {
       this.dialog_addQueFromBank = val;
     },
     returnChoicQue(newQue) {
-      this.questions = this.questions + "\n" + JSON.stringify(newQue);
+      this.questions = this.questions + JSON.stringify(newQue);
       this.dialog_addChoicQue = false;
     },
     returnFillInQue(newQue) {
-      this.questions = this.questions + "\n" + JSON.stringify(newQue);
+      this.questions = this.questions + JSON.stringify(newQue);
       this.dialog_addFillInQue = false;
     },
     returnTextQue(newQue) {
-      this.questions = this.questions + "\n" + JSON.stringify(newQue);
+      this.questions = this.questions + JSON.stringify(newQue);
       this.dialog_addTextQue = false;
-    },
+	  },
+	  saveAsWork() {
+		  if (this.work_name == "") {
+			alert("请输入本次作业在作业库中的名称")
+		  } else {
+			this.isTemp = true;
+		  }
+
+	  },
+	  releaseWork() {
+		  this.dialog_ifSaveAsWorkBank = true;
+		  let aWork = {};
+		  let work = {};
+		  aWork.cid = this.cid;
+		  aWork.deadline = this.deadline;
+		  aWork.totalScore = this.totalScore;
+		  aWork.autoReadoverChoice = this.autoReadoverChoice;
+		  aWork.autoReadoverFillIn = this.autoReadoverFillIn;
+		  work.work_name = this.work_name;
+		  work.questions = this.questions;
+		  isTemp = (this.isTemp) ? true : false;
+	}
   },
 };
 </script>

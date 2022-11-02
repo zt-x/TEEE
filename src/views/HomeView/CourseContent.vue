@@ -1,7 +1,8 @@
 <template>
   <v-container fluid>
+
     <v-dialog persistent v-model="releaseWorkDialog" width="800px">
-      <release-work @close="close($event)" />
+      <release-work :cid="cid" @close="close($event)" />
     </v-dialog>
     <v-row>
       <!-- Course WorkPlace -->
