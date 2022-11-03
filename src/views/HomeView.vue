@@ -78,7 +78,8 @@ export default {
       );
       // sessionStorage.setItem('userInfo')
       let routers = eval("(" + data_.data.routers + ")");
-      sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
+		sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
+		console.log(routers);
       setRouter(routers);
       let u = JSON.parse(this.userInfo);
       _this.user.username = u.username;
