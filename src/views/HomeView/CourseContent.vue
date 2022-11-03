@@ -105,6 +105,7 @@ import Chart_sex from "@/components/CourseContentChildren/charts/chart_sex.vue";
 import Chart_workScroe from "@/components/CourseContentChildren/charts/chart_workScroe.vue";
 
 let token = window.localStorage.getItem("token");
+var role;
 export default {
   components: {
     ExamsView,
@@ -125,14 +126,14 @@ export default {
       works: [],
       exams: [],
       announcement: [],
-      isTeacher: true,
+      isTeacher: false,
       releaseWorkDialog: false,
     };
   },
   methods: {
     async close() {
       this.releaseWorkDialog = false;
-      this.created();
+		  this.flushContent();
     },
     flushContent() {
       this.cid = this.$route.params.cid;
@@ -144,18 +145,29 @@ export default {
           Authorization: token,
         };
         return config;
-      });
+	  });
+		_axios.get("/api/power").then((res) => {
+			let role_data = res.data;
+			if (role_data.code == 2) {
+				_this.isTeacher = (role_data.data == "teacher")?1:0
+			} else {
+				alert('出问题咯，获取角色失败');
+			}
+		}).catch((err) => {
+			alert('出问题咯，获取角色请求失败');
+			
+	  })
       const form = new FormData();
       form.append("cid", this.cid);
       _axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
-        let dt = res.data.data;
+		  let dt = res.data.data;
+		  console.log(dt);
         _this.works = dt.filter((item) => {
           return item.isExam == 0;
         });
         _this.exams = dt.filter((item) => {
           return item.isExam == 1;
         });
-        _this.works = res.data.data;
         _this.loading_announcementview = true;
         _this.loading_workview = true;
         _this.loading_examview = true;
@@ -164,7 +176,8 @@ export default {
     },
   },
   mounted() {},
-  created() {
+	created() {
+	// this.isTeacher
     this.flushContent();
   },
 };

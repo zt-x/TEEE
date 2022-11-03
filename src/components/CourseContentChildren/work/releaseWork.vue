@@ -277,7 +277,8 @@ export default {
       aWork.workName = this.workTitle;
       aWork.autoReadoverChoice = this.autoReadoverChoice ? 1 : 0;
       aWork.autoReadoverFillIn = this.autoReadoverFillIn ? 1 : 0;
-      aWork.workId = 0;
+		aWork.workId = 0;
+		aWork.isExam = this.releaseWork_isExam ? 1 : 0;
       work.workName = this.work_name;
       work.questions = this.questions;
       work.isTemp = isTemp ? 1 : 0;
@@ -306,7 +307,6 @@ export default {
         });
     },
     closeFunc(val) {
-      alert("close2!");
       this.dialog_ifSaveAsWorkBank = val;
       this.close();
     },
