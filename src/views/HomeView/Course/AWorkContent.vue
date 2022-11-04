@@ -17,7 +17,7 @@
 			<v-tabs-items v-model="tab">
 				<v-tab-item>
 					<v-card color="basil" flat>
-
+						
 					</v-card>
 				</v-tab-item>
 				<v-tab-item>
