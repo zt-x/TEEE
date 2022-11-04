@@ -24,6 +24,7 @@
               <v-card color="basil" flat> </v-card>
             </v-tab-item>
           </v-tabs-items>
+		  <div style="height:10px"></div>
         </v-card>
       </v-col>
       <!-- Statistic -->
