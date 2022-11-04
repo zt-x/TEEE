@@ -24,7 +24,6 @@
               <v-card color="basil" flat> </v-card>
             </v-tab-item>
           </v-tabs-items>
->>>>>>> 17f6bc20e284d3ac2aa16797b4213c38e4b5f761
         </v-card>
       </v-col>
       <!-- Statistic -->
