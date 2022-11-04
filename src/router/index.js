@@ -32,6 +32,11 @@ const routes = [
 		name: '404 Not Found',
 		component:()=>import('@/views/404.vue')
 	},
+	{
+		path: '/doWork',
+		name: 'doWork',
+		component:()=>import('@/views/WorkPanel.vue')
+	}
 	// {
 	// 	path: '*',
 	// 	redirect:'/404',

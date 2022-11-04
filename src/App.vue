@@ -14,3 +14,9 @@ export default {
   }),
 };
 </script>
+
+<style>
+.v-main__wrap{
+	overflow: auto;
+}
+</style>
