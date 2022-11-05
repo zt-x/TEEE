@@ -5,4 +5,4 @@ COLOR:
 中：#a36645
 深色：#875438
 
-white_background:#f4f5fc
+white_background:#eeeeee

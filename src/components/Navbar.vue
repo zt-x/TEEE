@@ -157,35 +157,31 @@
       </v-card>
     </v-dialog>
 
-
-	<!-- MsgBox模块 -->
+    <!-- MsgBox模块 -->
     <v-badge dot overlap color="green" class="ml-3 mr-2" dark>
       <v-avatar color="#ffe9b3">
         <v-icon color="#875438">fas fa-bell</v-icon>
       </v-avatar>
     </v-badge>
 
-
-	<!-- 头像模块 -->
-	<v-menu offset-y transition="slide-y-transition">
-		<template v-slot:activator="{ on, attrs }">
-			<v-avatar color="#e5f1ff" v-bind="attrs" v-on="on">
-				<v-img :src="_avatar" width="40px"></v-img>
-			</v-avatar>
-		</template>
-		<v-list>
-			<v-list-item>
-				<v-list-item-title>个人信息</v-list-item-title>
-			</v-list-item>
-			<v-list-item @click="logout()">
-				<v-list-item-title>注销</v-list-item-title>
-			</v-list-item>
+    <!-- 头像模块 -->
+    <v-menu offset-y transition="slide-y-transition">
+      <template v-slot:activator="{ on, attrs }">
+        <v-avatar color="#e5f1ff" v-bind="attrs" v-on="on">
+          <v-img :src="_avatar" width="40px"></v-img>
+        </v-avatar>
+      </template>
+      <v-list>
+        <v-list-item>
+          <v-list-item-title>个人信息</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="logout()">
+          <v-list-item-title>注销</v-list-item-title>
+        </v-list-item>
       </v-list>
-	</v-menu>
+    </v-menu>
 
-
-
-	<!-- 弹出提示框 -->
+    <!-- 弹出提示框 -->
     <v-snackbar
       v-model="snackbar"
       top
@@ -223,16 +219,16 @@ export default {
     form_college: "",
     form_banner: "",
     form_startTime: "",
-	form_endTime: "",
+    form_endTime: "",
   }),
   created() {
     token = localStorage.getItem("token");
   },
-	methods: {
-	logout() {
-			localStorage.clear();
-		this.$router.replace({path:'/login'})
-	},
+  methods: {
+    logout() {
+      localStorage.clear();
+      this.$router.replace({ path: "/login" });
+    },
     AddCourse() {
       this.loadingText = "Loading ...";
       this.loading = true;

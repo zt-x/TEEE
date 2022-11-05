@@ -1,7 +1,7 @@
 <template>
   <!-- background-color: aqua; -->
 
-  <v-app style="background: #f4f5fc">
+  <v-app style="background: #eeeeee">
     <!-- <SideBar :key="new Date().getTime() + 1" v-if="nb" /> -->
     <SideBar :key="new Date().getTime() + 1" v-if="nb" />
     <Navbar :role="user.role" :_avatar="user.avatar" />
@@ -78,8 +78,8 @@ export default {
       );
       // sessionStorage.setItem('userInfo')
       let routers = eval("(" + data_.data.routers + ")");
-		sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
-		console.log(routers);
+      sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
+      console.log(routers);
       setRouter(routers);
       let u = JSON.parse(this.userInfo);
       _this.user.username = u.username;
