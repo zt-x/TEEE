@@ -10,6 +10,7 @@
       margin-top: 5px;
     "
     class="white--text"
+    :outlined="isWrite"
     @click="toQue()"
     >{{ qn }}</v-btn
   >
@@ -17,7 +18,7 @@
 
 <script>
 export default {
-  props: ["qn"],
+  props: ["qn", "isWrite"],
   computed: {
     color() {
       return this.status == 0 ? "blue" : "grey";

@@ -24,6 +24,7 @@
                           v-for="(item, i) in qs"
                           :key="i"
                           :qn="i + 1"
+                          :isWrite="!isWrite(i)"
                           @toQue="toQue"
                         />
                       </div>
@@ -35,7 +36,7 @@
           </v-col>
           <!-- 答题区 -->
           <v-col cols="10">
-            <v-card min-width="500px">
+            <v-card class="ml-5" min-width="500px">
               <v-card-title>题目</v-card-title>
               <v-divider></v-divider>
               <div style="background: #eeeeee" class="py-5">
@@ -72,6 +73,7 @@
                                 class="mr-5"
                                 color="blue"
                                 dark
+                                v-if="flushButton"
                                 :outlined="!isChose(i, index)"
                                 @click="chose(i, index)"
                                 >{{ map(index) }}</v-btn
@@ -83,16 +85,22 @@
                         <!-- 填空题 -->
                         <div class="pl-8 pt-5" v-else-if="item.qtype == 30011">
                           <div>
-                            {{ item.qans }}
                             <span>我的答案是: </span>
                             <div style="width: 300px">
-                              <v-text-field></v-text-field>
+                              <v-text-field v-model="myAnss[i]"></v-text-field>
                             </div>
                           </div>
                         </div>
                         <!-- 简答题 -->
-                        <div class="text-center" v-else-if="item.qtype == 30012">
-                          简答题
+                        <div class="pl-8 pt-5" v-else-if="item.qtype == 30012">
+                          <div>
+                            <div style="width: 700px">
+                              <v-textarea
+                                label="输入你的答案"
+                                v-model="myAnss[i]"
+                              ></v-textarea>
+                            </div>
+                          </div>
                         </div>
                       </v-card>
                     </v-tab-item>
@@ -119,7 +127,7 @@
                   @click="p_que++"
                   >下一题</v-btn
                 >
-                <v-btn class="mr-7" dark color="blue">提交</v-btn>
+                <v-btn class="mr-7" dark color="blue" @click="submit()">提交</v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -144,7 +152,7 @@ export default {
     wid() {
       if (this.$route.params.wid == null) {
         //测试环境
-        return 25;
+        return 27;
       } else {
         return this.$route.params.wid;
       }
@@ -154,10 +162,8 @@ export default {
     return {
       p_que: 0,
       qs: [],
-      chosed: [],
-      fillin: [],
-      text: [],
       myAnss: [],
+      flushButton: true,
     };
   },
   mounted() {
@@ -181,11 +187,9 @@ export default {
         .then((res) => {
           let questions = res.data.data;
           _this.qs = eval(questions);
-          console.log(_this.qs);
+          _this.myAnss.length = _this.qs.length;
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => {});
     },
     toQue(qid) {
       this.p_que = qid;
@@ -195,20 +199,32 @@ export default {
       this.$router.push({ name: "CourseContent", params: { cid: cid } });
     },
     chose(i, index) {
-      let item = i + "_" + index;
-      let p = this.chosed.indexOf(item);
+      let arr = [];
+      arr = this.myAnss[i];
+      if (arr == undefined) {
+        this.myAnss[i] = [];
+        arr = this.myAnss[i];
+      }
+      let p = arr.indexOf(index);
       if (p == -1) {
         //不存在
-        this.chosed.push(item);
+        arr.push(index);
       } else {
         //存在，删除、
-        this.chosed.splice(p, 1);
+        arr.splice(p, 1);
       }
-      console.log(this.chosed);
+      this.myAnss[i] = arr;
+      this.flushButton = false;
+      this.flushButton = true;
     },
     isChose(i, index) {
-      let item = i + "_" + index;
-      let p = this.chosed.indexOf(item);
+      let arr = [];
+      arr = this.myAnss[i];
+      if (arr == undefined) {
+        this.myAnss[i] = [];
+        arr = this.myAnss[i];
+      }
+      let p = arr.indexOf(index);
       if (p == -1) {
         return false;
       } else {
@@ -224,6 +240,65 @@ export default {
         return "C";
       } else if (val == 3) {
         return "D";
+      }
+    },
+    isWrite(val) {
+      if (
+        this.myAnss[val] != undefined &&
+        this.myAnss[val] != null &&
+        this.myAnss[val] != "" &&
+        this.myAnss[val].length != 0
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    submit() {
+      let undo = -1;
+      for (let i = this.myAnss.length - 1; i >= 0; i--) {
+        if (this.isWrite(i) == false) {
+          undo = i + 1;
+        }
+      }
+      if (undo != -1) {
+        this.$dialog({
+          title: "提交作业",
+          content: "你的第" + undo + "题还没写哦，确定要提交吗？",
+          btns: [
+            {
+              label: "我再想想",
+              color: "#09f",
+              ghost: true,
+            },
+            {
+              label: "提交",
+              color: "#09f",
+              callback: () => {
+                console.log(this.myAnss);
+              },
+            },
+          ],
+        });
+      } else {
+        this.$dialog({
+          title: "提交作业",
+          content: "确定要提交吗？",
+          btns: [
+            {
+              label: "我再想想",
+              color: "#09f",
+              ghost: true,
+            },
+            {
+              label: "提交",
+              color: "#09f",
+              callback: () => {
+                console.log(this.myAnss);
+              },
+            },
+          ],
+        });
       }
     },
   },
