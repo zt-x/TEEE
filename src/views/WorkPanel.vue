@@ -59,14 +59,38 @@
                           <span class="pl-5">{{ item.qtext }}</span>
                         </v-card-text>
                         <!-- 写答案区 -->
-                        <div class="text-center" v-if="item.qtype == 30010">
-                          <div v-for="(ans, index) in item.qans" :key="index">
-                            <v-btn @click="chose(i, index)"> {{ ans }} </v-btn>
+                        <!-- 选择题 -->
+                        <div class="pl-8 pt-5" v-if="item.qtype == 30010">
+                          <div
+                            class="mb-5"
+                            v-for="(ans, index) in item.qans"
+                            :key="index"
+                          >
+                            <div>
+                              <v-btn
+                                style="min-width: 44px; height: 44px; width: 44px"
+                                class="mr-5"
+                                color="blue"
+                                dark
+                                :outlined="!isChose(i, index)"
+                                @click="chose(i, index)"
+                                >{{ map(index) }}</v-btn
+                              >
+                              <span>{{ ans }} </span>
+                            </div>
                           </div>
                         </div>
-                        <div class="text-center" v-else-if="item.qtype == 30011">
-                          {{ item.qans }}
+                        <!-- 填空题 -->
+                        <div class="pl-8 pt-5" v-else-if="item.qtype == 30011">
+                          <div>
+                            {{ item.qans }}
+                            <span>我的答案是: </span>
+                            <div style="width: 300px">
+                              <v-text-field></v-text-field>
+                            </div>
+                          </div>
                         </div>
+                        <!-- 简答题 -->
                         <div class="text-center" v-else-if="item.qtype == 30012">
                           简答题
                         </div>
@@ -77,7 +101,24 @@
               </div>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="mr-1" dark outlined color="blue">下一题</v-btn>
+                <v-btn
+                  class="mr-1"
+                  v-if="p_que > 0"
+                  dark
+                  outlined
+                  color="blue"
+                  @click="p_que--"
+                  >上一题</v-btn
+                >
+                <v-btn
+                  class="mr-1"
+                  v-if="p_que < qs.length - 1"
+                  dark
+                  outlined
+                  color="blue"
+                  @click="p_que++"
+                  >下一题</v-btn
+                >
                 <v-btn class="mr-7" dark color="blue">提交</v-btn>
               </v-card-actions>
             </v-card>
@@ -113,8 +154,10 @@ export default {
     return {
       p_que: 0,
       qs: [],
-      qans: [],
       chosed: [],
+      fillin: [],
+      text: [],
+      myAnss: [],
     };
   },
   mounted() {
@@ -163,8 +206,28 @@ export default {
       }
       console.log(this.chosed);
     },
+    isChose(i, index) {
+      let item = i + "_" + index;
+      let p = this.chosed.indexOf(item);
+      if (p == -1) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    map(val) {
+      if (val == 0) {
+        return "A";
+      } else if (val == 1) {
+        return "B";
+      } else if (val == 2) {
+        return "C";
+      } else if (val == 3) {
+        return "D";
+      }
+    },
   },
 };
 </script>
 
-<style></style>
+<style scoped></style>
