@@ -1,12 +1,17 @@
 <template>
   <v-card style="min-width: 1520px; background: #875438; min-height: 1080px">
-    <v-card-title>666</v-card-title>
+    <v-card-title>
+      <v-chip @click="goBack()" small class="ma-2" color="black" text-color="white"
+        ><v-icon small left>fa fa-reply</v-icon>返回</v-chip
+      >
+      {{ wid }}</v-card-title
+    >
     <v-card-text>
       <v-container fluid>
         <v-row>
           <!-- 答题卡 -->
           <v-col cols="2">
-            <v-card>
+            <v-card style="min-width: 250px" class="mr-5">
               <v-card-title>答题卡</v-card-title>
               <v-divider></v-divider>
               <div style="background: #eeeeee" class="py-5">
@@ -15,7 +20,12 @@
                     <v-col cols="12">
                       <div style="height: 5px"></div>
                       <div class="mx-auto text-center">
-                        <QueNum v-for="i in 8" :key="i" />
+                        <QueNum
+                          v-for="(item, i) in qs"
+                          :key="i"
+                          :qn="i + 1"
+                          @toQue="toQue"
+                        />
                       </div>
                     </v-col>
                   </v-row>
@@ -35,22 +45,41 @@
                     background-color="transparent"
                     hide-slider
                     color="brown"
+                    height="0px"
                   >
-                    <v-tab v-for="item in items" :key="item.tab">
-                      {{ item.tab }}
-                    </v-tab>
+                    <v-tab v-for="(item, i) in qs" :key="i"> </v-tab>
                   </v-tabs>
-
                   <v-tabs-items v-model="tab">
-                    <v-tab-item v-for="item in items" :key="item.tab">
+                    <v-tab-item v-for="(item, i) in qs" :key="i">
                       <v-card flat>
-                        <v-card-text>{{ item.content }}</v-card-text>
+                        <v-card-text style="font-size: 20px">
+                          <span style="font-weight: bold"
+                            >{{ i + 1 }}、 ({{ item.qscore }}分)</span
+                          >
+                          <span class="pl-5">{{ item.qtext }}</span>
+                        </v-card-text>
+                        <!-- 写答案区 -->
+                        <div class="text-center" v-if="item.qtype == 30010">
+                          <div v-for="(ans, index) in item.qans" :key="index">
+                            <v-btn @click="chose(i, index)"> {{ ans }} </v-btn>
+                          </div>
+                        </div>
+                        <div class="text-center" v-else-if="item.qtype == 30011">
+                          {{ item.qans }}
+                        </div>
+                        <div class="text-center" v-else-if="item.qtype == 30012">
+                          简答题
+                        </div>
                       </v-card>
                     </v-tab-item>
                   </v-tabs-items>
                 </v-card>
               </div>
-              <v-card-title>题目</v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn class="mr-1" dark outlined color="blue">下一题</v-btn>
+                <v-btn class="mr-7" dark color="blue">提交</v-btn>
+              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
@@ -60,25 +89,80 @@
 </template>
 
 <script>
+import axios from "axios";
 import QueNum from "@/components/WorkPanel/QueNum.vue";
+import { setRouter } from "@/router";
+const _axios = axios.create();
+let token = window.localStorage.getItem("token");
 export default {
   components: { QueNum },
+  computed: {
+    tab() {
+      return this.p_que;
+    },
+    wid() {
+      if (this.$route.params.wid == null) {
+        //测试环境
+        return 25;
+      } else {
+        return this.$route.params.wid;
+      }
+    },
+  },
   data() {
     return {
-      tab: null,
-      items: [
-        { tab: "One", content: "Tab 1 Content" },
-        { tab: "Two", content: "Tab 2 Content" },
-        { tab: "Three", content: "Tab 3 Content" },
-        { tab: "Four", content: "Tab 4 Content" },
-        { tab: "Five", content: "Tab 5 Content" },
-        { tab: "Six", content: "Tab 6 Content" },
-        { tab: "Seven", content: "Tab 7 Content" },
-        { tab: "Eight", content: "Tab 8 Content" },
-        { tab: "Nine", content: "Tab 9 Content" },
-        { tab: "Ten", content: "Tab 10 Content" },
-      ],
+      p_que: 0,
+      qs: [],
+      qans: [],
+      chosed: [],
     };
+  },
+  mounted() {
+    this.getWork();
+  },
+  methods: {
+    async getWork() {
+      token = window.localStorage.getItem("token");
+      let _this = this;
+      // init axios
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      const form = new FormData();
+      form.append("wid", this.wid);
+      _axios
+        .post("/api/Work/getWork", form)
+        .then((res) => {
+          let questions = res.data.data;
+          _this.qs = eval(questions);
+          console.log(_this.qs);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    toQue(qid) {
+      this.p_que = qid;
+    },
+    goBack() {
+      let cid = this.$route.params.cid;
+      this.$router.push({ name: "CourseContent", params: { cid: cid } });
+    },
+    chose(i, index) {
+      let item = i + "_" + index;
+      let p = this.chosed.indexOf(item);
+      if (p == -1) {
+        //不存在
+        this.chosed.push(item);
+      } else {
+        //存在，删除、
+        this.chosed.splice(p, 1);
+      }
+      console.log(this.chosed);
+    },
   },
 };
 </script>

@@ -10,13 +10,14 @@
       margin-top: 5px;
     "
     class="white--text"
-    @click="status = 1"
-    >1</v-btn
+    @click="toQue()"
+    >{{ qn }}</v-btn
   >
 </template>
 
 <script>
 export default {
+  props: ["qn"],
   computed: {
     color() {
       return this.status == 0 ? "blue" : "grey";
@@ -26,6 +27,11 @@ export default {
     return {
       status: 0,
     };
+  },
+  methods: {
+    toQue() {
+      this.$emit("toQue", this.qn - 1);
+    },
   },
 };
 </script>

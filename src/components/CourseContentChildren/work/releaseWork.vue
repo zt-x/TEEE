@@ -211,7 +211,7 @@ export default {
       dialog_ifSaveAsWorkBank: false,
       dialog_msg: false,
       dialog_msg_msg: "",
-      questions: "",
+      questions: [],
       work_name: "",
       isTemp: false,
       rules: {
@@ -247,15 +247,15 @@ export default {
       this.dialog_addQueFromBank = val;
     },
     returnChoicQue(newQue) {
-      this.questions = this.questions + JSON.stringify(newQue);
+      this.questions.push(JSON.stringify(newQue));
       this.dialog_addChoicQue = false;
     },
     returnFillInQue(newQue) {
-      this.questions = this.questions + JSON.stringify(newQue);
+      this.questions.push(JSON.stringify(newQue));
       this.dialog_addFillInQue = false;
     },
     returnTextQue(newQue) {
-      this.questions = this.questions + JSON.stringify(newQue);
+      this.questions.push(JSON.stringify(newQue));
       this.dialog_addTextQue = false;
     },
     saveAsWork() {},
@@ -277,10 +277,10 @@ export default {
       aWork.workName = this.workTitle;
       aWork.autoReadoverChoice = this.autoReadoverChoice ? 1 : 0;
       aWork.autoReadoverFillIn = this.autoReadoverFillIn ? 1 : 0;
-		aWork.workId = 0;
-		aWork.isExam = this.releaseWork_isExam ? 1 : 0;
+      aWork.workId = 0;
+      aWork.isExam = this.releaseWork_isExam ? 1 : 0;
       work.workName = this.work_name;
-      work.questions = this.questions;
+      work.questions = "[" + this.questions.toString() + "]";
       work.isTemp = isTemp ? 1 : 0;
       const _axios = axios.create();
       _axios.interceptors.request.use(function (config) {

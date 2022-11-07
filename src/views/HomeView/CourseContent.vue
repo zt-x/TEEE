@@ -32,7 +32,7 @@
               <v-tabs-items v-model="tab">
                 <v-tab-item :key="items[0]">
                   <v-card color="basil" flat>
-                    <WorksView :works="works" v-if="loading_workview" />
+                    <WorksView :cid="cid" :works="works" v-if="loading_workview" />
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
@@ -133,7 +133,7 @@ export default {
   methods: {
     async close() {
       this.releaseWorkDialog = false;
-		  this.flushContent();
+      this.flushContent();
     },
     flushContent() {
       this.cid = this.$route.params.cid;
@@ -145,40 +145,48 @@ export default {
           Authorization: token,
         };
         return config;
-	  });
-		_axios.get("/api/power").then((res) => {
-			let role_data = res.data;
-			if (role_data.code == 2) {
-				_this.isTeacher = (role_data.data == "teacher")?1:0
-			} else {
-				alert('出问题咯，获取角色失败');
-			}
-		}).catch((err) => {
-			alert('出问题咯，获取角色请求失败');
-			
-	  })
+      });
+      _axios
+        .get("/api/power")
+        .then((res) => {
+          let role_data = res.data;
+          if (role_data.code == 2) {
+            _this.isTeacher = role_data.data == "teacher" ? 1 : 0;
+          } else {
+            alert("出问题咯，获取角色失败");
+          }
+        })
+        .catch((err) => {
+          alert("出问题咯，获取角色请求失败");
+        });
       const form = new FormData();
       form.append("cid", this.cid);
-      _axios.post("/api/Course/getAllWorksByCID", form).then((res) => {
-		  let dt = res.data.data;
-		  console.log(dt);
-        _this.works = dt.filter((item) => {
-          return item.isExam == 0;
+      _axios
+        .post("/api/Course/getAllWorksByCID", form)
+        .then((res) => {
+          let dt = res.data.data;
+          console.log(dt);
+          _this.works = dt.filter((item) => {
+            return item.isExam == 0;
+          });
+          _this.exams = dt.filter((item) => {
+            return item.isExam == 1;
+          });
+          _this.loading_announcementview = true;
+          _this.loading_workview = true;
+          _this.loading_examview = true;
+          _this.$vuetify.goTo(0);
+        })
+        .catch((err) => {
+          _this.$router.push({ name: "我的课程" });
         });
-        _this.exams = dt.filter((item) => {
-          return item.isExam == 1;
-        });
-        _this.loading_announcementview = true;
-        _this.loading_workview = true;
-        _this.loading_examview = true;
-        _this.$vuetify.goTo(0);
-      });
     },
   },
-  mounted() {},
-	created() {
-	// this.isTeacher
+  mounted() {
     this.flushContent();
+  },
+  created() {
+    // this.isTeacher
   },
 };
 </script>

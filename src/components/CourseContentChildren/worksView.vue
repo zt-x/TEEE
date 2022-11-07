@@ -1,7 +1,12 @@
 <template>
   <v-container>
     <div v-for="work in works" v-bind:key="work.id">
-      <v-card style="min-width: 100%" hover ripple="">
+      <v-card
+        style="min-width: 100%"
+        hover
+        ripple=""
+        @click="$router.push({ name: 'doWork', params: { wid: work.id, cid: cid } })"
+      >
         <v-card-title>
           {{ work.workName }}
           <v-spacer></v-spacer>
@@ -16,7 +21,7 @@
 
 <script>
 export default {
-  props: ["works"],
+  props: ["works", "cid"],
   data() {
     return {};
   },
