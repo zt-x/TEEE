@@ -248,6 +248,7 @@ export default {
             _this.loading = false;
             _this.dialog_stu = false;
             _this.snackbar = true;
+            _this.$router.replace({ path: "/Flush", params: { path: "/Course" } });
             // _this.$router.replace({ path: "Flush", params: { path: "Course" } });
           })
           .catch((err) => {
