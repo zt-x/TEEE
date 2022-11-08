@@ -157,6 +157,9 @@ export default {
         return this.$route.params.wid;
       }
     },
+    cid() {
+      return this.$route.params.cid;
+    },
   },
   data() {
     return {
@@ -195,8 +198,13 @@ export default {
       this.p_que = qid;
     },
     goBack() {
-      let cid = this.$route.params.cid;
-      this.$router.push({ name: "CourseContent", params: { cid: cid } });
+      let _cid = this.cid;
+      //   alert(_cid);
+      this.$router.replace({
+        name: "home",
+        params: { targetName: "CourseContent", pars: { pname: "cid", pvalue: _cid } },
+      });
+      //   this.$router.back();
     },
     chose(i, index) {
       let arr = [];
@@ -240,6 +248,18 @@ export default {
         return "C";
       } else if (val == 3) {
         return "D";
+      } else if (val == 4) {
+        return "E";
+      } else if (val == 5) {
+        return "F";
+      } else if (val == 6) {
+        return "G";
+      } else if (val == 7) {
+        return "H";
+      } else if (val == 8) {
+        return "I";
+      } else if (val == 9) {
+        return "J";
       }
     },
     isWrite(val) {
