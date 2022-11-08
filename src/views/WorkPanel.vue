@@ -294,7 +294,18 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                console.log(this.myAnss);
+                let ass = this.myAnss;
+                const form = new FormData();
+                form.append("wid", this.wid);
+                form.append("ans", ass);
+                _axios
+                  .post("/api/submit/submitWork", form)
+                  .then((res) => {
+                    this.$dialog({
+                      content: res.data,
+                    });
+                  })
+                  .catch((err) => {});
               },
             },
           ],
