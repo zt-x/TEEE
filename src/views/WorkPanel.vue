@@ -1,11 +1,14 @@
 <template>
-  <v-card style="min-width: 1520px; background: #875438; min-height: 1080px">
-    <v-card-title>
-      <v-chip @click="goBack()" small class="ma-2" color="black" text-color="white"
+  <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
+	<v-app-bar color="white" app>
+		<v-card-title>
+      <v-chip @click="goBack()" small class="ma-2" color="#555555" text-color="white"
         ><v-icon small left>fa fa-reply</v-icon>返回</v-chip
       >
-      {{ wid }}</v-card-title
+      {{ wname }}</v-card-title
     >
+	</v-app-bar>
+
     <v-card-text>
       <v-container fluid>
         <v-row>
