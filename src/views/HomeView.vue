@@ -53,6 +53,8 @@ export default {
 
   computed: mapState(["userInfo"]),
   created() {
+    let tName = this.$route.params.targetName;
+    let pms = this.$route.params.pars;
     let _this = this;
     //配置路由
     resetRouter();
@@ -79,8 +81,12 @@ export default {
       // sessionStorage.setItem('userInfo')
       let routers = eval("(" + data_.data.routers + ")");
       sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
-      console.log(routers);
       setRouter(routers);
+      if (tName != undefined) {
+        if (pms.pname == "cid") {
+          this.$router.push({ name: tName, params: { cid: pms.pvalue } });
+        }
+      }
       let u = JSON.parse(this.userInfo);
       _this.user.username = u.username;
       _this.user.avatar = u.avatar;

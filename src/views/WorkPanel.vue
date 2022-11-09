@@ -157,6 +157,9 @@ export default {
         return this.$route.params.wid;
       }
     },
+    cid() {
+      return this.$route.params.cid;
+    },
 	  wname() {
 		if (this.$route.params.wname == null) {
         //测试环境
@@ -203,8 +206,13 @@ export default {
       this.p_que = qid;
     },
     goBack() {
-      let cid = this.$route.params.cid;
-      this.$router.push({ name: "CourseContent", params: { cid: cid } });
+      let _cid = this.cid;
+      //   alert(_cid);
+      this.$router.replace({
+        name: "home",
+        params: { targetName: "CourseContent", pars: { pname: "cid", pvalue: _cid } },
+      });
+      //   this.$router.back();
     },
     chose(i, index) {
       let arr = [];
@@ -248,6 +256,18 @@ export default {
         return "C";
       } else if (val == 3) {
         return "D";
+      } else if (val == 4) {
+        return "E";
+      } else if (val == 5) {
+        return "F";
+      } else if (val == 6) {
+        return "G";
+      } else if (val == 7) {
+        return "H";
+      } else if (val == 8) {
+        return "I";
+      } else if (val == 9) {
+        return "J";
       }
     },
     isWrite(val) {
@@ -302,35 +322,35 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-				  let ass = this.myAnss;
-				  let str = "[";
+                let ass = this.myAnss;
+                let str = "[";
                 const form = new FormData();
-				  form.append("wid", this.wid);
+                form.append("wid", this.wid);
 
-				  // 手动装配arr， 避免直接使用toString拉直成一维 ....
-				  for (var i = 0; i < ass.length; i++){
-					  if (Array.isArray(ass[i])){
-						  str += ("[" + ass[i].toString()  + "], ");
-					  } else {
-						  str += (ass[i] + ", ");
-					}
-				  }
-				  str = str.slice(0, -2);
-				  str += "]";
-				  form.append("ans", str);
+                // 手动装配arr， 避免直接使用toString拉直成一维 ....
+                for (var i = 0; i < ass.length; i++) {
+                  if (Array.isArray(ass[i])) {
+                    str += "[" + ass[i].toString() + "], ";
+                  } else {
+                    str += ass[i] + ", ";
+                  }
+                }
+                str = str.slice(0, -2);
+                str += "]";
+                form.append("ans", str);
 
                 _axios
                   .post("/api/submit/submitWork", form)
                   .then((res) => {
                     this.$dialog({
-						content: res.data.msg,
-						btns: [
-							{
-							label: "芜湖",
-							color: "#09f",
-							// ghost: true,
-							},
-					  ],
+                      content: res.data.msg,
+                      btns: [
+                        {
+                          label: "芜湖",
+                          color: "#09f",
+                          // ghost: true,
+                        },
+                      ],
                     });
                   })
                   .catch((err) => {});

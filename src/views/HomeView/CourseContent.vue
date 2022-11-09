@@ -137,6 +137,11 @@ export default {
     },
     flushContent() {
       this.cid = this.$route.params.cid;
+      if (this.cid == undefined) {
+        this.cid = sessionStorage.getItem("temp_cid");
+      } else {
+        sessionStorage.setItem("temp_cid", this.cid);
+      }
       let _this = this;
       token = window.localStorage.getItem("token");
       const _axios = axios.create();
@@ -178,7 +183,8 @@ export default {
           _this.$vuetify.goTo(0);
         })
         .catch((err) => {
-          _this.$router.push({ name: "我的课程" });
+          _this.$router.replace({ path: "/Course" });
+          //   _this.$router.push({  name: "CourseContent", params: { cid: cid } });
         });
     },
   },
