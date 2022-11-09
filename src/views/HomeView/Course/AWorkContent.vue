@@ -17,7 +17,7 @@
           <v-tabs-items v-model="tab">
             <v-tab-item>
               <v-card color="basil" flat class="pt-3">
-                <SubmitWork v-for="(info, index) in infos" :key="index" :INFO="info" />
+                <SubmitWork v-for="(submit, index) in submits" :key="index" :SUBMIT="submit" />
               </v-card>
             </v-tab-item>
             <v-tab-item>
@@ -39,19 +39,50 @@
 
 <script>
 import SubmitWork from "@/components/CourseContentChildren/work/submitWork.vue";
+import axios from "axios";
+const _axios = axios.create();
+let token = window.localStorage.getItem("token");
 export default {
+	
   components: { SubmitWork },
   data() {
     return {
       tab: null,
       items: ["未批改", "已批改"],
-      infos: [
+      submits: [
         { name: "xzt", username: "2020", score: 99 },
         { name: "xzt", username: "2020", score: 99 },
         { name: "xzt", username: "2020", score: 99 },
       ],
     };
-  },
+},
+	methods: {
+		async getAllSubmits() {
+			token = window.localStorage.getItem("token");
+			let _this = this;
+			// init axios
+			_axios.interceptors.request.use(function (config) {
+				config.headers = {
+				Authorization: token,
+				};
+				return config;
+			});
+			const form = new FormData();
+			form.append("wid", this.wid);
+			_axios
+				.post("/api/Work/getWork", form)
+				.then((res) => {
+				let questions = res.data.data;
+				_this.qs = eval(questions);
+				_this.myAnss.length = _this.qs.length;
+				})
+				.catch((err) => {});
+		},
+	},
+	mounted() {
+
+	}
+   
 };
 </script>
 

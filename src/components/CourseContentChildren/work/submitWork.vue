@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  props: ["INFO"],
+  props: ["SUBMIT"],
 };
 </script>
 

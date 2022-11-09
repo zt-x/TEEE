@@ -143,7 +143,6 @@
 <script>
 import axios from "axios";
 import QueNum from "@/components/WorkPanel/QueNum.vue";
-import { setRouter } from "@/router";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
