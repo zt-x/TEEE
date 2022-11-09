@@ -5,7 +5,7 @@
         style="min-width: 100%"
         hover
         ripple=""
-        @click="$router.push({ name: 'doWork', params: { wid: work.id, cid: cid } })"
+        @click="$router.push({ name: 'doWork', params: { wid: work.id,wname: work.workName, cid: cid } })"
       >
         <v-card-title>
           {{ work.workName }}

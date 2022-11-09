@@ -157,6 +157,14 @@ export default {
         return this.$route.params.wid;
       }
     },
+	  wname() {
+		if (this.$route.params.wname == null) {
+        //测试环境
+        return '测试环境题目';
+      } else {
+        return this.$route.params.wname;
+      }
+	}
   },
   data() {
     return {
