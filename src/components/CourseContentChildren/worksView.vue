@@ -21,7 +21,12 @@
 
 <script>
 export default {
-  props: ["works", "cid"],
+	props: ["works", "cid"],
+	computed: {
+		doWork() {
+			
+		}
+  },
   data() {
     return {};
   },

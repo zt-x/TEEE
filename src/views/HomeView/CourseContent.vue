@@ -32,7 +32,8 @@
               <v-tabs-items v-model="tab">
                 <v-tab-item :key="items[0]">
                   <v-card color="basil" flat>
-                    <WorksView :cid="cid" :works="works" v-if="loading_workview" />
+                    <WorksView :cid="cid" :works="works" v-if="loading_workview && !isTeacher" />
+                    <WorksViewTeacher :cid="cid" :works="works" v-if="loading_workview && isTeacher" />
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
@@ -103,6 +104,7 @@ import axios from "axios";
 import ReleaseWork from "@/components/CourseContentChildren/work/releaseWork.vue";
 import Chart_sex from "@/components/CourseContentChildren/charts/chart_sex.vue";
 import Chart_workScroe from "@/components/CourseContentChildren/charts/chart_workScroe.vue";
+import WorksViewTeacher from "@/components/CourseContentChildren/worksViewTeacher.vue";
 
 let token = window.localStorage.getItem("token");
 var role;
@@ -114,7 +116,8 @@ export default {
     ReleaseWork,
     Chart_sex,
     Chart_workScroe,
-  },
+    WorksViewTeacher
+},
   data() {
     return {
       tab: null,
@@ -127,7 +130,7 @@ export default {
       exams: [],
       announcement: [],
       isTeacher: false,
-      releaseWorkDialog: false,
+		releaseWorkDialog: false,
     };
   },
   methods: {

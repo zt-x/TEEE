@@ -5,7 +5,7 @@
 		  style="min-width: 100%"
 		  hover
 		  ripple=""
-		  @click="enterSubmitsPage()"
+		  @click="$router.push({ name: 'WorkContent', params: { wid: work.id,wname: work.workName, cid: cid } })"
 		>
 		  <v-card-title>
 			{{ work.workName }}
@@ -21,16 +21,16 @@
   
   <script>
   export default {
-	props: ["works", "cid"],
+	  props: ["works", "cid"],
+	  computed: {
+		  doWork() {
+			  
+		  }
+	},
 	data() {
 	  return {};
 	},
-	created() { },
-	methods: {
-		enterSubmitsPage() {
-			// this.$router.push({ name: 'doWork', params: { wid: work.id, wname: work.workName, cid: cid } });
-		}
-	}
+	created() {},
   };
   </script>
   
