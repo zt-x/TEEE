@@ -13,7 +13,6 @@ export default {
   props: ["statistic"],
   mounted() {
     myChart = echarts.init(document.getElementById("charts"));
-
     this.initChart();
   },
   methods: {
@@ -58,7 +57,6 @@ export default {
       deep: true,
       handler(newVal, oldVal) {
         this.sta = newVal;
-        console.log(this.sta);
         this.initChart();
       },
     },

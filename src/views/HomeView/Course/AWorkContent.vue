@@ -122,10 +122,12 @@ export default {
       form.append("wid", this.wid);
       _axios
         .post("/api/submit/getAllSubmitByWorkId", form)
-        .then((res) => {
-          let submits = res.data.data;
-          _this.submits = eval(submits);
-
+		  .then((res) => {
+			  let submits = res.data.data;
+			  _this.submits = eval(submits);
+			  _this.submits.sort((a, b) => {
+				  return b.score - a.score;
+			  })
           //分离已完成批改和未完成批改的
           _this.submit_finish = _this.submits.filter((item) => {
             return item.finishReadOver == 1;
@@ -158,7 +160,6 @@ export default {
     },
     setStatisticsPanel(statistic) {
       this.statistic_content = statistic;
-      console.log(this.statistic_content);
       this.sta = [];
       this.sta.push({ value: statistic.NOP_excellent, name: "优秀(分数>90%)" });
       this.sta.push({ value: statistic.NOP_good, name: "良好(分数在90%~75%)" });

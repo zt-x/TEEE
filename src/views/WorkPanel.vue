@@ -305,7 +305,38 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                console.log(this.myAnss);
+                let ass = this.myAnss;
+                let str = "[";
+                const form = new FormData();
+                form.append("wid", this.wid);
+
+                // 手动装配arr， 避免直接使用toString拉直成一维 ....
+                for (var i = 0; i < ass.length; i++) {
+                  if (Array.isArray(ass[i])) {
+                    str += "[" + ass[i].toString() + "], ";
+                  } else {
+                    str += ass[i] + ", ";
+                  }
+                }
+                str = str.slice(0, -2);
+                str += "]";
+                form.append("ans", str);
+
+                _axios
+                  .post("/api/submit/submitWork", form)
+                  .then((res) => {
+                    this.$dialog({
+                      content: res.data.msg,
+                      btns: [
+                        {
+                          label: "芜湖",
+                          color: "#09f",
+                          // ghost: true,
+                        },
+                      ],
+                    });
+                  })
+                  .catch((err) => {});
               },
             },
           ],
@@ -366,4 +397,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

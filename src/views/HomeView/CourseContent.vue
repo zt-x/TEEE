@@ -173,7 +173,6 @@ export default {
         .post("/api/Course/getAllWorksByCID", form)
         .then((res) => {
           let dt = res.data.data;
-          console.log(dt);
           _this.works = dt.filter((item) => {
             return item.isExam == 0;
           });

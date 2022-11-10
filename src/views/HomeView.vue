@@ -78,8 +78,6 @@ export default {
           avatar: data_.data.avatar,
         })
       );
-      // sessionStorage.setItem('userInfo')
-		console.log(data_.data.routers);
 		let routers = eval("(" + data_.data.routers + ")");
 	  
       sessionStorage.setItem("serverRoutes", JSON.stringify(routers));

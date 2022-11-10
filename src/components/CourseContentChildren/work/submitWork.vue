@@ -2,12 +2,12 @@
   <v-card ripple hover class="my-1 mx-auto" style="width: 95%">
     <v-container>
       <v-row>
-        <v-col cols="2">
+        <v-col cols="2" class="hideMore">
           <v-avatar class="mr-1" size="30px">
             <v-img :src="SUBMIT.avatar"></v-img>
           </v-avatar>
-          {{ SUBMIT.username }}</v-col
-        >
+			{{ SUBMIT.username }}
+        </v-col>
         <v-col cols="2">{{ SUBMIT.uid }}</v-col>
         <v-col cols="6">
           <v-spacer></v-spacer>
@@ -26,8 +26,8 @@ export default {
   computed: {
     score_color() {
       return this.SUBMIT.score > 60
-        ? this.SUBMIT.score > 80
-          ? "success"
+        ? this.SUBMIT.score > 75
+          ? this.SUBMIT.score>90?"success":"info"
           : "warning"
         : "error";
     },
@@ -41,4 +41,10 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.hideMore{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+</style>

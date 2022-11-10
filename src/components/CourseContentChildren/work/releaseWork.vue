@@ -293,10 +293,8 @@ export default {
       _axios
         .post("/api/Bank/addWorkBank", work)
         .then((res) => {
-          console.log(res.data);
           aWork.workId = res.data.data;
           _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
-            console.log(res2.data);
             _this.dialog_msg_msg = res2.data.msg;
             _this.dialog_msg = true;
           });
