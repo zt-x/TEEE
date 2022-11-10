@@ -41,7 +41,11 @@
       <!-- Statistic -->
       <v-col cols="12" sm="4">
         <v-card>
-          <v-card-title>111</v-card-title>
+          <v-card-title>{{statistic_content.workname}}</v-card-title>
+		  <v-divider></v-divider>
+		  <v-card-text>
+			
+		  </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -81,7 +85,8 @@ export default {
         { name: "xzt", username: "2020", score: 99 },
       ],
       submit_finish: [],
-      submit_unfinish: [],
+		submit_unfinish: [],
+	  statistic_content:{},
     };
   },
   methods: {
@@ -117,29 +122,24 @@ export default {
         })
         .catch((err) => {});
     },
-    async getStatistics() {
+	  async getStatistics() {
+		  let _this = this;
       const form = new FormData();
       form.append("wid", this.wid);
       _axios
-        .post("/api/submit/getAllSubmitByWorkId", form)
-        .then((res) => {
-          let submits = res.data.data;
-          _this.submits = eval(submits);
-
-          //分离已完成批改和未完成批改的
-          _this.submit_finish = _this.submits.filter((item) => {
-            return item.finishReadOver == 1;
-          });
-          _this.submit_unfinish = _this.submits.filter((item) => {
-            return (
-              item.finishReadOver == 0 ||
-              item.finishReadOver == undefined ||
-              item.finishReadOver == null
-            );
-          });
+        .post("/api/submit/getSubmitSummary", form)
+		  .then((res) => {
+			  let Statistic = {}
+			  Statistic = JSON.parse(res.data.data);
+			  _this.setStatisticsPanel(Statistic);
         })
-        .catch((err) => {});
-    },
+		  .catch((err) => {
+			  console.log(err);
+		});
+	  },
+	  setStatisticsPanel(statistic) {
+		  this.statistic_content = statistic;
+	}
   },
   mounted() {
     let _this = this;

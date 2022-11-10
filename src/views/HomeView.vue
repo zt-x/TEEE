@@ -79,7 +79,9 @@ export default {
         })
       );
       // sessionStorage.setItem('userInfo')
-      let routers = eval("(" + data_.data.routers + ")");
+		console.log(data_.data.routers);
+		let routers = eval("(" + data_.data.routers + ")");
+	  
       sessionStorage.setItem("serverRoutes", JSON.stringify(routers));
       setRouter(routers);
       if (tName != undefined) {
