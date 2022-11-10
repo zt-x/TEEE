@@ -226,8 +226,8 @@ export default {
   },
   methods: {
     logout() {
-		  localStorage.clear();
-		  sessionStorage.clear();
+      localStorage.clear();
+      sessionStorage.clear();
       this.$router.replace({ path: "/login" });
     },
     AddCourse() {
@@ -318,8 +318,8 @@ export default {
       }
     },
   },
-	created() {
-		token = window.localStorage.getItem("token");
+  created() {
+    token = window.localStorage.getItem("token");
     _axios.interceptors.request.use(function (config) {
       config.headers = {
         Authorization: token,

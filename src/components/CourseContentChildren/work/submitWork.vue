@@ -2,10 +2,17 @@
   <v-card ripple hover class="my-1 mx-auto" style="width: 95%">
     <v-container>
       <v-row>
-        <v-col cols="2">{{ SUBMIT.username }}</v-col>
+        <v-col cols="2">
+          <v-avatar class="mr-1" size="30px">
+            <v-img :src="SUBMIT.avatar"></v-img>
+          </v-avatar>
+          {{ SUBMIT.username }}</v-col
+        >
         <v-col cols="2">{{ SUBMIT.uid }}</v-col>
-        <v-col cols="8">
+        <v-col cols="6">
           <v-spacer></v-spacer>
+        </v-col>
+        <v-col cols="2">
           <v-chip :color="score_color" small>{{ SUBMIT.score }}</v-chip>
         </v-col>
       </v-row>
@@ -15,12 +22,22 @@
 
 <script>
 export default {
-	props: ["SUBMIT"],
-	computed: {
-		score_color() {
-			return this.SUBMIT.score > 60 ? (this.SUBMIT.score > 80 ? "success" : "warning") : "error";
-		}
-	}
+  props: ["SUBMIT"],
+  computed: {
+    score_color() {
+      return this.SUBMIT.score > 60
+        ? this.SUBMIT.score > 80
+          ? "success"
+          : "warning"
+        : "error";
+    },
+  },
+  data() {
+    return {
+      img_src:
+        "https://img1.baidu.com/it/u=592570905,1313515675&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1668186000&t=934cb8891f34756eedcaf478b7111ee9",
+    };
+  },
 };
 </script>
 

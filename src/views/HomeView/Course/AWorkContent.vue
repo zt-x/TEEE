@@ -17,20 +17,22 @@
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item>
-              <v-card color="basil" flat class="pt-3">
+              <v-card style="background: #eeeeee" color="basil" flat class="pt-3 pb-3">
                 <SubmitWork
                   v-for="(submit, index) in submit_unfinish"
                   :key="index"
                   :SUBMIT="submit"
+                  class="mb-1"
                 />
               </v-card>
             </v-tab-item>
             <v-tab-item>
-              <v-card color="basil" flat class="pt-3">
+              <v-card style="background: #eeeeee" color="basil" flat class="pt-3 pb-3">
                 <SubmitWork
                   v-for="(submit, index) in submit_finish"
                   :key="index"
                   :SUBMIT="submit"
+                  class="mb-1"
                 />
               </v-card>
             </v-tab-item>
@@ -41,11 +43,23 @@
       <!-- Statistic -->
       <v-col cols="12" sm="4">
         <v-card>
-          <v-card-title>{{statistic_content.workname}}</v-card-title>
-		  <v-divider></v-divider>
-		  <v-card-text>
-			
-		  </v-card-text>
+          <v-card-title>
+            {{ statistic_content.workname }}
+            <v-spacer></v-spacer>
+            <v-icon small @click="getStatistics()">fas fa-redo</v-icon>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <div style="margin: 0 auto; width: 400px; height: 400px">
+                    <Chart_score_statistics :statistic="sta" />
+                  </div>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -55,10 +69,11 @@
 <script>
 import SubmitWork from "@/components/CourseContentChildren/work/submitWork.vue";
 import axios from "axios";
+import Chart_score_statistics from "@/components/CourseContentChildren/charts/SubmitStatic/chart_score_statistics.vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  components: { SubmitWork },
+  components: { SubmitWork, Chart_score_statistics },
   computed: {
     wid() {
       if (this.$route.params.wid == null) {
@@ -84,9 +99,12 @@ export default {
         { name: "xzt", username: "2020", score: 99 },
         { name: "xzt", username: "2020", score: 99 },
       ],
+      sta: [
+        // { value: 2, name: "不及格" },
+      ],
       submit_finish: [],
-		submit_unfinish: [],
-	  statistic_content:{},
+      submit_unfinish: [],
+      statistic_content: {},
     };
   },
   methods: {
@@ -122,24 +140,31 @@ export default {
         })
         .catch((err) => {});
     },
-	  async getStatistics() {
-		  let _this = this;
+    async getStatistics() {
+      this.sta = [];
+      let _this = this;
       const form = new FormData();
       form.append("wid", this.wid);
       _axios
         .post("/api/submit/getSubmitSummary", form)
-		  .then((res) => {
-			  let Statistic = {}
-			  Statistic = JSON.parse(res.data.data);
-			  _this.setStatisticsPanel(Statistic);
+        .then((res) => {
+          let Statistic = {};
+          Statistic = JSON.parse(res.data.data);
+          _this.setStatisticsPanel(Statistic);
         })
-		  .catch((err) => {
-			  console.log(err);
-		});
-	  },
-	  setStatisticsPanel(statistic) {
-		  this.statistic_content = statistic;
-	}
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    setStatisticsPanel(statistic) {
+      this.statistic_content = statistic;
+      console.log(this.statistic_content);
+      this.sta = [];
+      this.sta.push({ value: statistic.NOP_excellent, name: "优秀(分数>90%)" });
+      this.sta.push({ value: statistic.NOP_good, name: "良好(分数在90%~75%)" });
+      this.sta.push({ value: statistic.NOP_NTB, name: "及格(分数在60%~75%)" });
+      this.sta.push({ value: statistic.NOP_fail, name: "不及格(分数<60%)" });
+    },
   },
   mounted() {
     let _this = this;
