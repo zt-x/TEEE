@@ -6,14 +6,14 @@
           <v-avatar class="mr-1" size="30px">
             <v-img :src="SUBMIT.avatar"></v-img>
           </v-avatar>
-			{{ SUBMIT.username }}
+          {{ SUBMIT.username }}
         </v-col>
         <v-col cols="2">{{ SUBMIT.uid }}</v-col>
         <v-col cols="6">
           <v-spacer></v-spacer>
         </v-col>
         <v-col cols="2">
-          <v-chip :color="score_color" small>{{ SUBMIT.score }}</v-chip>
+          <v-chip :color="score_color" small>{{ SUBMIT.score.toFixed(1) }}</v-chip>
         </v-col>
       </v-row>
     </v-container>
@@ -27,7 +27,9 @@ export default {
     score_color() {
       return this.SUBMIT.score > 60
         ? this.SUBMIT.score > 75
-          ? this.SUBMIT.score>90?"success":"info"
+          ? this.SUBMIT.score > 90
+            ? "success"
+            : "info"
           : "warning"
         : "error";
     },
@@ -42,9 +44,9 @@ export default {
 </script>
 
 <style>
-.hideMore{
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+.hideMore {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>

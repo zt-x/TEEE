@@ -10,12 +10,12 @@
           <v-col cols="12">
             <v-card rounded="true" style="padding: 10px">
               <v-chip label @click="releaseWorkDialog = true" color="#b97a57">
-                <v-icon color="white" small left>fa fa-paper-plane</v-icon>
+                <v-icon color="white" x-small left>fa fa-paper-plane</v-icon>
                 <span style="color: white">发布新作业 / 考试</span>
               </v-chip>
 
               <v-chip label color="#b97a57" class="ml-5">
-                <v-icon color="white" small left>mdi-clipboard-outline</v-icon>
+                <v-icon color="white" x-small left>mdi-clipboard-outline</v-icon>
                 <span style="color: white">发布公告</span>
               </v-chip>
             </v-card>
@@ -32,8 +32,16 @@
               <v-tabs-items v-model="tab">
                 <v-tab-item :key="items[0]">
                   <v-card color="basil" flat>
-                    <WorksView :cid="cid" :works="works" v-if="loading_workview && !isTeacher" />
-                    <WorksViewTeacher :cid="cid" :works="works" v-if="loading_workview && isTeacher" />
+                    <WorksView
+                      :cid="cid"
+                      :works="works"
+                      v-if="loading_workview && !isTeacher"
+                    />
+                    <WorksViewTeacher
+                      :cid="cid"
+                      :works="works"
+                      v-if="loading_workview && isTeacher"
+                    />
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
@@ -116,8 +124,8 @@ export default {
     ReleaseWork,
     Chart_sex,
     Chart_workScroe,
-    WorksViewTeacher
-},
+    WorksViewTeacher,
+  },
   data() {
     return {
       tab: null,
@@ -130,7 +138,7 @@ export default {
       exams: [],
       announcement: [],
       isTeacher: false,
-		releaseWorkDialog: false,
+      releaseWorkDialog: false,
     };
   },
   methods: {
