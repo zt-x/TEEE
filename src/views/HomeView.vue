@@ -12,7 +12,7 @@
       right
       color="success"
       dense="true"
-      timeout="11 00"
+      timeout="1000"
     >
       欢迎回来，{{ user.username }}
     </v-snackbar>

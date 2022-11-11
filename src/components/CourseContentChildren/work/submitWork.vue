@@ -1,6 +1,9 @@
 <template>
-  <v-card ripple hover class="my-1 mx-auto" style="width: 95%">
-    <v-container>
+  <v-card @click="showSubmitCard()" ripple hover class="my-1 mx-auto" style="width: 95%">
+	<v-dialog persistent width="600px" v-model="showCard">
+		<StuAns @closeSubmitCard="closeSubmitCard($event)" :sid="sid"/>
+	</v-dialog>
+	<v-container>
       <v-row>
         <v-col cols="2" class="hideMore">
           <v-avatar class="mr-1" size="30px">
@@ -21,25 +24,43 @@
 </template>
 
 <script>
+import StuAns from '@/components/CourseContentChildren/stuAns.vue';
+import axios from "axios";
+const _axios = axios.create();
+let token = window.localStorage.getItem("token");
+
 export default {
-  props: ["SUBMIT"],
-  computed: {
-    score_color() {
-      return this.SUBMIT.score > 60
-        ? this.SUBMIT.score > 75
-          ? this.SUBMIT.score > 90
-            ? "success"
-            : "info"
-          : "warning"
-        : "error";
-    },
-  },
-  data() {
-    return {
-      img_src:
-        "https://img1.baidu.com/it/u=592570905,1313515675&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1668186000&t=934cb8891f34756eedcaf478b7111ee9",
-    };
-  },
+	props: ["SUBMIT"],
+	components: { StuAns },
+	computed: {
+		score_color() {
+			return this.SUBMIT.score > 60
+				? this.SUBMIT.score > 75
+					? this.SUBMIT.score > 90
+						? "success"
+						: "info"
+					: "warning"
+				: "error";
+		},
+	},
+	data() {
+		return {
+			img_src: "https://img1.baidu.com/it/u=592570905,1313515675&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1668186000&t=934cb8891f34756eedcaf478b7111ee9",
+			sid: 0,
+			showCard: false,
+		}
+	},	
+	methods: {
+		showSubmitCard() {
+			this.sid = this.SUBMIT.id;
+			this.showCard = true;
+		},
+		closeSubmitCard(val) {
+			this.showCard = false;
+		}
+	},
+
+
 };
 </script>
 

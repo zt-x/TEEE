@@ -1,6 +1,7 @@
 ·
 <template>
   <v-container fluid>
+
     <v-row>
       <!-- Submitted WorkPlace -->
       <v-col cols="12" sm="8">
@@ -73,7 +74,7 @@ import Chart_score_statistics from "@/components/CourseContentChildren/charts/Su
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  components: { SubmitWork, Chart_score_statistics },
+  components: { SubmitWork, Chart_score_statistics},
   computed: {
     wid() {
       if (this.$route.params.wid == null) {
@@ -104,7 +105,9 @@ export default {
       ],
       submit_finish: [],
       submit_unfinish: [],
-      statistic_content: {},
+		statistic_content: {},
+		sid: 0,
+		submitCard: false,
     };
   },
   methods: {
@@ -165,7 +168,7 @@ export default {
       this.sta.push({ value: statistic.NOP_good, name: "良好(分数在90%~75%)" });
       this.sta.push({ value: statistic.NOP_NTB, name: "及格(分数在60%~75%)" });
       this.sta.push({ value: statistic.NOP_fail, name: "不及格(分数<60%)" });
-    },
+	  },
   },
   mounted() {
     let _this = this;

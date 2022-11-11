@@ -18,6 +18,10 @@
                 <v-icon color="white" x-small left>mdi-clipboard-outline</v-icon>
                 <span style="color: white">发布公告</span>
               </v-chip>
+              <v-chip @click="flushContent()" label color="#626262" class="ml-5">
+                <v-icon color="white" x-small left>fas fa-redo</v-icon>
+                <span style="color: white">刷新</span>
+              </v-chip>
             </v-card>
           </v-col>
         </v-row>
@@ -101,6 +105,10 @@
         </v-card>
       </v-col>
     </v-row>
+	<v-overlay v-if="loading">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+          <div class="mx-auto">{{ loadingText }}</div>
+        </v-overlay>
   </v-container>
 </template>
 
@@ -138,7 +146,9 @@ export default {
       exams: [],
       announcement: [],
       isTeacher: false,
-      releaseWorkDialog: false,
+		releaseWorkDialog: false,
+		loading: false,
+		loadingText:"",
     };
   },
   methods: {
@@ -146,7 +156,9 @@ export default {
       this.releaseWorkDialog = false;
       this.flushContent();
     },
-    flushContent() {
+	  flushContent() {
+		  this.loadingText = "正在获取作业 ...";
+		  this.loading = true;
       this.cid = this.$route.params.cid;
       if (this.cid == undefined) {
         this.cid = sessionStorage.getItem("temp_cid");
@@ -169,11 +181,14 @@ export default {
           if (role_data.code == 2) {
             _this.isTeacher = role_data.data == "teacher" ? 1 : 0;
           } else {
-            alert("出问题咯，获取角色失败");
+			  alert("出问题咯，获取角色失败");
+			  _this.loading = false;
+			
           }
         })
         .catch((err) => {
-          alert("出问题咯，获取角色请求失败");
+			alert("出问题咯，获取角色请求失败");
+			_this.loading = false;
         });
       const form = new FormData();
       form.append("cid", this.cid);
@@ -190,12 +205,15 @@ export default {
           _this.loading_announcementview = true;
           _this.loading_workview = true;
           _this.loading_examview = true;
-          _this.$vuetify.goTo(0);
+			_this.$vuetify.goTo(0);
+			_this.loading = false;
+		  
         })
         .catch((err) => {
           _this.$router.replace({ path: "/Course" });
-          //   _this.$router.push({  name: "CourseContent", params: { cid: cid } });
-        });
+		  _this.loading = false;
+
+		});
     },
   },
   mounted() {

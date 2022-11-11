@@ -13,7 +13,7 @@
                 class="ma-2"
                 color="error"
                 text-color="white"
-                @click="deleteWork()"
+                @click="deleteWork(work)"
                 hover
                 v-on="on"
                 v-bind="attrs"
@@ -29,16 +29,32 @@
       </v-card>
       <div style="height: 5px"></div>
     </div>
+	<v-snackbar
+      v-model="snackbar"
+      style="margin-top: 64px"
+      top
+      right
+      color="success"
+      dense="true"
+      timeout="1000"
+    >
+      {{msg}}
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
+import axios from "axios";
+const _axios = axios.create();
+let token = window.localStorage.getItem("token");
 export default {
   props: ["works", "cid"],
   computed: {},
   data() {
     return {
-      isDelete: false,
+		isDelete: false,
+		snackbar: false,
+		msg:""
     };
   },
   methods: {
@@ -53,7 +69,9 @@ export default {
         this.isDelete = false;
       }
     },
-    deleteWork() {
+	  deleteWork(work) {
+		let _this = this;
+		
       this.isDelete = true;
       this.$dialog({
         title: "删除课程",
@@ -68,8 +86,26 @@ export default {
             label: "确定",
             color: "red darken-5",
             callback: () => {
-              // TODO
-              alert("删除课程嘞");
+			  token = window.localStorage.getItem("token");
+				// init axios
+				_axios.interceptors.request.use(function (config) {
+					config.headers = {
+					Authorization: token,
+					};
+					return config;
+				});
+				const form = new FormData();
+				form.append("wid", work.id);
+				_axios
+					.post("/api/Course/deleteAWork", form)
+					.then((res) => {
+						_this.msg = res.data.msg;
+						_this.snackbar = true;
+					})
+					.catch((err) => {
+						_this.msg = "发生了错误" + err;
+						_this.snackbar = true;
+					});
             },
           },
         ],
