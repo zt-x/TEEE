@@ -95,13 +95,14 @@
                           </div>
                         </div>
                         <!-- 简答题 -->
-                        <div class="pl-8 pt-5" v-else-if="item.qtype == 30012">
+                        <div class="px-8 py-5" v-else-if="item.qtype == 30012">
                           <div>
-                            <div style="width: 700px">
-                              <v-textarea
-                                label="输入你的答案"
+                            <div style="100%">
+                              <ckeditor
                                 v-model="myAnss[i]"
-                              ></v-textarea>
+                                :config="editorConfig"
+                                editor-url="/ckeditor/ckeditor.js"
+                              ></ckeditor>
                             </div>
                           </div>
                         </div>
@@ -143,10 +144,11 @@
 <script>
 import axios from "axios";
 import QueNum from "@/components/WorkPanel/QueNum.vue";
+import CKEditor from "ckeditor4-vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  components: { QueNum },
+  components: { QueNum, ckeditor: CKEditor.component },
   computed: {
     tab() {
       return this.p_que;
@@ -177,6 +179,28 @@ export default {
       qs: [],
       myAnss: [],
       flushButton: true,
+      editorConfig: {
+        removeButtons:
+          "Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Scayt,Form,TextField,Textarea,Select,Button,ImageButton,Radio,Checkbox,HiddenField,CopyFormatting,RemoveFormat,BulletedList,NumberedList,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Unlink,Link,Smiley,Iframe,PageBreak,Styles,Format,About,ShowBlocks",
+        toolbarGroups: [
+          { name: "document", groups: ["mode", "document", "doctools"] },
+          { name: "clipboard", groups: ["clipboard", "undo"] },
+          { name: "editing", groups: ["find", "selection", "spellchecker", "editing"] },
+          { name: "forms", groups: ["forms"] },
+          { name: "basicstyles", groups: ["basicstyles", "cleanup"] },
+          {
+            name: "paragraph",
+            groups: ["list", "indent", "blocks", "align", "bidi", "paragraph"],
+          },
+          { name: "links", groups: ["links"] },
+          { name: "insert", groups: ["insert"] },
+          { name: "styles", groups: ["styles"] },
+          { name: "colors", groups: ["colors"] },
+          { name: "tools", groups: ["tools"] },
+          { name: "others", groups: ["others"] },
+          { name: "about", groups: ["about"] },
+        ],
+      },
     };
   },
   mounted() {
@@ -320,8 +344,12 @@ export default {
                 }
                 str = str.slice(0, -2);
                 str += "]";
-                form.append("ans", str);
+                console.log(str);
 
+                str = str.replaceAll('"', "&quot;");
+                console.log(str);
+
+                form.append("ans", str);
                 _axios
                   .post("/api/submit/submitWork", form)
                   .then((res) => {
