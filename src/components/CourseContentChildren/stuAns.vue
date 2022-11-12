@@ -121,15 +121,15 @@ export default {
           let data = res.data.data;
           console.log(data);
           data = JSON.parse(
-            data.replace("\\r", "&[[换行r]]").replace("\\n", "&[[换行n]]")
+            data.replaceAll("\\r", "&[[换行r]]").replaceAll("\\n", "&[[换行n]]")
           );
 
           _this.readover = eval(data.readover);
           _this.submitContent = eval(
             "(" +
               data.submitContent
-                .replace("&[[换行r]]", "\\r")
-                .replace("&[[换行n]]", "\\n") +
+                .replaceAll("&[[换行r]]", "\\r")
+                .replaceAll("&[[换行n]]", "\\n") +
               ")"
           );
         })
