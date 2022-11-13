@@ -5,6 +5,7 @@
         @closeSubmitCard="closeSubmitCard($event)"
         v-if="showCard"
         :SUBMIT="SUBMIT"
+		:qscores="qscores"
       />
     </v-dialog>
     <v-container>
@@ -34,7 +35,7 @@ const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 
 export default {
-  props: ["SUBMIT"],
+  props: ["SUBMIT", "qscores"],
   components: { StuAns },
   computed: {
     score_color() {

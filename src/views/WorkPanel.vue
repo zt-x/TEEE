@@ -347,6 +347,8 @@ export default {
                 console.log(str);
 
                 str = str.replaceAll('"', "&quot;");
+                str = str.replaceAll(",", "&douhao;");
+
                 console.log(str);
 
                 form.append("ans", str);
@@ -393,13 +395,15 @@ export default {
                   if (Array.isArray(ass[i])) {
                     str += "[" + ass[i].toString() + "], ";
                   } else {
-                    str += ass[i] + ", ";
+                    str +=
+                      ass[i].replaceAll('"', "&quot;").replaceAll(",", "&douhao;") + ", ";
                   }
                 }
                 str = str.slice(0, -2);
                 str += "]";
-                form.append("ans", str);
+                console.log(str);
 
+                form.append("ans", str);
                 _axios
                   .post("/api/submit/submitWork", form)
                   .then((res) => {

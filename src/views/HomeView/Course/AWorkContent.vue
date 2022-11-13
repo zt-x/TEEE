@@ -22,6 +22,7 @@
                   v-for="(submit, index) in submit_unfinish"
                   :key="index"
                   :SUBMIT="submit"
+				  :qscores="qscores"
                   class="mb-1"
                 />
               </v-card>
@@ -32,6 +33,7 @@
                   v-for="(submit, index) in submit_finish"
                   :key="index"
                   :SUBMIT="submit"
+				  :qscores="qscores"
                   class="mb-1"
                 />
               </v-card>
@@ -107,9 +109,35 @@ export default {
       statistic_content: {},
       sid: 0,
       submitCard: false,
+      qs: [],
+      qscores: [],
     };
   },
   methods: {
+    async getWork() {
+      token = window.localStorage.getItem("token");
+      let _this = this;
+      // init axios
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      const form = new FormData();
+      form.append("wid", this.wid);
+      _axios
+        .post("/api/Work/getWork", form)
+        .then((res) => {
+          let questions = res.data.data;
+          _this.qs = eval(questions);
+          _this.qs.forEach((val, i) => {
+            _this.qscores[i] = val.qscore;
+          });
+          console.log(_this.qscores);
+        })
+        .catch((err) => {});
+    },
     async getAllSubmits() {
       token = window.localStorage.getItem("token");
       let _this = this;
@@ -172,7 +200,9 @@ export default {
   mounted() {
     let _this = this;
     this.getAllSubmits().then(() => {
-      _this.getStatistics();
+      _this.getStatistics().then(() => {
+        _this.getWork();
+      });
     });
   },
 };

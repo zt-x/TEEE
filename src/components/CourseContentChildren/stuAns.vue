@@ -18,45 +18,105 @@
     <v-container>
       <v-expansion-panels class="mb-6">
         <v-expansion-panel v-for="(item, i) in readover" :key="i">
-          <v-expansion-panel-header expand-icon="mdi-menu-down">
+          <v-expansion-panel-header
+            expand-icon="mdi-menu-down"
+            :style="{ color: item == readover_new[i] ? 'black' : '#2196f3' }"
+          >
             <div style="width: 25px">
-              <v-icon color="green" v-if="item != -1" small>mdi-check</v-icon>
-              <v-icon color="warning" v-if="item == -1" small>mdi-border-color</v-icon>
+              <v-icon color="green" v-if="readover_new[i] != -1" small>mdi-check</v-icon>
+              <v-icon color="warning" v-if="readover_new[i] == -1" small
+                >mdi-border-color</v-icon
+              >
             </div>
 
             第{{ i + 1 }}题
             <v-spacer></v-spacer>
-            得分： {{ item }}
+            得分：
+
+            {{
+              readover_new[i] == -1
+                ? "未批改 / " + qscores[i]
+                : readover_new[i] + " / " + qscores[i]
+            }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             学生提交的答案：
-
-            <div v-html="parseContent(submitContent[i])">
-              <!-- {{  }} -->
+            <div
+              style="max-height: 300px; overflow: auto"
+              v-html="parseContent(submitContent[i])"
+            ></div>
+            <div class="mt-5" style="float: right">
+              <v-spacer></v-spacer>
+              <v-chip small dark color="blue" @click="showChangeScoreDialog(i)">
+                {{ readover_new[i] == -1 ? "批改" + i + 1 : "修改得分" + i + 1 }}
+              </v-chip>
             </div>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="blue" dark text @click="close()">取消</v-btn>
+      <v-btn color="blue" dark @click="finish()">完成批改</v-btn>
+    </v-card-actions>
+    <v-dialog width="300px" v-model="showChangeScore">
+      <stuAnsSetScore
+        @saveScore="saveScore($event)"
+        @exitSaveScore="exitSaveScore($event)"
+        v-if="showChangeScore"
+        :i="ind_i"
+        :max="ind_max"
+      />
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
 import axios from "axios";
+import stuAnsSetScore from "./work/stuAnsSetScore.vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  props: ["SUBMIT"],
+  components: { stuAnsSetScore },
+  props: ["SUBMIT", "qscores"],
   data() {
     return {
       submitContent: [],
       readover: [],
+      readover_new: [],
+      showChangeScore: false,
+      ind_i: 0,
+      ind_max: 0,
     };
   },
   mounted() {
     this.getSubmitContent();
   },
   methods: {
+    finish() {
+      const form = new FormData();
+      form.append("subid", this.SUBMIT.submitId);
+      form.append("score", this.readover_new);
+      _axios
+        .post("/api/submit/setSubmitScore", form)
+        .then((res) => {
+          console.log(res.data.msg);
+          this.$dialog({
+            content: res.data.msg,
+            btns: [
+              {
+                label: "确定",
+                color: "#09f",
+                // ghost: true,
+              },
+            ],
+          });
+        })
+        .catch((err) => {
+          alert(err);
+        });
+    },
     parseContent(val) {
       let _this = this;
       try {
@@ -65,8 +125,6 @@ export default {
         let arr = eval(val);
         try {
           if (arr instanceof Array) {
-            console.log("arr是Array");
-            console.log(arr);
             let str = "";
             for (let i = 0; i < arr.length; i++) {
               str += _this.map(arr[i]) + " ";
@@ -76,11 +134,10 @@ export default {
             }
             return str;
           } else {
-            console.log("arr不是Array");
-            return "666";
+            return "无";
           }
         } catch {}
-        return "666";
+        return "无";
       } catch {
         return val.replaceAll("&quot;", '"');
       }
@@ -100,6 +157,7 @@ export default {
         return "F";
       }
     },
+
     close() {
       this.$emit("closeSubmitCard", false);
     },
@@ -121,21 +179,50 @@ export default {
           let data = res.data.data;
           console.log(data);
           data = JSON.parse(
-            data.replaceAll("\\r", "&[[换行r]]").replaceAll("\\n", "&[[换行n]]")
+            data
+              .replaceAll("\\r", "&[[换行r]]")
+              .replaceAll("\\n", "&[[换行n]]")
+              .replaceAll("\\t", "&[[table]]")
           );
-
+          console.log(data.readover);
           _this.readover = eval(data.readover);
+          console.log(_this.readover);
+          _this.readover.forEach((val, i) => {
+            _this.readover_new[i] = val;
+          });
           _this.submitContent = eval(
             "(" +
               data.submitContent
                 .replaceAll("&[[换行r]]", "\\r")
-                .replaceAll("&[[换行n]]", "\\n") +
+                .replaceAll("&[[换行n]]", "\\n")
+                .replaceAll("&[[table]]", "\\t")
+                .replaceAll("&douhao;", ",") +
               ")"
           );
         })
         .catch((err) => {
           alert(err);
         });
+    },
+    showChangeScoreDialog(i) {
+      this.ind_max = this.qscores[i];
+      this.ind_i = i;
+      this.showChangeScore = true;
+    },
+    saveScore(data) {
+      if (data.score >= 0 && Number(data.score) <= Number(this.qscores[data.i])) {
+        this.readover_new[data.i] = data.score;
+        console.log(this.readover);
+        console.log(this.readover_new);
+        this.showChangeScore = false;
+      } else {
+        alert("分数不能小于0，也不能大于本题的最大分数哦~");
+        this.readover_new[data.i] = this.readover[data.i];
+      }
+      this.showChangeScore = false;
+    },
+    exitSaveScore(val) {
+      this.showChangeScore = false;
     },
   },
 };
