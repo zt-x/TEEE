@@ -48,7 +48,7 @@
             <div class="mt-5" style="float: right">
               <v-spacer></v-spacer>
               <v-chip small dark color="blue" @click="showChangeScoreDialog(i)">
-                {{ readover_new[i] == -1 ? "批改" + i + 1 : "修改得分" + i + 1 }}
+                {{ readover_new[i] == -1 ? "批改" : "修改得分" }}
               </v-chip>
             </div>
           </v-expansion-panel-content>
@@ -108,7 +108,6 @@ export default {
               {
                 label: "确定",
                 color: "#09f",
-                // ghost: true,
               },
             ],
           });
@@ -134,7 +133,7 @@ export default {
             }
             return str;
           } else {
-            return "无";
+            return val;
           }
         } catch {}
         return "无";

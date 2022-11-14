@@ -22,7 +22,7 @@
                   v-for="(submit, index) in submit_unfinish"
                   :key="index"
                   :SUBMIT="submit"
-				  :qscores="qscores"
+                  :qscores="qscores"
                   class="mb-1"
                 />
               </v-card>
@@ -30,10 +30,11 @@
             <v-tab-item>
               <v-card style="background: #eeeeee" color="basil" flat class="pt-3 pb-3">
                 <SubmitWork
+                  transition="scroll-y-transition"
                   v-for="(submit, index) in submit_finish"
                   :key="index"
                   :SUBMIT="submit"
-				  :qscores="qscores"
+                  :qscores="qscores"
                   class="mb-1"
                 />
               </v-card>

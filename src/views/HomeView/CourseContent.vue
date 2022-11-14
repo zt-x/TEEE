@@ -35,7 +35,7 @@
               </v-tabs>
               <v-tabs-items v-model="tab">
                 <v-tab-item :key="items[0]">
-                  <v-card color="basil" flat>
+                  <v-card color="basil" style="background: #f6f7f8" flat>
                     <WorksView
                       :cid="cid"
                       :works="works"
@@ -49,16 +49,58 @@
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                  <v-card color="basil" flat>
+                  <v-card color="basil" style="background: #f6f7f8" flat>
                     <ExamsView :exams="exams" v-if="loading_examview" />
                   </v-card>
                 </v-tab-item>
-                <v-tab-item>
-                  <v-card color="basil" flat>
+                <v-tab-item v-if="loading_workview && isTeacher">
+                  <v-card color="basil" style="background: #f6f7f8" flat>
                     <Announcement
                       :announcement="announcement"
                       v-if="loading_announcementview"
                     />
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item v-if="loading_workview && isTeacher">
+                  <v-card class="py-5" color="basil" style="background: #f6f7f8" flat>
+                    <v-card
+                      class="mx-auto"
+                      width="95%"
+                      rounded="true"
+                      style="background: #a36645"
+                    >
+                      <v-container>
+                        <v-row>
+                          <v-col cols="4"> </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <v-text-field
+                                append-icon="fas fa-search"
+                                dense
+                                label="all"
+                                hide-details="auto"
+                                solo
+                              ></v-text-field>
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <v-btn dark color="#a36645">
+                              <v-icon>fas fa-plus</v-icon>
+                              添加用户
+                            </v-btn>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card>
+
+                    <v-card
+                      class="mx-auto mb-5"
+                      width="95%"
+                      rounded="false"
+                      style="padding: 10px; background: #f6f7f8"
+                    >
+                      内容
+                    </v-card>
                   </v-card>
                 </v-tab-item>
               </v-tabs-items>
@@ -105,10 +147,10 @@
         </v-card>
       </v-col>
     </v-row>
-	<v-overlay v-if="loading">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-          <div class="mx-auto">{{ loadingText }}</div>
-        </v-overlay>
+    <v-overlay v-if="loading">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      <div class="mx-auto">{{ loadingText }}</div>
+    </v-overlay>
   </v-container>
 </template>
 
@@ -137,7 +179,7 @@ export default {
   data() {
     return {
       tab: null,
-      items: ["作业", "考试", "公告"],
+      items: ["作业", "考试", "公告", "成员"],
       cid: 0,
       loading_workview: false,
       loading_examview: false,
@@ -146,9 +188,10 @@ export default {
       exams: [],
       announcement: [],
       isTeacher: false,
-		releaseWorkDialog: false,
-		loading: false,
-		loadingText:"",
+      releaseWorkDialog: false,
+      loading: false,
+      loadingText: "",
+      searchIcon: "fa fa-user",
     };
   },
   methods: {
@@ -156,9 +199,9 @@ export default {
       this.releaseWorkDialog = false;
       this.flushContent();
     },
-	  flushContent() {
-		  this.loadingText = "正在获取作业 ...";
-		  this.loading = true;
+    flushContent() {
+      this.loadingText = "正在获取作业 ...";
+      this.loading = true;
       this.cid = this.$route.params.cid;
       if (this.cid == undefined) {
         this.cid = sessionStorage.getItem("temp_cid");
@@ -180,15 +223,19 @@ export default {
           let role_data = res.data;
           if (role_data.code == 2) {
             _this.isTeacher = role_data.data == "teacher" ? 1 : 0;
+            if (_this.isTeacher) {
+              _this.items = ["作业", "考试", "公告", "成员"];
+            } else {
+              _this.items = ["作业", "考试"];
+            }
           } else {
-			  alert("出问题咯，获取角色失败");
-			  _this.loading = false;
-			
+            alert("出问题咯，获取角色失败");
+            _this.loading = false;
           }
         })
         .catch((err) => {
-			alert("出问题咯，获取角色请求失败");
-			_this.loading = false;
+          alert("出问题咯，获取角色请求失败");
+          _this.loading = false;
         });
       const form = new FormData();
       form.append("cid", this.cid);
@@ -205,15 +252,13 @@ export default {
           _this.loading_announcementview = true;
           _this.loading_workview = true;
           _this.loading_examview = true;
-			_this.$vuetify.goTo(0);
-			_this.loading = false;
-		  
+          _this.$vuetify.goTo(0);
+          _this.loading = false;
         })
         .catch((err) => {
           _this.$router.replace({ path: "/Course" });
-		  _this.loading = false;
-
-		});
+          _this.loading = false;
+        });
     },
   },
   mounted() {
