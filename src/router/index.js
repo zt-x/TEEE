@@ -36,11 +36,11 @@ const routes = [
 		path: '/doWork',
 		name: 'doWork',
 		component:()=>import('@/views/WorkPanel.vue')
+	},
+	{
+		path: '*',
+		redirect:'/404',
 	}
-	// {
-	// 	path: '*',
-	// 	redirect:'/404',
-	// }
 ]
 
 const router = new VueRouter({
