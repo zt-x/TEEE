@@ -101,7 +101,6 @@ export default {
       _axios
         .post("/api/submit/setSubmitScore", form)
         .then((res) => {
-          console.log(res.data.msg);
           this.$dialog({
             content: res.data.msg,
             btns: [
@@ -176,16 +175,13 @@ export default {
         .post("/api/submit/getSubmitBySid", form)
         .then((res) => {
           let data = res.data.data;
-          console.log(data);
           data = JSON.parse(
             data
               .replaceAll("\\r", "&[[换行r]]")
               .replaceAll("\\n", "&[[换行n]]")
               .replaceAll("\\t", "&[[table]]")
           );
-          console.log(data.readover);
           _this.readover = eval(data.readover);
-          console.log(_this.readover);
           _this.readover.forEach((val, i) => {
             _this.readover_new[i] = val;
           });
@@ -211,8 +207,6 @@ export default {
     saveScore(data) {
       if (data.score >= 0 && Number(data.score) <= Number(this.qscores[data.i])) {
         this.readover_new[data.i] = data.score;
-        console.log(this.readover);
-        console.log(this.readover_new);
         this.showChangeScore = false;
       } else {
         alert("分数不能小于0，也不能大于本题的最大分数哦~");

@@ -146,7 +146,7 @@ export default {
           arr.forEach((val, i) => {
             _this.finish_status[i] = val;
           });
-          console.log(_this.finish_status);
+          (_this.finish_status);
           _this.finishGetStatus = true;
         })
         .catch((err) => {
@@ -162,7 +162,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.works);
     this.getWorkStatus();
   },
   created() {},

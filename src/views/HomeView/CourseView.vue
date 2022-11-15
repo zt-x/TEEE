@@ -79,7 +79,11 @@ export default {
       _this.prepareing_overlay = false;
       NProgress.set(1);
     });
-    if (window.localStorage.getItem("cid_temp") != -1) {
+    if (
+      window.localStorage.getItem("cid_temp") != -1 &&
+      window.localStorage.getItem("cid_temp") != null &&
+      window.localStorage.getItem("cid_temp") != undefined
+    ) {
       this.$router.replace({
         name: "CourseContent",
         params: { cid: window.localStorage.getItem("cid_temp") },

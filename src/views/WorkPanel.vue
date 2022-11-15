@@ -344,12 +344,9 @@ export default {
                 }
                 str = str.slice(0, -2);
                 str += "]";
-                console.log(str);
 
                 str = str.replaceAll('"', "&quot;");
                 str = str.replaceAll(",", "&douhao;");
-
-                console.log(str);
 
                 form.append("ans", str);
                 _axios
@@ -401,7 +398,6 @@ export default {
                 }
                 str = str.slice(0, -2);
                 str += "]";
-                console.log(str);
 
                 form.append("ans", str);
                 _axios

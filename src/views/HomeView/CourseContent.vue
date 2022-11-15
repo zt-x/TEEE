@@ -61,8 +61,14 @@
                     />
                   </v-card>
                 </v-tab-item>
-                <v-tab-item v-if="isTeacher && finishGetUser">
-                  <v-card class="py-5" color="basil" style="background: #f6f7f8" flat>
+                <v-tab-item v-if="isTeacher">
+                  <v-card
+                    v-if="finishGetUser"
+                    class="py-5"
+                    color="basil"
+                    style="background: #f6f7f8"
+                    flat
+                  >
                     <v-card
                       class="mx-auto"
                       width="95%"
@@ -142,15 +148,26 @@
                         </v-container>
                       </v-card>
                     </v-card>
-                    <v-card
-                      class="mx-auto mb-5"
-                      width="95%"
-                      rounded="false"
-                      style="padding: 10px; background: #f6f7f8"
-                      v-if="!finishGetUser"
-                    >
-                      Waiting ....
-                    </v-card>
+                  </v-card>
+                  <v-card
+                    v-if="!finishGetUser"
+                    class="py-5"
+                    color="basil"
+                    style="background: #f6f7f8"
+                    flat
+                  >
+                    <v-container>
+                      <v-row class="text-center">
+                        <v-col cols="12">
+                          <v-progress-circular
+                            indeterminate
+                            :size="20"
+                            color="primary"
+                          ></v-progress-circular>
+                          <span class="pl-2">正在获取成员信息并统计作业情况 ...</span>
+                        </v-col>
+                      </v-row>
+                    </v-container>
                   </v-card>
                 </v-tab-item>
               </v-tabs-items>
@@ -252,9 +269,15 @@ export default {
       this.flushContent();
     },
     flushContent() {
+      this.finishGetUser = false;
       this.loadingText = "正在获取作业 ...";
       this.loading = true;
       this.cid = this.$route.params.cid;
+      //   if (this.cid == null || this.cid == undefined) {
+      //     _this.$router.replace({ path: "/Course" });
+      //     _this.loading = false;
+      //     return;
+      //   }
       if (this.cid == undefined) {
         this.cid = sessionStorage.getItem("temp_cid");
       } else {
@@ -293,7 +316,6 @@ export default {
                 arr = arr.sort((a, b) => {
                   return Number(b.workAverageScore) - Number(a.workAverageScore);
                 });
-                console.log(arr);
                 arr.forEach((element, i) => {
                   _this.userinfos[i] = element;
                 });
@@ -303,15 +325,18 @@ export default {
               .catch((err) => {
                 alert("出问题咯，获取班级成员异常: " + err);
                 _this.loading = false;
+                _this.$router.replace({ path: "/Course" });
               });
           } else {
             alert("出问题咯，获取角色失败");
             _this.loading = false;
+            _this.$router.replace({ path: "/login" });
           }
         })
         .catch((err) => {
           alert("出问题咯，获取角色请求失败");
           _this.loading = false;
+          _this.$router.replace({ path: "/login" });
         });
       const form = new FormData();
       form.append("cid", this.cid);

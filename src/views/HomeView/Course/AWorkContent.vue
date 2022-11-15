@@ -135,7 +135,6 @@ export default {
           _this.qs.forEach((val, i) => {
             _this.qscores[i] = val.qscore;
           });
-          console.log(_this.qscores);
         })
         .catch((err) => {});
     },
@@ -185,9 +184,7 @@ export default {
           Statistic = JSON.parse(res.data.data);
           _this.setStatisticsPanel(Statistic);
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => {});
     },
     setStatisticsPanel(statistic) {
       this.statistic_content = statistic;
