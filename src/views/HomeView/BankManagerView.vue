@@ -56,6 +56,9 @@
 
 <script>
 export default {
+  mounted() {
+    this.$store.commit("updatePageName", "库管理");
+  },
   data() {
     return {
       prepareing_overlay: false,

@@ -57,6 +57,7 @@ export default {
   }),
   methods: {},
   mounted() {
+    this.$store.commit("updatePageName", "我的课程");
     NProgress.set(0.35);
     // NProgress.configure({ parent: "#main" });
     token = window.localStorage.getItem("token");

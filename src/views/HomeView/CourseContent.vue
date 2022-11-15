@@ -270,6 +270,8 @@ export default {
         return config;
       });
       this.loadingText = "正在准备权限信息 .. ";
+      this.$store.commit("updatePageName", "我的课程 / " + this.cid);
+
       _axios
         .get("/api/power")
         .then((res) => {

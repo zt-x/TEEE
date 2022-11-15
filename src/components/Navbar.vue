@@ -3,12 +3,10 @@
     <v-chip @click="$router.go(-1)" small class="ma-2" color="warn" text-color="white"
       ><v-icon x-small left>fa fa-reply</v-icon>返回上一级</v-chip
     >
-    <h4 class="black--text ml-3">My Courses</h4>
+    <h4 class="brown--text text--lighten ml-3">{{ $store.state.pageName }}</h4>
     <v-spacer></v-spacer>
-    <h4 class="brown--text text--lighten">User info</h4>
-    <v-icon x-small color="red" class="ml-2 mr-2">fas fa-caret-down</v-icon>
     <v-btn color="#a36645" class="withoutupercase" @click.stop="openCourseDialog()">
-      <v-icon left>fas fa-plus</v-icon>Add Course
+      <v-icon left>fas fa-plus</v-icon> 加入/创建课程
     </v-btn>
 
     <!-- 加入课程 -->
