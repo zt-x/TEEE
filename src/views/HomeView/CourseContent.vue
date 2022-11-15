@@ -53,7 +53,7 @@
                     <ExamsView :exams="exams" v-if="loading_examview" />
                   </v-card>
                 </v-tab-item>
-                <v-tab-item v-if="loading_workview && isTeacher">
+                <v-tab-item v-if="isTeacher">
                   <v-card color="basil" style="background: #f6f7f8" flat>
                     <Announcement
                       :announcement="announcement"
@@ -61,7 +61,7 @@
                     />
                   </v-card>
                 </v-tab-item>
-                <v-tab-item v-if="loading_workview && isTeacher">
+                <v-tab-item v-if="isTeacher && finishGetUser">
                   <v-card class="py-5" color="basil" style="background: #f6f7f8" flat>
                     <v-card
                       class="mx-auto"
@@ -97,9 +97,59 @@
                       class="mx-auto mb-5"
                       width="95%"
                       rounded="false"
-                      style="padding: 10px; background: #f6f7f8"
+                      style="padding: 10px; background: #f6f7f8; overflow-y: auto"
+                      v-if="finishGetUser"
+                      max-height="500px"
                     >
-                      内容
+                      <v-card class="my-1 mx-auto" style="width: 95%">
+                        <v-container>
+                          <v-row justify="center">
+                            <v-col cols="2" class="hideMore"> 姓名 </v-col>
+                            <v-col cols="2">学号</v-col>
+                            <v-col cols="6">
+                              <v-spacer></v-spacer>
+                            </v-col>
+                            <v-col cols="2"> 作业平均分 </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card>
+                      <v-card
+                        v-for="user in userinfos"
+                        :key="user.uid"
+                        ripple
+                        hover
+                        class="my-1 mx-auto"
+                        style="width: 94%"
+                      >
+                        <v-container>
+                          <v-row>
+                            <v-col cols="2" class="hideMore">
+                              <v-avatar class="mr-1" size="30px">
+                                <v-img :src="user.avatar"></v-img>
+                              </v-avatar>
+                              {{ user.username }}
+                            </v-col>
+                            <v-col cols="2">{{ user.uid }}</v-col>
+                            <v-col cols="6">
+                              <v-spacer></v-spacer>
+                            </v-col>
+                            <v-col cols="2">
+                              <v-chip small>{{
+                                user.workAverageScore.toFixed(1)
+                              }}</v-chip>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card>
+                    </v-card>
+                    <v-card
+                      class="mx-auto mb-5"
+                      width="95%"
+                      rounded="false"
+                      style="padding: 10px; background: #f6f7f8"
+                      v-if="!finishGetUser"
+                    >
+                      Waiting ....
                     </v-card>
                   </v-card>
                 </v-tab-item>
@@ -192,6 +242,8 @@ export default {
       loading: false,
       loadingText: "",
       searchIcon: "fa fa-user",
+      userinfos: [],
+      finishGetUser: false,
     };
   },
   methods: {
@@ -217,6 +269,7 @@ export default {
         };
         return config;
       });
+      this.loadingText = "正在准备权限信息 .. ";
       _axios
         .get("/api/power")
         .then((res) => {
@@ -228,6 +281,27 @@ export default {
             } else {
               _this.items = ["作业", "考试"];
             }
+            this.loadingText = "正在获取班级成员 .. ";
+            const form1 = new FormData();
+            form1.append("cid", this.cid);
+            _axios
+              .post("/api/Course/getAllUser", form1)
+              .then((res) => {
+                let arr = eval(res.data.data);
+                arr = arr.sort((a, b) => {
+                  return Number(b.workAverageScore) - Number(a.workAverageScore);
+                });
+                console.log(arr);
+                arr.forEach((element, i) => {
+                  _this.userinfos[i] = element;
+                });
+                _this.finishGetUser = true;
+                _this.loading = false;
+              })
+              .catch((err) => {
+                alert("出问题咯，获取班级成员异常: " + err);
+                _this.loading = false;
+              });
           } else {
             alert("出问题咯，获取角色失败");
             _this.loading = false;
@@ -270,4 +344,10 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.hideMore {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+</style>

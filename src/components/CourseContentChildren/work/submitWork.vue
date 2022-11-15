@@ -5,7 +5,7 @@
         @closeSubmitCard="closeSubmitCard($event)"
         v-if="showCard"
         :SUBMIT="SUBMIT"
-		:qscores="qscores"
+        :qscores="qscores"
       />
     </v-dialog>
     <v-container>
