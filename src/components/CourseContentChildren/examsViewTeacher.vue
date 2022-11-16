@@ -101,6 +101,7 @@ export default {
                 .then((res) => {
                   _this.msg = res.data.msg;
                   _this.snackbar = true;
+                  _this.$emit("flush", true);
                 })
                 .catch((err) => {
                   _this.msg = "发生了错误" + err;

@@ -22,6 +22,7 @@
                 @click="
                   flushContent();
                   getCourseInfo();
+                  getCourseStatsitics();
                 "
                 label
                 color="#626262"
@@ -52,6 +53,7 @@
                     <WorksViewTeacher
                       :cid="cid"
                       :works="works"
+                      @flush="flushContent"
                       v-if="loading_workview && isTeacher"
                     />
                   </v-card>
@@ -66,6 +68,7 @@
                     <ExamsViewTeacher
                       :cid="cid"
                       :exams="exams"
+                      @flush="flushContent"
                       v-if="loading_examview && isTeacher"
                     />
                   </v-card>
@@ -132,9 +135,11 @@
                           <v-row justify="center">
                             <v-col cols="2" class="hideMore"> 姓名 </v-col>
                             <v-col cols="2">学号</v-col>
-                            <v-col cols="6">
+                            <v-col cols="4">
                               <v-spacer></v-spacer>
                             </v-col>
+                            <v-col cols="2"> 完成作业数 </v-col>
+
                             <v-col cols="2"> 作业平均分 </v-col>
                           </v-row>
                         </v-container>
@@ -156,8 +161,11 @@
                               {{ user.username }}
                             </v-col>
                             <v-col cols="2">{{ user.uid }}</v-col>
-                            <v-col cols="6">
+                            <v-col cols="4">
                               <v-spacer></v-spacer>
+                            </v-col>
+                            <v-col cols="2">
+                              <v-chip small>{{ user.finishWorkNum }}</v-chip>
                             </v-col>
                             <v-col cols="2">
                               <v-chip small>{{
@@ -226,7 +234,7 @@
                 </v-card>
               </v-col>
               <v-col cols="7">
-                <Chart_sex />
+                <Chart_sex v-if="gotExams" :data="CourseStatsitics.examsCount" />
               </v-col>
             </v-row>
           </v-container>
@@ -237,7 +245,10 @@
           <v-container>
             <v-row>
               <v-col cols="12">
-                <Chart_workScroe />
+                <Chart_workScroe
+                  v-if="gotWorkScore"
+                  :data="CourseStatsitics.worksCount"
+                />
               </v-col>
             </v-row>
           </v-container>
@@ -297,6 +308,9 @@ export default {
       finishGetUser: false,
       CourseInfo: {},
       search_user: "",
+      gotExams: false,
+      gotWorkScore: false,
+      CourseStatsitics: {},
     };
   },
   methods: {
@@ -313,6 +327,7 @@ export default {
       this.releaseWorkDialog = false;
       this.flushContent();
       this.getCourseInfo();
+      this.getCourseStatsitics();
     },
     getCourseInfo() {
       let _this = this;
@@ -321,14 +336,32 @@ export default {
       _axios
         .post("/api/Course/getCourseInfo", form)
         .then((res) => {
+          //   console.log(res.data.data);
           _this.CourseInfo = eval(res.data.data);
         })
         .catch((err) => {
           alert("获取课程INFO失败：" + err);
         });
     },
+    getCourseStatsitics() {
+      let _this = this;
+      const form = new FormData();
+      form.append("cid", this.cid);
+      _axios
+        .post("/api/Course/getCourseStatistic", form)
+        .then((res) => {
+          _this.CourseStatsitics = eval(res.data.data);
+          _this.gotExams = true;
+          _this.gotWorkScore = true;
+        })
+        .catch((err) => {
+          alert("获取课程Statistics失败：" + err);
+        });
+    },
     flushContent() {
       let _this = this;
+      _this.finishGetUser = false;
+
       _axios
         .get("/api/power")
         .then((res) => {
@@ -419,6 +452,7 @@ export default {
     this.$store.commit("updatePageName", "我的课程 / " + this.cid);
     this.flushContent();
     this.getCourseInfo();
+    this.getCourseStatsitics();
   },
   created() {
     // this.isTeacher

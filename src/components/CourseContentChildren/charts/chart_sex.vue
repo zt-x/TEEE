@@ -10,11 +10,13 @@ window.onresize = function () {
 };
 
 export default {
+  props: ["data"],
   mounted() {
     this.initChart();
   },
   methods: {
     initChart() {
+      let _this = this;
       // 基于准备好的dom，初始化echarts实例
       myChart = echarts.init(document.getElementById("charts"));
       window.onresize = function () {
@@ -33,10 +35,10 @@ export default {
             type: "pie",
             radius: "50%",
             data: [
-              { value: 10, name: "优秀" },
-              { value: 15, name: "良好" },
-              { value: 18, name: "及格" },
-              { value: 2, name: "不及格" },
+              { value: _this.data[0], name: "优秀" },
+              { value: _this.data[1], name: "良好" },
+              { value: _this.data[2], name: "及格" },
+              { value: _this.data[3], name: "不及格" },
             ],
             emphasis: {
               itemStyle: {

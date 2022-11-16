@@ -10,11 +10,32 @@ window.onresize = function () {
 };
 
 export default {
+  props: ["data"],
+  computed: {
+    data_name() {
+      let arr = eval(this.data);
+      let ret = [];
+      arr.forEach((element, i) => {
+        ret[i] = element.WorkName;
+      });
+      return ret;
+    },
+    data_value() {
+      let arr = eval(this.data);
+      let ret = [];
+      arr.forEach((element, i) => {
+        ret[i] = element.score;
+      });
+      return ret;
+    },
+  },
   mounted() {
     this.initChart();
+    console.log(this.data_name);
   },
   methods: {
     initChart() {
+      let _this = this;
       myChart = echarts.init(document.getElementById("charts_work"));
       window.onresize = function () {
         myChart.resize();
@@ -28,12 +49,12 @@ export default {
         },
         xAxis: {
           type: "category",
-          data: ["work1", "work2", "work3", "work4", "work5", "work6", "work7"],
+          data: _this.data_name,
         },
         series: [
           {
             type: "line",
-            data: [80, 85, 73, 92, 78, 90, 95],
+            data: _this.data_value,
             smooth: true,
           },
         ],
