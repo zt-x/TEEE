@@ -25,7 +25,10 @@
             <span>删除该作业</span>
           </v-tooltip>
         </v-card-title>
-        <v-card-subtitle>123</v-card-subtitle>
+        <v-card-subtitle
+          >截止时间 |
+          {{ work.deadline == undefined ? " - " : work.deadline }}</v-card-subtitle
+        >
       </v-card>
       <div style="height: 5px"></div>
     </div>

@@ -16,7 +16,17 @@
     >
       欢迎回来，{{ user.username }}
     </v-snackbar>
-
+    <v-snackbar
+      v-for="i in 10"
+      :key="i + 1"
+      v-model="TRUE"
+      top
+      right
+      color="success"
+      dense
+    >
+      6666
+    </v-snackbar>
     <v-main style="min-width: 1550px; padding: 64px; overflow: auto" id="main">
       <router-view></router-view>
     </v-main>
@@ -48,6 +58,7 @@ export default {
       },
       nb: false,
       sb: false,
+      TRUE: true,
     };
   },
 

@@ -350,6 +350,7 @@ export default {
       _axios
         .post("/api/Course/getCourseStatistic", form)
         .then((res) => {
+          console.log(res.data.data);
           _this.CourseStatsitics = eval(res.data.data);
           _this.gotExams = true;
           _this.gotWorkScore = true;

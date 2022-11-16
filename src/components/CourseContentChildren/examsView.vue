@@ -37,7 +37,9 @@
             {{ status(work.id) }}
           </v-chip>
         </v-card-title>
-        <v-card-subtitle>{{ work.deadline }}</v-card-subtitle>
+        <v-card-subtitle
+          >截止时间 | {{ work.deadline == null ? " - " : work.deadline }}</v-card-subtitle
+        >
       </v-card>
       <div style="height: 5px"></div>
     </div>

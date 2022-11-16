@@ -309,6 +309,7 @@ export default {
       }
     },
     submit() {
+      let _this = this;
       let undo = -1;
       for (let i = this.myAnss.length - 1; i >= 0; i--) {
         if (this.isWrite(i) == false) {
@@ -359,6 +360,9 @@ export default {
                           label: "芜湖",
                           color: "#09f",
                           // ghost: true,
+                          callback: () => {
+                            _this.goBack();
+                          },
                         },
                       ],
                     });
