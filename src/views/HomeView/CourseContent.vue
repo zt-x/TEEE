@@ -50,7 +50,16 @@
                 </v-tab-item>
                 <v-tab-item>
                   <v-card color="basil" style="background: #f6f7f8" flat>
-                    <ExamsView :exams="exams" v-if="loading_examview" />
+                    <ExamsView
+                      :cid="cid"
+                      :exams="exams"
+                      v-if="loading_examview && !isTeacher"
+                    />
+                    <ExamsViewTeacher
+                      :cid="cid"
+                      :exams="exams"
+                      v-if="loading_examview && isTeacher"
+                    />
                   </v-card>
                 </v-tab-item>
                 <v-tab-item v-if="isTeacher">
@@ -82,11 +91,11 @@
                             <div>
                               <v-text-field
                                 append-icon="fas fa-search"
-								@click:append = "searchUser"
+                                @click:append="searchUser"
                                 dense
                                 label="all"
                                 hide-details="auto"
-								v-model="search_user"
+                                v-model="search_user"
                                 solo
                               ></v-text-field>
                             </div>
@@ -180,22 +189,30 @@
       <!-- Course Info -->
       <v-col cols="12" sm="4">
         <v-card>
-          <v-card-title>{{CourseInfo.CourseName}}</v-card-title>
-          <v-card-subtitle>CourseKey:{{ this.cid }} || {{CourseInfo.CourseTime}}</v-card-subtitle>
+          <v-card-title>{{ CourseInfo.CourseName }}</v-card-title>
+          <v-card-subtitle
+            >CourseKey:{{ this.cid }} || {{ CourseInfo.CourseTime }}</v-card-subtitle
+          >
           <v-divider class="mb-5"></v-divider>
           <v-container>
             <v-row>
               <v-col cols="5">
                 <v-card class="pl-5 pt-6" style="height: 200px">
-                  <span>任课教师：{{CourseInfo.TeacherName}}</span>
+                  <span>任课教师：{{ CourseInfo.TeacherName }}</span>
                   <v-divider></v-divider>
 
-                  <span>班级人数: {{CourseInfo.UserCount}}</span>
+                  <span>班级人数: {{ CourseInfo.UserCount }}</span>
                   <v-divider></v-divider>
 
-                  <span>作业次数: {{CourseInfo.WorkCount == null?0:CourseInfo.WorkCount}}</span>
+                  <span
+                    >作业次数:
+                    {{ CourseInfo.WorkCount == null ? 0 : CourseInfo.WorkCount }}</span
+                  >
                   <v-divider></v-divider>
-				  <span>考试次数: {{CourseInfo.ExamsCount == null?0:CourseInfo.ExamsCount}}</span>
+                  <span
+                    >考试次数:
+                    {{ CourseInfo.ExamsCount == null ? 0 : CourseInfo.ExamsCount }}</span
+                  >
                   <v-divider></v-divider>
                 </v-card>
               </v-col>
@@ -234,6 +251,7 @@ import ReleaseWork from "@/components/CourseContentChildren/work/releaseWork.vue
 import Chart_sex from "@/components/CourseContentChildren/charts/chart_sex.vue";
 import Chart_workScroe from "@/components/CourseContentChildren/charts/chart_workScroe.vue";
 import WorksViewTeacher from "@/components/CourseContentChildren/worksViewTeacher.vue";
+import ExamsViewTeacher from "@/components/CourseContentChildren/examsViewTeacher.vue";
 
 let token = window.localStorage.getItem("token");
 const _axios = axios.create();
@@ -247,6 +265,7 @@ export default {
     Chart_sex,
     Chart_workScroe,
     WorksViewTeacher,
+    ExamsViewTeacher,
   },
   data() {
     return {
@@ -264,40 +283,43 @@ export default {
       loading: false,
       loadingText: "",
       searchIcon: "fa fa-user",
-		userinfos: [],
-	  userinfos_show:[],
-		finishGetUser: false,
-		CourseInfo: {},
-	  search_user:'',
+      userinfos: [],
+      userinfos_show: [],
+      finishGetUser: false,
+      CourseInfo: {},
+      search_user: "",
     };
   },
-	methods: {
-		searchUser() {
-			let str = `\S*${this.search_user}\S*`;
-			let reg = new RegExp(str);
+  methods: {
+    searchUser() {
+      let str = `\S*${this.search_user}\S*`;
+      let reg = new RegExp(str);
 
-			this.userinfos_show = [];
-			this.userinfos_show = this.userinfos.filter(item => {
-				return reg.test(item.username) || reg.test(item.uid);
-			})
-	},
+      this.userinfos_show = [];
+      this.userinfos_show = this.userinfos.filter((item) => {
+        return reg.test(item.username) || reg.test(item.uid);
+      });
+    },
     async close() {
       this.releaseWorkDialog = false;
-		  this.flushContent();
-		  this.getCourseInfo();
-	  },
-	  getCourseInfo() {
-		  let _this = this;
-		const form = new FormData();
-     	 form.append("cid", this.cid);
-		  _axios.post("/api/Course/getCourseInfo", form).then((res) => {
-			  _this.CourseInfo = eval(res.data.data);
-		  }).catch((err) => {
-			  alert("获取课程INFO失败：" + err);
-		  });
-	  },
-	  flushContent() {
-		  let _this = this;
+      this.flushContent();
+      this.getCourseInfo();
+    },
+    getCourseInfo() {
+      let _this = this;
+      const form = new FormData();
+      form.append("cid", this.cid);
+      _axios
+        .post("/api/Course/getCourseInfo", form)
+        .then((res) => {
+          _this.CourseInfo = eval(res.data.data);
+        })
+        .catch((err) => {
+          alert("获取课程INFO失败：" + err);
+        });
+    },
+    flushContent() {
+      let _this = this;
       _axios
         .get("/api/power")
         .then((res) => {
@@ -320,8 +342,8 @@ export default {
                   return Number(b.workAverageScore) - Number(a.workAverageScore);
                 });
                 arr.forEach((element, i) => {
-					_this.userinfos[i] = element;
-					_this.userinfos_show[i] = element;
+                  _this.userinfos[i] = element;
+                  _this.userinfos_show[i] = element;
                 });
                 _this.finishGetUser = true;
                 _this.loading = false;
@@ -366,29 +388,28 @@ export default {
         });
     },
   },
-	mounted() {
-
-		this.finishGetUser = false;
-      this.loadingText = "正在获取作业 ...";
-      this.loading = true;
-      this.cid = this.$route.params.cid;
-      if (this.cid == undefined) {
-        this.cid = sessionStorage.getItem("temp_cid");
-      } else {
-        sessionStorage.setItem("temp_cid", this.cid);
-      }
-      let _this = this;
-      token = window.localStorage.getItem("token");
-      _axios.interceptors.request.use(function (config) {
-        config.headers = {
-          Authorization: token,
-        };
-        return config;
-      });
-      this.loadingText = "正在准备权限信息 .. ";
-      this.$store.commit("updatePageName", "我的课程 / " + this.cid);
+  mounted() {
+    this.finishGetUser = false;
+    this.loadingText = "正在获取作业 ...";
+    this.loading = true;
+    this.cid = this.$route.params.cid;
+    if (this.cid == undefined) {
+      this.cid = sessionStorage.getItem("temp_cid");
+    } else {
+      sessionStorage.setItem("temp_cid", this.cid);
+    }
+    let _this = this;
+    token = window.localStorage.getItem("token");
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
+    this.loadingText = "正在准备权限信息 .. ";
+    this.$store.commit("updatePageName", "我的课程 / " + this.cid);
     this.flushContent();
-	this.getCourseInfo();
+    this.getCourseInfo();
   },
   created() {
     // this.isTeacher

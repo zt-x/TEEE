@@ -146,7 +146,7 @@ export default {
           arr.forEach((val, i) => {
             _this.finish_status[i] = val;
           });
-          (_this.finish_status);
+          _this.finish_status;
           _this.finishGetStatus = true;
         })
         .catch((err) => {
@@ -159,6 +159,8 @@ export default {
     return {
       finish_status: [],
       finishGetStatus: false,
+      msg: "",
+      snackbar: "",
     };
   },
   mounted() {

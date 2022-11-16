@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <div v-for="work in works" v-bind:key="work.id">
+    <div v-for="work in exams" v-bind:key="work.id">
       <v-card style="min-width: 100%" hover ripple="" @click="doWork(work)">
         <v-card-title>
           {{ work.workName }}
@@ -48,7 +48,7 @@ import axios from "axios";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  props: ["works", "cid"],
+  props: ["exams", "cid"],
   computed: {},
   data() {
     return {
