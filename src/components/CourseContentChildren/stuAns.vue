@@ -69,6 +69,13 @@
         :max="ind_max"
       />
     </v-dialog>
+    <v-overlay v-if="overlay">
+      <v-chip>
+        <v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
+        <v-spacer></v-spacer>
+        <span>{{ overlay_msg }}</span>
+      </v-chip>
+    </v-overlay>
   </v-card>
 </template>
 
@@ -88,6 +95,8 @@ export default {
       showChangeScore: false,
       ind_i: 0,
       ind_max: 0,
+      overlay: false,
+      overlay_msg: "",
     };
   },
   mounted() {
@@ -95,18 +104,25 @@ export default {
   },
   methods: {
     finish() {
+      this.overlay = true;
+      this.overlay_msg = "提交批改中 ...";
       const form = new FormData();
       form.append("subid", this.SUBMIT.submitId);
       form.append("score", this.readover_new);
+      let _this = this;
       _axios
         .post("/api/submit/setSubmitScore", form)
         .then((res) => {
+          _this.overlay = false;
           this.$dialog({
             content: res.data.msg,
             btns: [
               {
                 label: "确定",
                 color: "#09f",
+                callback: () => {
+                  _this.close();
+                },
               },
             ],
           });

@@ -23,6 +23,7 @@
                   :key="index"
                   :SUBMIT="submit"
                   :qscores="qscores"
+                  @flushSubmit="flushSubmit"
                   class="mb-1"
                 />
               </v-card>
@@ -34,6 +35,7 @@
                   v-for="(submit, index) in submit_finish"
                   :key="index"
                   :SUBMIT="submit"
+                  @flushSubmit="flushSubmit"
                   :qscores="qscores"
                   class="mb-1"
                 />
@@ -115,6 +117,9 @@ export default {
     };
   },
   methods: {
+    async flushSubmit(val) {
+      this.getAllSubmits();
+    },
     async getWork() {
       token = window.localStorage.getItem("token");
       let _this = this;

@@ -63,6 +63,7 @@ export default {
     },
     closeSubmitCard(val) {
       this.showCard = false;
+      this.$emit("flushSubmit", true);
     },
   },
 };
