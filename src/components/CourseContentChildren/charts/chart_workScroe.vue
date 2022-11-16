@@ -56,6 +56,10 @@ export default {
             type: "line",
             data: _this.data_value,
             smooth: true,
+            label: {
+              show: true,
+              position: "top",
+            },
           },
         ],
       };

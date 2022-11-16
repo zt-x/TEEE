@@ -128,7 +128,7 @@ export default {
           });
         })
         .catch((err) => {
-          alert(err);
+          alert("finish" + err);
         });
     },
     parseContent(val) {
@@ -197,7 +197,9 @@ export default {
               .replaceAll("\\n", "&[[换行n]]")
               .replaceAll("\\t", "&[[table]]")
           );
+          console.log(data);
           _this.readover = eval(data.readover);
+          console.log(_this.readover);
           _this.readover.forEach((val, i) => {
             _this.readover_new[i] = val;
           });
@@ -212,7 +214,7 @@ export default {
           );
         })
         .catch((err) => {
-          alert(err);
+          alert("getSub" + err);
         });
     },
     showChangeScoreDialog(i) {
