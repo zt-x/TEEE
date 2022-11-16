@@ -18,7 +18,7 @@
                 <v-icon color="white" x-small left>mdi-clipboard-outline</v-icon>
                 <span style="color: white">发布公告</span>
               </v-chip>
-              <v-chip @click="flushContent()" label color="#626262" class="ml-5">
+              <v-chip @click="flushContent();getCourseInfo()" label color="#626262" class="ml-5">
                 <v-icon color="white" x-small left>fas fa-redo</v-icon>
                 <span style="color: white">刷新</span>
               </v-chip>
@@ -83,6 +83,7 @@
                               <v-text-field
                                 append-icon="fas fa-search"
 								@click:append = "searchUser"
+								@keypress.enter= "searchUser" 
                                 dense
                                 label="all"
                                 hide-details="auto"
