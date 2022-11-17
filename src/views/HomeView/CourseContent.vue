@@ -382,7 +382,7 @@ export default {
               .then((res) => {
                 let arr = eval(res.data.data);
                 arr = arr.sort((a, b) => {
-                  return Number(b.workAverageScore) - Number(a.workAverageScore);
+                  return Number(b.finishWorkNum) - Number(a.finishWorkNum);
                 });
                 arr.forEach((element, i) => {
                   _this.userinfos[i] = element;

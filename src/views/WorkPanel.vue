@@ -338,8 +338,11 @@ export default {
                 // 手动装配arr， 避免直接使用toString拉直成一维 ....
                 for (var i = 0; i < ass.length; i++) {
                   if (Array.isArray(ass[i])) {
-                    str += "[" + ass[i].toString() + "], ";
-                  } else {
+                    str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
+				  } else {
+					  if (ass[i] == undefined || ass[i] == null) {
+						  ass[i] = "无";
+					}
                     str += ass[i] + ", ";
                   }
                 }
@@ -347,21 +350,21 @@ export default {
                 str += "]";
 
                 str = str.replaceAll('"', "&quot;");
-                str = str.replaceAll(",", "&douhao;");
 
                 form.append("ans", str);
                 _axios
                   .post("/api/submit/submitWork", form)
-                  .then((res) => {
-                    this.$dialog({
+					.then((res) => {
+
+                    _this.$dialog({
                       content: res.data.msg,
                       btns: [
                         {
-                          label: "芜湖",
+                          label: "确定",
                           color: "#09f",
                           // ghost: true,
-                          callback: () => {
-                            _this.goBack();
+							  callback: () => {
+							  _this.goBack();
                           },
                         },
                       ],
@@ -414,6 +417,9 @@ export default {
                           label: "芜湖",
                           color: "#09f",
                           // ghost: true,
+						  callback: () => {
+							  _this.goBack();
+                          },
                         },
                       ],
                     });
