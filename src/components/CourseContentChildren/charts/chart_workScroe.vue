@@ -31,7 +31,6 @@ export default {
   },
   mounted() {
     this.initChart();
-    console.log(this.data_name);
   },
   methods: {
     initChart() {
