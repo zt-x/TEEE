@@ -311,6 +311,8 @@ export default {
       gotExams: false,
       gotWorkScore: false,
       CourseStatsitics: {},
+		submit_totalNum: 0,
+		loading_summary: false,
     };
   },
   methods: {
@@ -423,7 +425,8 @@ export default {
           _this.loading_workview = true;
           _this.loading_examview = true;
           _this.$vuetify.goTo(0);
-          _this.loading = false;
+			_this.loading = false;
+			_this.loading_summary = false;
         })
         .catch((err) => {
           _this.$router.replace({ path: "/Course" });

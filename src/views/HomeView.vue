@@ -94,6 +94,7 @@ export default {
       _this.snackbar = true;
       _this.nb = true;
       _this.sb = true;
+	  _this.$router.replace({ path: "/Start" });
     });
   },
 };

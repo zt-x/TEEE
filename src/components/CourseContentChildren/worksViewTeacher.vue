@@ -5,7 +5,7 @@
         <v-card-title>
           {{ work.workName }}
           <v-spacer></v-spacer>
-          <v-chip small class="ma-2" color="green" text-color="white"> 已完成 </v-chip>
+          <v-chip small class="ma-2" color="green" text-color="white" v-if="loading_subNum"> {{work.subNum}} | {{work.submit_totalNum}}</v-chip>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-chip
@@ -56,7 +56,8 @@ export default {
     return {
       isDelete: false,
       snackbar: false,
-      msg: "",
+		msg: "",
+		loading_subNum:false,
     };
   },
   methods: {
@@ -70,7 +71,28 @@ export default {
       } else {
         this.isDelete = false;
       }
-    },
+	  },
+	  getSubStatus() {
+		  let _this = this;
+		const form = new FormData();
+		  form.append("cid", this.cid);
+		// TODO
+		  _axios.post("/api/Course/getAllWorkSummary", form).then((res) => {
+			  let data = res.data.data;
+			  let arr = eval(data.works);
+			  _this.submit_totalNum = data.submit_totalNum;
+			  arr.forEach((item) => {
+				  _this.works.forEach((w, i) => {
+					  if (item.wid == w.id) {
+						  w.subNum = item.subNum;
+						  w.rDone = item.rDone;
+					  }
+				  })
+			  })
+			  loading_subNum = true;
+			  console.log(_this.works);
+		  })
+	},
     deleteWork(work) {
       let _this = this;
 
@@ -116,7 +138,17 @@ export default {
       return;
     },
   },
-  created() {},
+	created() {
+		this.loading_SubStatus = false;
+    token = window.localStorage.getItem("token");
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+	});
+		this.getSubStatus();
+  },
 };
 </script>
 
