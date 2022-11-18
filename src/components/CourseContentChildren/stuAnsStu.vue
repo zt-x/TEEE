@@ -36,7 +36,18 @@
             :style="{ color: item == readover_new[i] ? 'black' : '#2196f3' }"
           >
             <div style="width: 25px">
-              <v-icon color="green" v-if="readover_new[i] != -1" small>mdi-check</v-icon>
+              <v-icon
+                color="green"
+                v-if="readover_new[i] != -1 && readover_new[i] == qscores[i]"
+                small
+                >mdi-check</v-icon
+              >
+              <v-icon
+                color="error"
+                v-if="readover_new[i] != -1 && readover_new[i] != qscores[i]"
+                small
+                >mdi-close</v-icon
+              >
               <v-icon color="warning" v-if="readover_new[i] == -1" small
                 >mdi-border-color</v-icon
               >
@@ -146,6 +157,8 @@ export default {
       this.$emit("closeSubmitCard", false);
     },
     async getSubmitContent() {
+      console.log(this.SUBMIT);
+      console.log(this.SUBMIT.submitId);
       token = window.localStorage.getItem("token");
       let _this = this;
       // init axios
@@ -185,24 +198,6 @@ export default {
         .catch((err) => {
           alert("getSub" + err);
         });
-    },
-    showChangeScoreDialog(i) {
-      this.ind_max = this.qscores[i];
-      this.ind_i = i;
-      this.showChangeScore = true;
-    },
-    saveScore(data) {
-      if (data.score >= 0 && Number(data.score) <= Number(this.qscores[data.i])) {
-        this.readover_new[data.i] = data.score;
-        this.showChangeScore = false;
-      } else {
-        alert("分数不能小于0，也不能大于本题的最大分数哦~");
-        this.readover_new[data.i] = this.readover[data.i];
-      }
-      this.showChangeScore = false;
-    },
-    exitSaveScore(val) {
-      this.showChangeScore = false;
     },
   },
 };

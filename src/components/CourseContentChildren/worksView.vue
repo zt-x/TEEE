@@ -1,13 +1,7 @@
 <template>
   <v-container>
     <div v-for="work in works" v-bind:key="work.id">
-      <v-card
-        style="min-width: 100%"
-        hover
-        ripple=""
-        @click="doWork(work)"
-        @contextmenu.prevent="mouseclick()"
-      >
+      <v-card style="min-width: 100%" hover ripple="" @click="doWork(work)">
         <v-card-title>
           {{ work.workName }}
           <v-spacer></v-spacer>
@@ -21,6 +15,19 @@
           >
             {{ getScore(work.id) }}
           </v-chip>
+          <v-chip
+            v-if="!finishGetStatus"
+            small
+            color="grey lighten-1"
+            text-color="white"
+            class="mr-2"
+          >
+            <v-progress-circular
+              :size="15"
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
+          </v-chip>
           <span style="color: #eeeeee">|</span>
           <v-chip
             v-if="finishGetStatus"
@@ -31,6 +38,19 @@
           >
             {{ status(work.id) }}
           </v-chip>
+          <v-chip
+            v-if="!finishGetStatus"
+            small
+            color="grey lighten-1"
+            text-color="white"
+            class="mr-2"
+          >
+            <v-progress-circular
+              :size="15"
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
+          </v-chip>
         </v-card-title>
         <v-card-subtitle
           >截止时间 | {{ work.deadline == null ? " - " : work.deadline }}</v-card-subtitle
@@ -38,70 +58,70 @@
       </v-card>
       <div style="height: 5px"></div>
     </div>
-    <v-dialog v-model="dialog_stuAnsStu">
-		<stuAnsStu :SUBMIT="submits" :qscores="qscores"/>
-	</v-dialog>
+    <v-dialog width="550px" v-model="dialog_stuAnsStu">
+      <!-- 666 -->
+      <stuAnsStu @closeSubmitCard="close($event)" :SUBMIT="submits" :qscores="qscores" />
+    </v-dialog>
+    <v-overlay v-if="loading">
+      <v-progress-circular small indeterminate color="primary"></v-progress-circular>
+      <div class="mx-auto">{{ loadingText }}</div>
+    </v-overlay>
   </v-container>
 </template>
 
 <script>
 import axios from "axios";
-import stuAnsStu from './stuAnsStu.vue';
+import stuAnsStu from "./stuAnsStu.vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
   components: { stuAnsStu },
   props: ["works", "cid"],
   computed: {},
-	methods: {
-	async getWork(wid) {
-      token = window.localStorage.getItem("token");
-      let _this = this;
-      // init axios
-      _axios.interceptors.request.use(function (config) {
-        config.headers = {
-          Authorization: token,
-        };
-        return config;
-      });
-      const form = new FormData();
-      form.append("wid", wid);
-      _axios
-        .post("/api/Work/getWork", form)
-        .then((res) => {
-          let questions = res.data.data;
-          _this.qs = eval(questions);
-          _this.qs.forEach((val, i) => {
-            _this.qscores[i] = val.qscore;
-          });
-        })
-        .catch((err) => {});
+  methods: {
+    close(val) {
+      this.dialog_stuAnsStu = false;
     },
-		doWork(work) {
-			let _this = this;
+    doWork(work) {
+      let _this = this;
+      this.loading = true;
+      this.loadingText = "获取答题卡中 ... ";
       if (this.status(work.id) == "未提交") {
         this.$router.push({
           name: "doWork",
           params: { wid: work.id, wname: work.workName, cid: cid },
         });
-	  } else {
-		  this.getWork(work.id).then((res) => {
-			// TODO
-			const form = new FormData();
-			form.append("wid", work.id);
-			_axios
-				.post("/api/submit/getSubmitByWorkId", form)
-				.then((res) => {
-					_this.submits = eval(res.data.data);
-					_this.dialog_stuAnsStu = true;
-				})
-				.catch((err) => {
-					// TODO
-					_this.msg = "发生了错误" + err;
-					_this.snackbar = true;
-				});
-		  });
+      } else {
+        let _this = this;
+        const form = new FormData();
+        form.append("wid", work.id);
+        _axios
+          .post("/api/Work/getWork", form)
+          .then((res) => {
+            let questions = res.data.data;
+            _this.qs = eval(questions);
+            _this.qs.forEach((val, i) => {
+              _this.qscores[i] = val.qscore;
+            });
+            const form2 = new FormData();
+            form2.append("wid", work.id);
+            _axios
+              .post("/api/submit/getSubmitByWorkId", form2)
+              .then((res) => {
+                console.log(res.data.data);
+                _this.submits = JSON.parse(res.data.data);
+                _this.dialog_stuAnsStu = true;
+                _this.loading = false;
+              })
+              .catch((err) => {
+                // TODO
+                _this.msg = "发生了错误" + err;
+                _this.loading = false;
 
+                _this.snackbar = true;
+              });
+          })
+          .catch((err) => {});
       }
     },
     closeSubmitCard() {},
@@ -177,14 +197,6 @@ export default {
       // [{wid:, status: ,score:}]
       //
       let _this = this;
-      token = window.localStorage.getItem("token");
-      // init axios
-      _axios.interceptors.request.use(function (config) {
-        config.headers = {
-          Authorization: token,
-        };
-        return config;
-      });
       const form = new FormData();
       form.append("cid", _this.cid);
       _axios
@@ -208,15 +220,26 @@ export default {
       finish_status: [],
       finishGetStatus: false,
       msg: "",
-		snackbar: "",
-		dialog_stuAnsStu: false,
-		      qs: [],
-		qscores: [],
-		submits: [],
-		wid:0,
+      snackbar: "",
+      dialog_stuAnsStu: false,
+      qs: [],
+      qscores: [],
+      submits: [],
+      wid: 0,
+      loading: false,
+      loadingText: "",
     };
   },
   mounted() {
+    token = window.localStorage.getItem("token");
+    let _this = this;
+    // init axios
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
     this.getWorkStatus();
   },
   created() {},

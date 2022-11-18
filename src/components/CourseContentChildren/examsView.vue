@@ -26,6 +26,19 @@
           >
             {{ getScore(work.id) }}
           </v-chip>
+          <v-chip
+            v-if="!finishGetStatus"
+            small
+            color="grey lighten-1"
+            text-color="white"
+            class="mr-2"
+          >
+            <v-progress-circular
+              :size="15"
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
+          </v-chip>
           <span style="color: #eeeeee">|</span>
           <v-chip
             v-if="finishGetStatus"
@@ -35,6 +48,19 @@
             text-color="white"
           >
             {{ status(work.id) }}
+          </v-chip>
+          <v-chip
+            v-if="!finishGetStatus"
+            small
+            color="grey lighten-1"
+            text-color="white"
+            class="mr-2"
+          >
+            <v-progress-circular
+              :size="15"
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
           </v-chip>
         </v-card-title>
         <v-card-subtitle

@@ -86,7 +86,7 @@
                     ref="startMenu"
                     style="font-size: small"
                     v-model="startMenu"
-                    :close-on-content-click="true"
+                    :close-on-content-click="false"
                     transition="scale-transition"
                     min-width="290px"
                     offset-y
@@ -105,8 +105,15 @@
                         v-on="on"
                       ></v-text-field>
                     </template>
-                    <v-date-picker v-model="form_startTime" no-title scrollable>
+                    <v-date-picker
+                      color="brown lighten-1"
+                      locale="zh-cn"
+                      :first-day-of-week="0"
+                      v-model="form_startTime"
+                      scrollable
+                    >
                       <v-spacer></v-spacer>
+                      <v-btn text color="primary" @click="startMenu = false">OK</v-btn>
                     </v-date-picker>
                   </v-menu>
                 </v-col>
@@ -114,7 +121,7 @@
                   <v-menu
                     ref="endMenu"
                     v-model="endMenu"
-                    :close-on-content-click="true"
+                    :close-on-content-click="false"
                     transition="scale-transition"
                     min-width="290px"
                     offset-y
@@ -133,8 +140,15 @@
                         v-on="on"
                       ></v-text-field>
                     </template>
-                    <v-date-picker v-model="form_endTime" no-title scrollable>
+                    <v-date-picker
+                      color="brown lighten-1"
+                      locale="zh-cn"
+                      :first-day-of-week="0"
+                      v-model="form_endTime"
+                      scrollable
+                    >
                       <v-spacer></v-spacer>
+                      <v-btn text color="primary" @click="endMenu = false">OK</v-btn>
                     </v-date-picker>
                   </v-menu>
                 </v-col>

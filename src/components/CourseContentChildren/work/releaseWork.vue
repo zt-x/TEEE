@@ -74,12 +74,36 @@
           </v-col>
 
           <v-col cols="3">
-            <v-text-field
-              clearable
-              color="#875438"
-              v-model="deadline"
-              label="截止时间"
-            ></v-text-field>
+            <v-menu
+              style="font-size: small"
+              v-model="TimeMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              min-width="290px"
+              offset-y
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  clearable
+                  color="#875438"
+                  v-model="deadline"
+                  readonly
+                  label="截止时间"
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                color="brown lighten-1"
+                locale="zh-cn"
+                :first-day-of-week="0"
+                v-model="deadline"
+                scrollable
+              >
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="TimeMenu = false">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
           </v-col>
           <v-col cols="3">
             <v-checkbox
@@ -217,6 +241,7 @@ export default {
       rules: {
         required: (value) => !!value || "不能为空！",
       },
+      TimeMenu: "",
     };
   },
   methods: {
