@@ -38,6 +38,10 @@ const routes = [
 		component:()=>import('@/views/WorkPanel.vue')
 	},
 	{
+		path: '/',
+		redirect:'/Start',
+	},
+	{
 		path: '*',
 		redirect:'/404',
 	}
