@@ -38,25 +38,70 @@
       </v-card>
       <div style="height: 5px"></div>
     </div>
-    <v-dialog v-model="dialog_stuAnsStu"></v-dialog>
+    <v-dialog v-model="dialog_stuAnsStu">
+		<stuAnsStu :SUBMIT="submits" :qscores="qscores"/>
+	</v-dialog>
   </v-container>
 </template>
 
 <script>
 import axios from "axios";
+import stuAnsStu from './stuAnsStu.vue';
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
+  components: { stuAnsStu },
   props: ["works", "cid"],
   computed: {},
-  methods: {
-    doWork(work) {
+	methods: {
+	async getWork(wid) {
+      token = window.localStorage.getItem("token");
+      let _this = this;
+      // init axios
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      const form = new FormData();
+      form.append("wid", wid);
+      _axios
+        .post("/api/Work/getWork", form)
+        .then((res) => {
+          let questions = res.data.data;
+          _this.qs = eval(questions);
+          _this.qs.forEach((val, i) => {
+            _this.qscores[i] = val.qscore;
+          });
+        })
+        .catch((err) => {});
+    },
+		doWork(work) {
+			let _this = this;
       if (this.status(work.id) == "未提交") {
         this.$router.push({
           name: "doWork",
           params: { wid: work.id, wname: work.workName, cid: cid },
         });
-      } else {
+	  } else {
+		  this.getWork(work.id).then((res) => {
+			// TODO
+			const form = new FormData();
+			form.append("wid", work.id);
+			_axios
+				.post("/api/submit/getSubmitByWorkId", form)
+				.then((res) => {
+					_this.submits = eval(res.data.data);
+					_this.dialog_stuAnsStu = true;
+				})
+				.catch((err) => {
+					// TODO
+					_this.msg = "发生了错误" + err;
+					_this.snackbar = true;
+				});
+		  });
+
       }
     },
     closeSubmitCard() {},
@@ -163,7 +208,12 @@ export default {
       finish_status: [],
       finishGetStatus: false,
       msg: "",
-      snackbar: "",
+		snackbar: "",
+		dialog_stuAnsStu: false,
+		      qs: [],
+		qscores: [],
+		submits: [],
+		wid:0,
     };
   },
   mounted() {
