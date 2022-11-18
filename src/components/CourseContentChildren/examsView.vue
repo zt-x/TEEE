@@ -1,19 +1,16 @@
 <template>
   <v-container>
     <div v-for="work in exams" v-bind:key="work.id">
-      <v-card
-        style="min-width: 100%"
-        hover
-        ripple=""
-        @click="
-          $router.push({
-            name: 'doWork',
-            params: { wid: work.id, wname: work.workName, cid: cid },
-          })
-        "
-        @contextmenu.prevent="mouseclick()"
-      >
+      <v-card style="min-width: 100%" hover ripple="" @click="doWork(work)">
         <v-card-title>
+          <v-chip
+            :color="work.status == -1 ? 'error' : 'success'"
+            label
+            small
+            class="mr-2"
+          >
+            {{ work.status == -1 ? "已截止" : "进行中" }}
+          </v-chip>
           {{ work.workName }}
           <v-spacer></v-spacer>
 
@@ -69,6 +66,22 @@
       </v-card>
       <div style="height: 5px"></div>
     </div>
+    <v-dialog width="550px" v-model="dialog_stuAnsStu">
+      <!-- 666 -->
+      <stuAnsStu
+        v-if="dialog_stuAnsStu"
+        @closeSubmitCard="close($event)"
+        :SUBMIT="submits"
+        :qscores="qscores"
+      />
+    </v-dialog>
+    <v-overlay v-if="loading">
+      <v-progress-circular small indeterminate color="primary"></v-progress-circular>
+      <div class="mx-auto">{{ loadingText }}</div>
+    </v-overlay>
+    <v-snackbar v-model="snackbar" top color="error" dense="true" timeout="2000">
+      {{ msg }}
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -78,12 +91,66 @@ const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
   props: ["exams", "cid"],
-  computed: {
-    doWork() {},
-  },
+  computed: {},
   methods: {
-    mouseclick() {
-      alert("右键来咯!");
+    doWork(work) {
+      let _this = this;
+      if (this.status(work.id) == null || this.status(work.id) == undefined) {
+        this.loading = false;
+        return;
+      } else {
+        if (this.status(work.id) == "未提交") {
+          if (work.status == -1) {
+            this.$dialog({
+              title: "时间已到",
+              content: "已超过设定时间，无法作答",
+              btns: [
+                {
+                  label: "好叭",
+                  color: "red",
+                  ghost: true,
+                },
+              ],
+            });
+            return;
+          }
+          this.$router.push({
+            name: "doWork",
+            params: { wid: work.id, wname: work.workName, cid: _this.cid },
+          });
+        } else if (this.status(work.id) == "批改中" || this.status(work.id) == "已批改") {
+          this.loading = true;
+          this.loadingText = "获取答题卡中 ... ";
+          const form = new FormData();
+          form.append("wid", work.id);
+          _axios
+            .post("/api/Work/getWork", form)
+            .then((res) => {
+              let questions = res.data.data;
+              _this.qs = eval(questions);
+              _this.qs.forEach((val, i) => {
+                _this.qscores[i] = val.qscore;
+              });
+              const form2 = new FormData();
+              form2.append("wid", work.id);
+              _axios
+                .post("/api/submit/getSubmitByWorkId", form2)
+                .then((res) => {
+                  _this.submits = JSON.parse(res.data.data);
+                  _this.dialog_stuAnsStu = true;
+                  _this.loading = false;
+                })
+                .catch((err) => {
+                  // TODO
+                  _this.msg = "发生了错误" + err;
+                  _this.loading = false;
+
+                  _this.snackbar = true;
+                });
+            })
+            .catch((err) => {});
+        }
+      }
     },
     status(wid) {
       let ret = "";
@@ -150,7 +217,7 @@ export default {
           }
         }
       });
-      return ret;
+      return Number(ret).toFixed(1);
     },
     async getWorkStatus() {
       //
@@ -189,6 +256,13 @@ export default {
       finishGetStatus: false,
       msg: "",
       snackbar: "",
+      dialog_stuAnsStu: false,
+      qs: [],
+      qscores: [],
+      submits: [],
+      wid: 0,
+      loading: false,
+      loadingText: "",
     };
   },
   mounted() {

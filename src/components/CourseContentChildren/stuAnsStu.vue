@@ -157,8 +157,6 @@ export default {
       this.$emit("closeSubmitCard", false);
     },
     async getSubmitContent() {
-      console.log(this.SUBMIT);
-      console.log(this.SUBMIT.submitId);
       token = window.localStorage.getItem("token");
       let _this = this;
       // init axios

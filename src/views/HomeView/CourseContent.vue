@@ -56,23 +56,23 @@
                       @flush="flushContent"
                       v-if="loading_workview && isTeacher"
                     />
-					<v-card v-if="!loading_workview">
-						<v-container>
-							<v-row class="text-center">
-								<v-col cols="12">
-								<v-progress-circular
-									indeterminate
-									:size="20"
-									color="primary"
-								></v-progress-circular>
-								<span class="pl-2">正在获取作业 ...</span>
-								</v-col>
-							</v-row>
-						</v-container>
-					</v-card>
+                    <v-card v-if="!loading_workview">
+                      <v-container>
+                        <v-row class="text-center">
+                          <v-col cols="12">
+                            <v-progress-circular
+                              indeterminate
+                              :size="20"
+                              color="primary"
+                            ></v-progress-circular>
+                            <span class="pl-2">正在获取作业 ...</span>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card>
                   </v-card>
                 </v-tab-item>
-				<!-- 考试模块 -->
+                <!-- 考试模块 -->
                 <v-tab-item>
                   <v-card color="basil" style="background: #f6f7f8" flat>
                     <ExamsView
@@ -86,24 +86,23 @@
                       @flush="flushContent"
                       v-if="loading_examview && isTeacher"
                     />
-					<v-card v-if="!loading_examview">
-						<v-container>
-							<v-row class="text-center">
-								<v-col cols="12">
-								<v-progress-circular
-									indeterminate
-									:size="20"
-									color="primary"
-								></v-progress-circular>
-								<span class="pl-2">正在获取考试 ...</span>
-								</v-col>
-							</v-row>
-						</v-container>
-					</v-card>
-
+                    <v-card v-if="!loading_examview">
+                      <v-container>
+                        <v-row class="text-center">
+                          <v-col cols="12">
+                            <v-progress-circular
+                              indeterminate
+                              :size="20"
+                              color="primary"
+                            ></v-progress-circular>
+                            <span class="pl-2">正在获取考试 ...</span>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card>
                   </v-card>
                 </v-tab-item>
-				<!-- 公告模块 -->
+                <!-- 公告模块 -->
                 <v-tab-item>
                   <v-card color="basil" style="background: #f6f7f8" flat>
                     <Announcement
@@ -112,7 +111,7 @@
                     />
                   </v-card>
                 </v-tab-item>
-				<!-- 成员管理模块 -->
+                <!-- 成员管理模块 -->
                 <v-tab-item v-if="isTeacher">
                   <v-card
                     v-if="finishGetUser"
@@ -149,8 +148,8 @@
                               <v-icon>fas fa-plus</v-icon>
                               添加用户
                             </v-btn>
-							
-							<v-btn class="ml-3" dark color="#a36645">
+
+                            <v-btn class="ml-3" dark color="#a36645">
                               <v-icon>fas fa-plus</v-icon>
                               批量添加
                             </v-btn>
@@ -348,8 +347,8 @@ export default {
       gotExams: false,
       gotWorkScore: false,
       CourseStatsitics: {},
-		submit_totalNum: 0,
-		loading_summary: false,
+      submit_totalNum: 0,
+      loading_summary: false,
     };
   },
   methods: {
@@ -399,8 +398,8 @@ export default {
     flushContent() {
       let _this = this;
       _this.finishGetUser = false;
-		_this.loading_examview = false;
-		_this.loading_workview = false;
+      _this.loading_examview = false;
+      _this.loading_workview = false;
       _axios
         .get("/api/power")
         .then((res) => {
@@ -456,19 +455,20 @@ export default {
           });
           _this.exams = dt.filter((item) => {
             return item.isExam == 1;
-		  });
-			_this.works.sort((a,b) => {
-				return b.id - a.id;
-		  })	
-		  _this.exams.sort((a,b) => {
-				return b.id - a.id;
-		  })
+          });
+          _this.works.sort((a, b) => {
+            return b.id - a.id;
+          });
+          _this.exams.sort((a, b) => {
+            return b.id - a.id;
+          });
+          console.log(_this.works);
           _this.loading_announcementview = true;
           _this.loading_workview = true;
           _this.loading_examview = true;
           _this.$vuetify.goTo(0);
-			_this.loading = false;
-			_this.loading_summary = false;
+          _this.loading = false;
+          _this.loading_summary = false;
         })
         .catch((err) => {
           _this.$router.replace({ path: "/Course" });

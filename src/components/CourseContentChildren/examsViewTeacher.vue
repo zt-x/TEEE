@@ -3,6 +3,14 @@
     <div v-for="work in exams" v-bind:key="work.id">
       <v-card style="min-width: 100%" hover ripple="" @click="doWork(work)">
         <v-card-title>
+          <v-chip
+            :color="work.status == -1 ? 'error' : 'success'"
+            label
+            small
+            class="mr-2"
+          >
+            {{ work.status == -1 ? "已截止" : "进行中" }}
+          </v-chip>
           {{ work.workName }}
           <v-spacer></v-spacer>
           <v-chip small class="ma-2" color="green" text-color="white"> 已完成 </v-chip>
