@@ -5,38 +5,58 @@
         <v-card-title>
           {{ work.workName }}
           <v-spacer></v-spacer>
-		  <v-tooltip bottom v-if="work.subNum-work.rDone>0">
+          <v-tooltip top v-if="work.subNum - work.rDone > 0">
             <template v-slot:activator="{ on, attrs }">
-				<v-chip
-				 v-on="on"
-                v-bind="attrs" small class="ma-2" color="warning" text-color="white" >
-			<v-icon x-small>fa fa-bell</v-icon>
-		  </v-chip>
-			</template>
+              <v-chip
+                v-on="on"
+                v-bind="attrs"
+                small
+                class="ma-2"
+                color="warning"
+                text-color="white"
+              >
+                <v-icon x-small>fa fa-bell</v-icon>
+              </v-chip>
+            </template>
             <span>有未批改的作业</span>
           </v-tooltip>
 
-		  <v-tooltip v-if="loading_subNum" bottom>
+          <v-tooltip v-if="loading_subNum" top>
             <template v-slot:activator="{ on, attrs }">
-				<v-chip v-on="on" v-bind="attrs" small class="ma-2" color="green" text-color="white" > {{work.subNum}} | {{submit_totalNum}}</v-chip>
-			</template>
-            <span>已提交 | 班级人数</span>
+              <v-chip
+                v-on="on"
+                v-bind="attrs"
+                small
+                class="ma-2"
+                color="green"
+                text-color="white"
+              >
+                {{ work.subNum }} / {{ submit_totalNum }}</v-chip
+              >
+            </template>
+            <span>已提交 / 班级人数</span>
           </v-tooltip>
 
-		  <v-chip small class="ma-2" color="grey" text-color="white" v-if="!loading_subNum">
-				<v-container>
-					<v-row class="text-center">
-						<v-col cols="12">
-						<v-progress-circular
-							indeterminate
-							:size="20"
-							color="primary"
-						></v-progress-circular>
-						</v-col>
-					</v-row>
-				</v-container>
-				</v-chip>
-		  <v-tooltip bottom>
+          <v-chip
+            small
+            class="ma-2"
+            color="grey"
+            text-color="white"
+            v-if="!loading_subNum"
+          >
+            <v-container>
+              <v-row class="text-center">
+                <v-col cols="12">
+                  <v-progress-circular
+                    indeterminate
+                    :size="20"
+                    color="primary"
+                  ></v-progress-circular>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-chip>
+          <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-chip
                 small
@@ -86,9 +106,9 @@ export default {
     return {
       isDelete: false,
       snackbar: false,
-		msg: "",
-		loading_subNum: false,
-		submit_totalNum:-1,
+      msg: "",
+      loading_subNum: false,
+      submit_totalNum: -1,
     };
   },
   methods: {
@@ -102,27 +122,27 @@ export default {
       } else {
         this.isDelete = false;
       }
-	  },
-	  getSubStatus() {
-		  let _this = this;
-		const form = new FormData();
-		  form.append("cid", this.cid);
-		// TODO
-		  _axios.post("/api/Course/getAllWorkSummary", form).then((res) => {
-			  let data = res.data.data;
-			  let arr = eval(data.works);
-			  _this.submit_totalNum = data.submit_totalNum;
-			  arr.forEach((item) => {
-				  _this.works.forEach((w, i) => {
-					  if (item.wid == w.id) {
-						  w.subNum = item.subNum;
-						  w.rDone = item.rDone;
-					  }
-				  })
-			  })
-			  _this.loading_subNum = true;
-		  })
-	},
+    },
+    getSubStatus() {
+      let _this = this;
+      const form = new FormData();
+      form.append("cid", this.cid);
+      // TODO
+      _axios.post("/api/Course/getAllWorkSummary", form).then((res) => {
+        let data = res.data.data;
+        let arr = eval(data.works);
+        _this.submit_totalNum = data.submit_totalNum;
+        arr.forEach((item) => {
+          _this.works.forEach((w, i) => {
+            if (item.wid == w.id) {
+              w.subNum = item.subNum;
+              w.rDone = item.rDone;
+            }
+          });
+        });
+        _this.loading_subNum = true;
+      });
+    },
     deleteWork(work) {
       let _this = this;
 
@@ -168,20 +188,18 @@ export default {
       return;
     },
   },
-	created() {
-
-	},
-	mounted() {
-		this.loading_SubStatus = false;
-		token = window.localStorage.getItem("token");
-		_axios.interceptors.request.use(function (config) {
-		config.headers = {
-			Authorization: token,
-		};
-		return config;
-		});
-		this.getSubStatus();
-  }
+  created() {},
+  mounted() {
+    this.loading_SubStatus = false;
+    token = window.localStorage.getItem("token");
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
+    this.getSubStatus();
+  },
 };
 </script>
 

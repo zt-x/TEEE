@@ -1,20 +1,20 @@
 <template>
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
     <v-app-bar color="white" app>
-      <v-card-title>
+      <v-card-title class="text-center">
         <v-chip @click="goBack()" small class="ma-2" color="#555555" text-color="white"
           ><v-icon small left>fa fa-reply</v-icon>返回</v-chip
         >
-        {{ wname }}</v-card-title
-      >
+        <div style="margin-left: 850px">{{ wname }}</div>
+      </v-card-title>
     </v-app-bar>
 
     <v-card-text>
       <v-container fluid>
         <v-row>
           <!-- 答题卡 -->
-          <v-col cols="2">
-            <v-card style="min-width: 250px" class="mr-5">
+          <v-col cols="3">
+            <v-card style="min-width: 250px">
               <v-card-title>答题卡</v-card-title>
               <v-divider></v-divider>
               <div style="background: #eeeeee" class="py-5">
@@ -36,9 +36,14 @@
                 </v-container>
               </div>
             </v-card>
+            <v-card style="min-width: 250px" class="mt-5">
+              <v-card-title>剩余答题时间</v-card-title>
+              <v-divider></v-divider>
+              <div style="background: #eeeeee" class="py-5"></div>
+            </v-card>
           </v-col>
           <!-- 答题区 -->
-          <v-col cols="10">
+          <v-col cols="9">
             <v-card class="ml-5" min-width="500px">
               <v-card-title>题目</v-card-title>
               <v-divider></v-divider>
@@ -131,6 +136,9 @@
                   @click="p_que++"
                   >下一题</v-btn
                 >
+                <!-- TODO -->
+
+                <v-btn class="mr-1" outlined dark color="blue"> 暂存 </v-btn>
                 <v-btn class="mr-7" dark color="blue" @click="submit()">提交</v-btn>
               </v-card-actions>
             </v-card>
@@ -339,10 +347,10 @@ export default {
                 for (var i = 0; i < ass.length; i++) {
                   if (Array.isArray(ass[i])) {
                     str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
-				  } else {
-					  if (ass[i] == undefined || ass[i] == null) {
-						  ass[i] = "无";
-					}
+                  } else {
+                    if (ass[i] == undefined || ass[i] == null) {
+                      ass[i] = "无";
+                    }
                     str += ass[i] + ", ";
                   }
                 }
@@ -354,8 +362,7 @@ export default {
                 form.append("ans", str);
                 _axios
                   .post("/api/submit/submitWork", form)
-					.then((res) => {
-
+                  .then((res) => {
                     _this.$dialog({
                       content: res.data.msg,
                       btns: [
@@ -363,8 +370,8 @@ export default {
                           label: "确定",
                           color: "#09f",
                           // ghost: true,
-							  callback: () => {
-							  _this.goBack();
+                          callback: () => {
+                            _this.goBack();
                           },
                         },
                       ],
@@ -417,8 +424,8 @@ export default {
                           label: "芜湖",
                           color: "#09f",
                           // ghost: true,
-						  callback: () => {
-							  _this.goBack();
+                          callback: () => {
+                            _this.goBack();
                           },
                         },
                       ],

@@ -5,12 +5,7 @@
         style="min-width: 100%"
         hover
         ripple=""
-        @click="
-          $router.push({
-            name: 'doWork',
-            params: { wid: work.id, wname: work.workName, cid: cid },
-          })
-        "
+        @click="doWork(work)"
         @contextmenu.prevent="mouseclick()"
       >
         <v-card-title>
@@ -37,10 +32,13 @@
             {{ status(work.id) }}
           </v-chip>
         </v-card-title>
-        <v-card-subtitle>截止时间 | {{ work.deadline == null ? " - " : work.deadline }}</v-card-subtitle>
+        <v-card-subtitle
+          >截止时间 | {{ work.deadline == null ? " - " : work.deadline }}</v-card-subtitle
+        >
       </v-card>
       <div style="height: 5px"></div>
     </div>
+    <v-dialog v-model="dialog_stuAnsStu"></v-dialog>
   </v-container>
 </template>
 
@@ -50,13 +48,18 @@ const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
   props: ["works", "cid"],
-  computed: {
-    doWork() {},
-  },
+  computed: {},
   methods: {
-    mouseclick() {
-      alert("右键来咯!");
+    doWork(work) {
+      if (this.status(work.id) == "未提交") {
+        this.$router.push({
+          name: "doWork",
+          params: { wid: work.id, wname: work.workName, cid: cid },
+        });
+      } else {
+      }
     },
+    closeSubmitCard() {},
     status(wid) {
       let ret = "";
       this.finish_status.forEach((val, i) => {

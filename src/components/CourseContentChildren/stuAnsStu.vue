@@ -53,35 +53,19 @@
             }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            学生提交的答案：
+            提交的答案：
             <div
               style="max-height: 300px; overflow: auto"
               v-html="parseContent(submitContent[i])"
             ></div>
-            <div class="mt-5" style="float: right">
-              <v-spacer></v-spacer>
-              <v-chip small dark color="blue" @click="showChangeScoreDialog(i)">
-                {{ readover_new[i] == -1 ? "批改" : "修改得分" }}
-              </v-chip>
-            </div>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="blue" dark text @click="close()">取消</v-btn>
-      <v-btn color="blue" dark @click="finish()">完成批改</v-btn>
+      <v-btn color="blue" dark text @click="close()">返回</v-btn>
     </v-card-actions>
-    <v-dialog width="300px" v-model="showChangeScore">
-      <stuAnsSetScore
-        @saveScore="saveScore($event)"
-        @exitSaveScore="exitSaveScore($event)"
-        v-if="showChangeScore"
-        :i="ind_i"
-        :max="ind_max"
-      />
-    </v-dialog>
     <v-overlay v-if="overlay">
       <v-chip>
         <v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
@@ -117,34 +101,6 @@ export default {
     this.getSubmitContent();
   },
   methods: {
-    finish() {
-      this.overlay = true;
-      this.overlay_msg = "提交批改中 ...";
-      const form = new FormData();
-      form.append("subid", this.SUBMIT.submitId);
-      form.append("score", this.readover_new);
-      let _this = this;
-      _axios
-        .post("/api/submit/setSubmitScore", form)
-        .then((res) => {
-          _this.overlay = false;
-          this.$dialog({
-            content: res.data.msg,
-            btns: [
-              {
-                label: "确定",
-                color: "#09f",
-                callback: () => {
-                  _this.close();
-                },
-              },
-            ],
-          });
-        })
-        .catch((err) => {
-          alert("finish" + err);
-        });
-    },
     parseContent(val) {
       let _this = this;
       try {
