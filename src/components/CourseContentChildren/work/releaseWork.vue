@@ -57,6 +57,7 @@
         <v-row>
           <v-col cols="3">
             <v-text-field
+              required
               clearable
               color="#875438"
               label="作业标题"
@@ -66,10 +67,12 @@
           </v-col>
           <v-col cols="3">
             <v-text-field
+              required
               clearable
               color="#875438"
               label="分数"
               v-model="totalScore"
+              :rules="[rules.required]"
             ></v-text-field>
           </v-col>
 
@@ -171,6 +174,25 @@
           <v-col cols="12">
             <v-textarea outlined label="" v-model="questions" readonly no-resize>
             </v-textarea>
+            <v-card>
+              <v-chip
+                class="mr-5 mt-2"
+                close
+                v-for="(ques, i) in questions"
+                :key="ques.id"
+              >
+                {{ i + 1 }}、 |
+                {{
+                  JSON.parse(ques).qtype == "30010"
+                    ? "选择题"
+                    : JSON.parse(ques).qtype == "30011"
+                    ? "填空题"
+                    : "简答题"
+                }}
+                |
+                {{ JSON.parse(ques).qtext.slice(0, 20) }}
+              </v-chip>
+            </v-card>
             <v-row class="ml-0">
               <v-checkbox
                 row
@@ -210,8 +232,26 @@ import AddTextQue from "./addQuestion/addTextQue.vue";
 import axios from "axios";
 import Dialog_msg from "@/components/dialog_msg.vue";
 let token = window.localStorage.getItem("token");
-
+import {
+  required,
+  email,
+  numeric,
+  minValue,
+  maxLength,
+  maxValue,
+} from "vuelidate/lib/validators";
 export default {
+  validations: {
+    name: { required, maxLength: maxLength(10) },
+    email: { required, email },
+    select: { required },
+    checkbox: {
+      checked(val) {
+        return val;
+      },
+    },
+    release_score: { required, numeric, minValue: minValue(0), maxValue: maxValue(1000) },
+  },
   components: { addChoicQue, AddFillInQue, AddTextQue, Dialog_msg },
   props: ["cid"],
   data() {
@@ -240,8 +280,10 @@ export default {
       isTemp: false,
       rules: {
         required: (value) => !!value || "不能为空！",
+        mustNum: (val) => typeof Number(val) != "number" || typeof val,
       },
       TimeMenu: "",
+      valid: "",
     };
   },
   methods: {
