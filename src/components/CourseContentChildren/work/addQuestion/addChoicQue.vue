@@ -138,6 +138,9 @@ export default {
       } else if (_cans.length == 0) {
         this.msg = "请添加正确选项!";
         return;
+      } else if (isNaN(this.ans_score)) {
+        this.msg = "请输入一个正确的分数!";
+        return;
       }
 
       newQue.qtype = 30010;

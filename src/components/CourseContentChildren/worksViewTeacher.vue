@@ -82,6 +82,23 @@
             </template>
             <span>删除该作业</span>
           </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-chip
+                small
+                class="ma-2"
+                color="warning"
+                text-color="white"
+                hover
+                v-on="on"
+                @click="editWork(work)"
+                v-bind="attrs"
+              >
+                <v-icon x-small>fas fa-cog</v-icon>
+              </v-chip>
+            </template>
+            <span>编辑</span>
+          </v-tooltip>
         </v-card-title>
         <v-card-subtitle
           >截止时间 | {{ work.deadline == null ? " - " : work.deadline }}</v-card-subtitle

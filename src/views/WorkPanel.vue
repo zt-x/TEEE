@@ -37,9 +37,14 @@
               </div>
             </v-card>
             <v-card style="min-width: 250px" class="mt-5">
-              <v-card-title>剩余答题时间</v-card-title>
+              <v-card-title>
+                <v-icon class="mr-2">fa fa-clock</v-icon>
+                剩余答题时间</v-card-title
+              >
               <v-divider></v-divider>
-              <div style="background: #eeeeee" class="py-5"></div>
+              <div class="text-center py-8" style="background: #eeeeee">
+                <span style="font-size: 25px; color: #b97a57">{{ restTimeText }}</span>
+              </div>
             </v-card>
           </v-col>
           <!-- 答题区 -->
@@ -155,6 +160,8 @@ import QueNum from "@/components/WorkPanel/QueNum.vue";
 import CKEditor from "ckeditor4-vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
+var restTimerID;
+var restTimerCheckID;
 export default {
   components: { QueNum, ckeditor: CKEditor.component },
   computed: {
@@ -164,7 +171,7 @@ export default {
     wid() {
       if (this.$route.params.wid == null) {
         //测试环境
-        return 27;
+        return 4;
       } else {
         return this.$route.params.wid;
       }
@@ -180,9 +187,41 @@ export default {
         return this.$route.params.wname;
       }
     },
+    restTimeText() {
+      let value = this.restTime;
+      if (value == -10) {
+        return "无限制";
+      }
+      var secondTime = parseInt(value); // 秒
+      var minuteTime = 0; // 分
+      var hourTime = 0; // 小时
+      if (secondTime > 60) {
+        //如果秒数大于60，将秒数转换成整数
+        //获取分钟，除以60取整数，得到整数分钟
+        minuteTime = parseInt(secondTime / 60);
+        //获取秒数，秒数取余，得到整数秒数
+        secondTime = parseInt(secondTime % 60);
+        //如果分钟大于60，将分钟转换成小时
+        if (minuteTime > 60) {
+          //获取小时，获取分钟除以60，得到整数小时
+          hourTime = parseInt(minuteTime / 60);
+          //获取小时后取余的分，获取分钟除以60取余的分
+          minuteTime = parseInt(minuteTime % 60);
+        }
+      }
+      var result = "" + parseInt(secondTime) + " 秒 ";
+      if (minuteTime > 0) {
+        result = "" + parseInt(minuteTime) + " 分 " + result;
+      }
+      if (hourTime > 0) {
+        result = "" + parseInt(hourTime) + " 小时 " + result;
+      }
+      return result;
+    },
   },
   data() {
     return {
+      restTime: 0,
       p_que: 0,
       qs: [],
       myAnss: [],
@@ -213,8 +252,87 @@ export default {
   },
   mounted() {
     this.getWork();
+    this.InitTimer();
   },
   methods: {
+    InitTimer() {
+      let _this = this;
+      _this.checkTime().then(() => {
+        restTimerID = setInterval(() => {
+          _this.restTime--;
+          if (_this.restTime < 0) {
+            clearInterval(restTimerID);
+            clearInterval(restTimerCheckID);
+            _this.submit(1);
+            alert("时间结束咯");
+          }
+        }, 1000);
+      });
+      // 倒计时计时器
+
+      // 倒计时校验
+      restTimerCheckID = setInterval(() => {
+        _this.checkTime();
+      }, 1000 * 60 * 1);
+    },
+    async checkTime() {
+      token = window.localStorage.getItem("token");
+      let _this = this;
+      // init axios
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      const form = new FormData();
+      form.append("wid", this.wid);
+      await _axios
+        .post("/api/Work/getWorkTimer", form)
+        .then((res) => {
+          let code = res.data.code;
+          if (code == "00001") {
+            alert(res.data.msg);
+            _this.goBack();
+            return;
+          }
+          let data = res.data.data;
+          console.log(data);
+          if (isNaN(data)) {
+            _this.restTime = -10;
+          } else {
+            _this.restTime = Number(data);
+          }
+        })
+        .catch((err) => {});
+    },
+    getRestTimeText(value) {
+      var secondTime = parseInt(value); // 秒
+      var minuteTime = 0; // 分
+      var hourTime = 0; // 小时
+      if (secondTime > 60) {
+        //如果秒数大于60，将秒数转换成整数
+        //获取分钟，除以60取整数，得到整数分钟
+        minuteTime = parseInt(secondTime / 60);
+        //获取秒数，秒数取余，得到整数秒数
+        secondTime = parseInt(secondTime % 60);
+        //如果分钟大于60，将分钟转换成小时
+        if (minuteTime > 60) {
+          //获取小时，获取分钟除以60，得到整数小时
+          hourTime = parseInt(minuteTime / 60);
+          //获取小时后取余的分，获取分钟除以60取余的分
+          minuteTime = parseInt(minuteTime % 60);
+        }
+      }
+      var result = "" + parseInt(secondTime) + "秒";
+      if (minuteTime > 0) {
+        result = "" + parseInt(minuteTime) + "分" + result;
+      }
+      if (hourTime > 0) {
+        result = "" + parseInt(hourTime) + "小时" + result;
+      }
+      return result;
+    },
     async getWork() {
       token = window.localStorage.getItem("token");
       let _this = this;
@@ -316,8 +434,53 @@ export default {
         return false;
       }
     },
-    submit() {
+    submit(isTimeOver) {
       let _this = this;
+
+      if (isTimeOver == 1) {
+        alert("跳过UNDO检测");
+        let ass = this.myAnss;
+        let str = "[";
+        const form = new FormData();
+        form.append("wid", this.wid);
+
+        // 手动装配arr， 避免直接使用toString拉直成一维 ....
+        for (var i = 0; i < ass.length; i++) {
+          if (Array.isArray(ass[i])) {
+            str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
+          } else {
+            if (ass[i] == undefined || ass[i] == null) {
+              ass[i] = "无";
+            }
+            str += ass[i] + ", ";
+          }
+        }
+        str = str.slice(0, -2);
+        str += "]";
+
+        str = str.replaceAll('"', "&quot;");
+
+        form.append("ans", str);
+        _axios
+          .post("/api/submit/submitWork", form)
+          .then((res) => {
+            _this.$dialog({
+              content: res.data.msg,
+              btns: [
+                {
+                  label: "确定",
+                  color: "#09f",
+                  // ghost: true,
+                  callback: () => {
+                    _this.goBack();
+                  },
+                },
+              ],
+            });
+          })
+          .catch((err) => {});
+        return;
+      }
       let undo = -1;
       for (let i = this.myAnss.length - 1; i >= 0; i--) {
         if (this.isWrite(i) == false) {
@@ -404,24 +567,28 @@ export default {
                 // 手动装配arr， 避免直接使用toString拉直成一维 ....
                 for (var i = 0; i < ass.length; i++) {
                   if (Array.isArray(ass[i])) {
-                    str += "[" + ass[i].toString() + "], ";
+                    str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
                   } else {
-                    str +=
-                      ass[i].replaceAll('"', "&quot;").replaceAll(",", "&douhao;") + ", ";
+                    if (ass[i] == undefined || ass[i] == null) {
+                      ass[i] = "无";
+                    }
+                    str += ass[i] + ", ";
                   }
                 }
                 str = str.slice(0, -2);
                 str += "]";
 
+                str = str.replaceAll('"', "&quot;");
+
                 form.append("ans", str);
                 _axios
                   .post("/api/submit/submitWork", form)
                   .then((res) => {
-                    this.$dialog({
+                    _this.$dialog({
                       content: res.data.msg,
                       btns: [
                         {
-                          label: "芜湖",
+                          label: "确定",
                           color: "#09f",
                           // ghost: true,
                           callback: () => {

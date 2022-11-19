@@ -48,8 +48,11 @@
       <v-icon left>fa fa-paper-plane</v-icon>
       <span class="font-weight-black" style="color: #757575">发布作业</span>
       <v-spacer></v-spacer>
-      <v-chip small color="red" @click="close()">
-        <v-icon small center color="white">fa fa-times</v-icon>
+      <v-chip small color="grey" @click="close('minus')">
+        <v-icon x-small center color="white">fa fa-minus</v-icon>
+      </v-chip>
+      <v-chip class="ml-2" small color="red" @click="close('close')">
+        <v-icon x-small center color="white">fa fa-times</v-icon>
       </v-chip>
     </v-card-title>
     <v-card-text>
@@ -65,18 +68,28 @@
               v-model="workTitle"
             ></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col :cols="releaseWork_isExam ? 2 : 3">
             <v-text-field
               required
               clearable
               color="#875438"
               label="分数"
               v-model="totalScore"
-              :rules="[rules.required]"
+              :rules="[rules.required, rules.mustNum]"
             ></v-text-field>
           </v-col>
-
-          <v-col cols="3">
+          <v-col :cols="releaseWork_isExam ? 2 : 0" v-if="releaseWork_isExam">
+            <v-text-field
+              required
+              clearable
+              color="#875438"
+              label="作答限时"
+              hint="单位为分钟"
+              v-model="timeLimit"
+              :rules="[rules.required, rules.mustNum]"
+            ></v-text-field>
+          </v-col>
+          <v-col :cols="releaseWork_isExam ? 2 : 3">
             <v-menu
               style="font-size: small"
               v-model="TimeMenu"
@@ -91,7 +104,7 @@
                   color="#875438"
                   v-model="deadline"
                   readonly
-                  label="截止时间"
+                  label="作业截止时间"
                   v-bind="attrs"
                   v-on="on"
                 ></v-text-field>
@@ -167,21 +180,27 @@
               打开作业库
             </v-chip>
             <v-chip class="ml-5"> 总分 {{ totalScore }}分 </v-chip>
-            <v-chip v-if="choiceQue != 0" class="ml-3"> 选择题 {{ choiceQue }}题 </v-chip>
-            <v-chip v-if="FillInQue != 0" class="ml-3"> 填空题 {{ FillInQue }}题 </v-chip>
-            <v-chip class="ml-3"> Rate {{ Rate }} </v-chip>
+            <v-chip v-if="choiceQue != 0" class="ml-3">
+              选择题 {{ choiceQue }} 题
+            </v-chip>
+            <v-chip v-if="FillInQue != 0" class="ml-3">
+              填空题 {{ FillInQue }} 题
+            </v-chip>
+            <v-chip v-if="TextQue != 0" class="ml-3"> 简答题 {{ TextQue }} 题 </v-chip>
           </v-col>
           <v-col cols="12">
-            <v-textarea outlined label="" v-model="questions" readonly no-resize>
-            </v-textarea>
-            <v-card>
+            <v-card class="px-5 py-5" style="background: #eeeeee">
+              <!-- TODO: 点击后进行二次编辑 -->
               <v-chip
-                class="mr-5 mt-2"
+                dark
+                color="warning"
+                class="mx-2 my-1"
                 close
                 v-for="(ques, i) in questions"
                 :key="ques.id"
+                @click:close="questions.splice(i, 1)"
               >
-                {{ i + 1 }}、 |
+                {{ i + 1 }}、 【
                 {{
                   JSON.parse(ques).qtype == "30010"
                     ? "选择题"
@@ -189,7 +208,7 @@
                     ? "填空题"
                     : "简答题"
                 }}
-                |
+                】|
                 {{ JSON.parse(ques).qtext.slice(0, 20) }}
               </v-chip>
             </v-card>
@@ -218,7 +237,7 @@
         color="green darken-1"
         min-width="60px"
         class="white--text"
-        @click="dialog_ifSaveAsWorkBank = true"
+        @click="beforeReleaseWork()"
         >发布</v-btn
       >
     </v-card-actions>
@@ -232,28 +251,32 @@ import AddTextQue from "./addQuestion/addTextQue.vue";
 import axios from "axios";
 import Dialog_msg from "@/components/dialog_msg.vue";
 let token = window.localStorage.getItem("token");
-import {
-  required,
-  email,
-  numeric,
-  minValue,
-  maxLength,
-  maxValue,
-} from "vuelidate/lib/validators";
 export default {
-  validations: {
-    name: { required, maxLength: maxLength(10) },
-    email: { required, email },
-    select: { required },
-    checkbox: {
-      checked(val) {
-        return val;
-      },
-    },
-    release_score: { required, numeric, minValue: minValue(0), maxValue: maxValue(1000) },
-  },
   components: { addChoicQue, AddFillInQue, AddTextQue, Dialog_msg },
   props: ["cid"],
+  computed: {
+    choiceQue() {
+      let arr = this.questions.filter((val) => {
+        return JSON.parse(val).qtype == "30010";
+      });
+      let len = arr.length;
+      return len == 0 ? "0" : len;
+    },
+    FillInQue() {
+      let arr = this.questions.filter((val) => {
+        return JSON.parse(val).qtype == "30011";
+      });
+      let len = arr.length;
+      return len == 0 ? "0" : len;
+    },
+    TextQue() {
+      let arr = this.questions.filter((val) => {
+        return JSON.parse(val).qtype == "30012";
+      });
+      let len = arr.length;
+      return len == 0 ? "0" : len;
+    },
+  },
   data() {
     return {
       releaseWork_isExam: false,
@@ -262,8 +285,6 @@ export default {
       createNewWork: "",
       searchFromBank: "",
       totalScore: 100,
-      choiceQue: 5,
-      FillInQue: 5,
       Rate: 0.32,
       deadline: "",
       autoReadoverChoice: false,
@@ -278,16 +299,27 @@ export default {
       questions: [],
       work_name: "",
       isTemp: false,
+      timeLimit: "",
       rules: {
         required: (value) => !!value || "不能为空！",
-        mustNum: (val) => typeof Number(val) != "number" || typeof val,
+        mustNum: (val) => !isNaN(val) || "不是有效数字!",
       },
       TimeMenu: "",
       valid: "",
     };
   },
   methods: {
-    close() {
+    close(param) {
+      if (param == "close") {
+        this.workTitle = "";
+        this.totalScore = "";
+        this.timeLimit = "";
+        this.TimeMenu = "";
+        this.deadline = "";
+        this.releaseWork_isExam = false;
+        this.workContentRadio = "";
+        this.questions = [];
+      }
       this.$emit("close", true);
     },
     addChoicQue() {
@@ -326,6 +358,19 @@ export default {
       this.dialog_addTextQue = false;
     },
     saveAsWork() {},
+    beforeReleaseWork() {
+      if (this.workTitle == "") {
+        alert("请输入作业标题");
+        return;
+      } else if (this.totalScore == "") {
+        alert("请输入分数");
+        return;
+      } else if (this.questions.length <= 0) {
+        alert("请不要发布空作业");
+        return;
+      }
+      this.dialog_ifSaveAsWorkBank = true;
+    },
     releaseWork(isTemp) {
       if (isTemp == false) {
         //保存到作业库
@@ -336,6 +381,7 @@ export default {
           this.isTemp = false;
         }
       }
+
       let aWork = {};
       let work = {};
       aWork.cid = this.cid;
@@ -345,6 +391,7 @@ export default {
       aWork.autoReadoverChoice = this.autoReadoverChoice ? 1 : 0;
       aWork.autoReadoverFillIn = this.autoReadoverFillIn ? 1 : 0;
       aWork.workId = 0;
+      aWork.timeLimit = this.timeLimit;
       aWork.isExam = this.releaseWork_isExam ? 1 : 0;
       work.workName = this.work_name;
       work.questions = "[" + this.questions.toString() + "]";

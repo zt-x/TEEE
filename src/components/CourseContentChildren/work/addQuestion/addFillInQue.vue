@@ -78,6 +78,9 @@ export default {
       } else if (this.cans == "") {
         this.msg = "请输入正确答案！若无标准答案，请发布简答题";
         return;
+      } else if (isNaN(this.ans_score)) {
+        this.msg = "请输入一个正确的分数!";
+        return;
       }
       let newQue = {};
       newQue.qtype = 30011;

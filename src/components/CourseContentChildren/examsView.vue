@@ -87,12 +87,19 @@
 
 <script>
 import axios from "axios";
+import stuAnsStu from "./stuAnsStu.vue";
+
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
+  components: { stuAnsStu },
+
   props: ["exams", "cid"],
   computed: {},
   methods: {
+    close(val) {
+      this.dialog_stuAnsStu = false;
+    },
     doWork(work) {
       let _this = this;
       if (this.status(work.id) == null || this.status(work.id) == undefined) {

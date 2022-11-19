@@ -13,7 +13,56 @@
           </v-chip>
           {{ work.workName }}
           <v-spacer></v-spacer>
-          <v-chip small class="ma-2" color="green" text-color="white"> 已完成 </v-chip>
+          <v-tooltip top v-if="work.subNum - work.rDone > 0">
+            <template v-slot:activator="{ on, attrs }">
+              <v-chip
+                v-on="on"
+                v-bind="attrs"
+                small
+                class="ma-2"
+                color="warning"
+                text-color="white"
+              >
+                <v-icon x-small>fa fa-bell</v-icon>
+              </v-chip>
+            </template>
+            <span>有未批改的作业</span>
+          </v-tooltip>
+
+          <v-tooltip v-if="loading_subNum" top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-chip
+                v-on="on"
+                v-bind="attrs"
+                small
+                class="ma-2"
+                color="green"
+                text-color="white"
+              >
+                {{ work.subNum }} / {{ submit_totalNum }}</v-chip
+              >
+            </template>
+            <span>已提交 / 班级人数</span>
+          </v-tooltip>
+          <v-chip
+            small
+            class="ma-2"
+            color="grey"
+            text-color="white"
+            v-if="!loading_subNum"
+          >
+            <v-container>
+              <v-row class="text-center">
+                <v-col cols="12">
+                  <v-progress-circular
+                    indeterminate
+                    :size="20"
+                    color="primary"
+                  ></v-progress-circular>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-chip>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-chip
@@ -63,6 +112,8 @@ export default {
   computed: {},
   data() {
     return {
+      loading_subNum: false,
+      submit_totalNum: -1,
       isDelete: false,
       snackbar: false,
       msg: "",
@@ -79,6 +130,26 @@ export default {
       } else {
         this.isDelete = false;
       }
+    },
+    getSubStatus() {
+      let _this = this;
+      const form = new FormData();
+      form.append("cid", this.cid);
+      // TODO
+      _axios.post("/api/Course/getAllWorkSummary", form).then((res) => {
+        let data = res.data.data;
+        let arr = eval(data.works);
+        _this.submit_totalNum = data.submit_totalNum;
+        arr.forEach((item) => {
+          _this.exams.forEach((w, i) => {
+            if (item.wid == w.id) {
+              w.subNum = item.subNum;
+              w.rDone = item.rDone;
+            }
+          });
+        });
+        _this.loading_subNum = true;
+      });
     },
     deleteWork(work) {
       let _this = this;
@@ -126,6 +197,17 @@ export default {
     },
   },
   created() {},
+  mounted() {
+    this.loading_SubStatus = false;
+    token = window.localStorage.getItem("token");
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
+    this.getSubStatus();
+  },
 };
 </script>
 

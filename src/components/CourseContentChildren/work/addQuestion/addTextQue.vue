@@ -66,6 +66,9 @@ export default {
       } else if (this.ans_text == "") {
         this.msg = "题目内容不能为空";
         return;
+      } else if (isNaN(this.ans_score)) {
+        this.msg = "请输入一个正确的分数!";
+        return;
       }
       let newQue = {};
       newQue.qtype = 30012;
