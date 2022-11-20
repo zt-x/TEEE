@@ -227,14 +227,22 @@ export default {
       myAnss: [],
       flushButton: true,
       editorConfig: {
+        removePlugins: "easyimage",
+        extraPlugins: "image2,uploadimage",
+        uploadUrl: "http://localhost:8080/upload/img",
+        filebrowserBrowseUrl: "http://localhost:8080/upload/img",
+        filebrowserImageBrowseUrl: "http://localhost:8080/upload/img",
+        filebrowserUploadUrl: "http://localhost:8080/upload/img",
+        filebrowserImageUploadUrl: "http://localhost:8080/upload/img",
         removeButtons:
-          "Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Scayt,Form,TextField,Textarea,Select,Button,ImageButton,Radio,Checkbox,HiddenField,CopyFormatting,RemoveFormat,BulletedList,NumberedList,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Unlink,Link,Smiley,Iframe,PageBreak,Styles,Format,About,ShowBlocks",
+          "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Link,Unlink,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source",
         toolbarGroups: [
           { name: "document", groups: ["mode", "document", "doctools"] },
           { name: "clipboard", groups: ["clipboard", "undo"] },
           { name: "editing", groups: ["find", "selection", "spellchecker", "editing"] },
           { name: "forms", groups: ["forms"] },
           { name: "basicstyles", groups: ["basicstyles", "cleanup"] },
+          "/",
           {
             name: "paragraph",
             groups: ["list", "indent", "blocks", "align", "bidi", "paragraph"],
