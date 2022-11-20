@@ -1,5 +1,14 @@
 <template>
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
+    <div style="position: fixed; left: 20px; bottom: 20px">
+      <v-img
+        style="background-position: right center"
+        width="150px"
+        height="150px"
+        src="OIP-C.png"
+      ></v-img>
+    </div>
+    <!-- <v-card fixed dark fab left bottom color="pink"></v-card> -->
     <v-app-bar color="white" app>
       <v-card-title class="text-center">
         <v-chip @click="goBack()" small class="ma-2" color="#555555" text-color="white"
@@ -70,9 +79,17 @@
                           <span style="font-weight: bold"
                             >{{ i + 1 }}、 ({{ item.qscore }}分)</span
                           >
-                          <span class="pl-5">{{ item.qtext }}</span>
+                          <span v-if="item.qtype != 30012" class="pl-5">{{
+                            item.qtext
+                          }}</span>
+                          <div
+                            v-if="item.qtype == 30012"
+                            class="pl-5 pt-5"
+                            v-html="item.qtext"
+                          ></div>
                         </v-card-text>
                         <!-- 写答案区 -->
+
                         <!-- 选择题 -->
                         <div class="pl-8 pt-5" v-if="item.qtype == 30010">
                           <div
@@ -171,7 +188,7 @@ export default {
     wid() {
       if (this.$route.params.wid == null) {
         //测试环境
-        return 4;
+        return 8;
       } else {
         return this.$route.params.wid;
       }
@@ -228,14 +245,14 @@ export default {
       flushButton: true,
       editorConfig: {
         removePlugins: "easyimage",
-        extraPlugins: "image2,uploadimage",
-        uploadUrl: "http://localhost:8080/upload/img",
-        filebrowserBrowseUrl: "http://localhost:8080/upload/img",
-        filebrowserImageBrowseUrl: "http://localhost:8080/upload/img",
-        filebrowserUploadUrl: "http://localhost:8080/upload/img",
-        filebrowserImageUploadUrl: "http://localhost:8080/upload/img",
+        extraPlugins: "image2,uploadimage,uploadfile",
+        uploadUrl: "/api/upload/img",
+        filebrowserBrowseUrl: "/api/upload/img",
+        filebrowserImageBrowseUrl: "/api/upload/img",
+        filebrowserUploadUrl: "/api/upload/img",
+        filebrowserImageUploadUrl: "/api/upload/img",
         removeButtons:
-          "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Link,Unlink,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source",
+          "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source",
         toolbarGroups: [
           { name: "document", groups: ["mode", "document", "doctools"] },
           { name: "clipboard", groups: ["clipboard", "undo"] },

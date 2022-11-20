@@ -37,7 +37,7 @@
         @addFillInQue="returnFillInQue($event)"
       />
     </v-dialog>
-    <v-dialog persistent v-model="dialog_addTextQue" width="600px">
+    <v-dialog persistent v-model="dialog_addTextQue" width="900px">
       <add-text-que
         @closeAddTextQue="closeAddTextQue($event)"
         @addTextQue="returnTextQue($event)"
@@ -297,6 +297,7 @@ export default {
       dialog_msg: false,
       dialog_msg_msg: "",
       questions: [],
+      files: [],
       work_name: "",
       isTemp: false,
       timeLimit: "",
@@ -319,6 +320,7 @@ export default {
         this.releaseWork_isExam = false;
         this.workContentRadio = "";
         this.questions = [];
+        this.files = [];
       }
       this.$emit("close", true);
     },
