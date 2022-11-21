@@ -159,63 +159,65 @@ export default {
         this.msg = "请输入一个正确的分数!";
         return;
       }
-      token = window.localStorage.getItem("token");
-      let param = new FormData();
-      for (let i in this.files) {
-        param.append("file", this.files[i]);
-      }
-      this.loading_upload = true;
-      let config = {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: token,
-        },
-      };
-      axios
-        .post("/api/upload/file", param, config)
-        .then((res) => {
-          if (res.data.code == 1) {
-            // 上传失败
-            _this.snackbar_msg = res.data.msg;
+      if (this.files.length != 0) {
+        token = window.localStorage.getItem("token");
+        let param = new FormData();
+        for (let i in this.files) {
+          param.append("file", this.files[i]);
+        }
+        this.loading_upload = true;
+        let config = {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: token,
+          },
+        };
+        axios
+          .post("/api/upload/file", param, config)
+          .then((res) => {
+            if (res.data.code == 1) {
+              // 上传失败
+              _this.snackbar_msg = res.data.msg;
+              _this.snackbar_color = "error";
+              _this.snackbar = true;
+              console.log(_this.snackbar_color);
+              return;
+            } else {
+              _this.snackbar_msg = res.data.msg;
+              _this.snackbar_color = "success";
+              _this.snackbar = true;
+              console.log(_this.snackbar_color);
+
+              //   解析 获得 FileRealPath
+              // _this.filesRealPath
+              console.log(res.data.data);
+              // 返回JSON
+              // {qtype: 30012, qscore: 2.0,
+              // qtext: "1111", cans: "",files:""}
+
+              let newQue = {};
+              newQue.qtype = 30012;
+              newQue.qscore = this.ans_score;
+              newQue.qtext = this.ans_text;
+              console.log(eval(res.data.data));
+              newQue.qfiles = eval(res.data.data);
+              //上传附件
+
+              //
+              this.ans_score = "";
+              this.ans_text = "";
+              this.msg = "";
+              this.$emit("addTextQue", newQue);
+              _this.loading_upload = false;
+            }
+          })
+          .catch((err) => {
             _this.snackbar_color = "error";
-            _this.snackbar = true;
-            console.log(_this.snackbar_color);
-            return;
-          } else {
-            _this.snackbar_msg = res.data.msg;
-            _this.snackbar_color = "success";
-            _this.snackbar = true;
-            console.log(_this.snackbar_color);
-
-            //   解析 获得 FileRealPath
-            // _this.filesRealPath
-            console.log(res.data.data);
-            // 返回JSON
-            // {qtype: 30012, qscore: 2.0,
-            // qtext: "1111", cans: "",files:""}
-
-            let newQue = {};
-            newQue.qtype = 30012;
-            newQue.qscore = this.ans_score;
-            newQue.qtext = this.ans_text;
-            console.log(eval(res.data.data));
-            newQue.qfiles = eval(res.data.data);
-            //上传附件
-
-            //
-            this.ans_score = "";
-            this.ans_text = "";
-            this.msg = "";
-            this.$emit("addTextQue", newQue);
+            _this.snackbar_msg = err;
             _this.loading_upload = false;
-          }
-        })
-        .catch((err) => {
-          _this.snackbar_color = "error";
-          _this.snackbar_msg = err;
-          _this.loading_upload = false;
-        });
-      // return;
+          });
+        // return;
+      }
     },
   },
 };

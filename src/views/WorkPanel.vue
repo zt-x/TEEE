@@ -1,5 +1,28 @@
 <template>
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
+    <v-dialog width="400px" v-if="dialog_upload_info" v-model="dialog_upload_info">
+      <v-card loading="brown">
+        <v-card-title>正在上传 ...</v-card-title>
+        <v-card-text>
+          <div v-for="(item, i) in files_realpath" :key="i + 1">
+            <span v-for="(f, j) in item" :key="j">
+              {{ f.toString().substr(f.indexOf("_").substr(f.substr(f.indexOf("_")))) }}
+              <!-- {{ f.subStr(f.indexOf("_").subStr(f.subStr(f.indexOf("_").indexOf("_")))) }} -->
+            </span>
+            <br />
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialog_upload_info = false" v-if="finishUploadingFile"
+            >确定</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
+      {{ snackbar_msg }}
+    </v-snackbar>
     <div style="position: fixed; left: 20px; bottom: 20px">
       <v-img
         style="background-position: right center"
@@ -86,7 +109,21 @@
                             v-if="item.qtype == 30012"
                             class="pl-5 pt-5"
                             v-html="item.qtext"
+                            style="max-height: 500px; overflow: auto"
                           ></div>
+                          <!-- 简答题附件 -->
+                          <div class="pl-5 pt-5" v-if="item.qtype == 30012">
+                            <span style="font-size: 15px">附件下载</span>
+                            <v-card-text>
+                              <v-chip
+                                class="mx-2 my-1"
+                                v-for="file in item.qfiles"
+                                :key="file"
+                                @click="downloadFile(file)"
+                                >{{ getFileName(file.toString()) }}</v-chip
+                              >
+                            </v-card-text>
+                          </div>
                         </v-card-text>
                         <!-- 写答案区 -->
 
@@ -131,6 +168,39 @@
                                 editor-url="/ckeditor/ckeditor.js"
                               ></ckeditor>
                             </div>
+                          </div>
+                          <div class="mt-2">
+                            <v-file-input
+                              dense
+                              v-model="files[i]"
+                              color="deep-purple accent-4"
+                              multiple
+                              placeholder="点击选择添加附件"
+                              prepend-icon="mdi-paperclip"
+                              outlined
+                              @change="sout(files)"
+                            >
+                              <template v-slot:selection="{ index, text }">
+                                <v-chip
+                                  close
+                                  v-if="index < 3"
+                                  color="deep-purple accent-4"
+                                  dark
+                                  label
+                                  small
+                                  @click:close="files[i].splice(index, 1)"
+                                >
+                                  {{ text }}
+                                </v-chip>
+
+                                <span
+                                  v-else-if="index === 3"
+                                  class="overline grey--text text--darken-3 mx-2"
+                                >
+                                  +{{ files.length - 3 }} File(s)
+                                </span>
+                              </template>
+                            </v-file-input>
                           </div>
                         </div>
                       </v-card>
@@ -188,7 +258,7 @@ export default {
     wid() {
       if (this.$route.params.wid == null) {
         //测试环境
-        return 8;
+        return 10;
       } else {
         return this.$route.params.wid;
       }
@@ -206,7 +276,7 @@ export default {
     },
     restTimeText() {
       let value = this.restTime;
-      if (value == -10) {
+      if (value <= -10) {
         return "无限制";
       }
       var secondTime = parseInt(value); // 秒
@@ -238,11 +308,18 @@ export default {
   },
   data() {
     return {
+      files: [],
+      files_realpath: [],
       restTime: 0,
       p_que: 0,
       qs: [],
       myAnss: [],
       flushButton: true,
+      snackbar: false,
+      snackbar_color: "success",
+      snackbar_msg: "",
+      dialog_upload_info: false,
+      finishUploadingFile: false,
       editorConfig: {
         removePlugins: "easyimage",
         extraPlugins: "image2,uploadimage,uploadfile",
@@ -280,12 +357,18 @@ export default {
     this.InitTimer();
   },
   methods: {
+    sout(val) {
+      console.log(val);
+    },
     InitTimer() {
       let _this = this;
+      if (_this.restTime <= -10) {
+        return;
+      }
       _this.checkTime().then(() => {
         restTimerID = setInterval(() => {
           _this.restTime--;
-          if (_this.restTime < 0) {
+          if (_this.restTime < 0 && _this.restTime > -5) {
             clearInterval(restTimerID);
             clearInterval(restTimerCheckID);
             _this.submit(1);
@@ -298,7 +381,7 @@ export default {
       // 倒计时校验
       restTimerCheckID = setInterval(() => {
         _this.checkTime();
-      }, 1000 * 60 * 1);
+      }, 1000 * 60 * 5000);
     },
     async checkTime() {
       token = window.localStorage.getItem("token");
@@ -322,7 +405,6 @@ export default {
             return;
           }
           let data = res.data.data;
-          console.log(data);
           if (isNaN(data)) {
             _this.restTime = -10;
           } else {
@@ -358,6 +440,36 @@ export default {
       }
       return result;
     },
+    getFileName(str) {
+      let str2 = str.substr(str.indexOf("_") + 1);
+      return str2.substr(str2.indexOf("_") + 1);
+    },
+    downloadFile(file) {
+      let form = new FormData();
+      form.append("fileName", file);
+      _axios
+        .post("/api/upload/getFile", form, { responseType: "blob" })
+        .then((res) => {
+          const { data, headers } = res;
+          const fileName = headers["content-disposition"].replace(
+            /\w+;filename=(.*)/,
+            "$1"
+          );
+          // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
+          //const blob = new Blob([JSON.stringify(data)], ...)
+          const blob = new Blob([data], { type: headers["content-type"] });
+          let dom = document.createElement("a");
+          let url = window.URL.createObjectURL(blob);
+          dom.href = url;
+          dom.download = decodeURI(fileName);
+          dom.style.display = "none";
+          document.body.appendChild(dom);
+          dom.click();
+          dom.parentNode.removeChild(dom);
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((err) => {});
+    },
     async getWork() {
       token = window.localStorage.getItem("token");
       let _this = this;
@@ -376,6 +488,8 @@ export default {
           let questions = res.data.data;
           _this.qs = eval(questions);
           _this.myAnss.length = _this.qs.length;
+          _this.files.length = _this.qs.length;
+          console.log(_this.files);
         })
         .catch((err) => {});
     },
@@ -459,51 +573,98 @@ export default {
         return false;
       }
     },
+    async uploadFile(fs) {
+      let param = new FormData();
+      for (let i in fs) {
+        param.append("file", fs[i]);
+      }
+      this.loading_upload = true;
+      let config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: token,
+        },
+      };
+      let ret = [];
+      // 尝试上传Files
+      await axios
+        .post("/api/upload/file", param, config)
+        .then((res) => {
+          if (res.data.code == 1) {
+            // 上传失败
+            alert("上传文件失败: " + res.data.msg);
+            ret = [];
+          } else {
+            ret = eval(res.data.data);
+          }
+        })
+        .catch((err) => {
+          alert("上传失败" + err);
+        });
+
+      return ret;
+    },
+    async prepareUpload() {
+      this.finishUploadingFile = false;
+      for (let i in this.files) {
+        this.files_realpath[i] = await this.uploadFile(this.files[i]);
+      }
+      this.finishUploadingFile = true;
+    },
+    async submitWork() {
+      let ass = this.myAnss;
+      let str = "[";
+      const form = new FormData();
+      form.append("wid", this.wid);
+      //上传文件
+      console.log("准备上传队列 ...");
+      this.dialog_upload_info = true;
+      await this.prepareUpload();
+      console.log("结束上传队列 ...");
+      return;
+      // 手动装配arr， 避免直接使用toString拉直成一维 ....
+
+      for (var i = 0; i < ass.length; i++) {
+        if (Array.isArray(ass[i])) {
+          str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
+        } else {
+          if (ass[i] == undefined || ass[i] == null) {
+            ass[i] = "无";
+          }
+          str += ass[i] + ", ";
+        }
+      }
+      str = str.slice(0, -2);
+      str += "]";
+
+      str = str.replaceAll('"', "&quot;");
+
+      form.append("ans", str);
+      _axios
+        .post("/api/submit/submitWork", form)
+        .then((res) => {
+          _this.$dialog({
+            content: res.data.msg,
+            btns: [
+              {
+                label: "确定",
+                color: "#09f",
+                // ghost: true,
+                callback: () => {
+                  _this.goBack();
+                },
+              },
+            ],
+          });
+        })
+        .catch((err) => {});
+    },
     submit(isTimeOver) {
       let _this = this;
 
       if (isTimeOver == 1) {
         alert("跳过UNDO检测");
-        let ass = this.myAnss;
-        let str = "[";
-        const form = new FormData();
-        form.append("wid", this.wid);
-
-        // 手动装配arr， 避免直接使用toString拉直成一维 ....
-        for (var i = 0; i < ass.length; i++) {
-          if (Array.isArray(ass[i])) {
-            str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
-          } else {
-            if (ass[i] == undefined || ass[i] == null) {
-              ass[i] = "无";
-            }
-            str += ass[i] + ", ";
-          }
-        }
-        str = str.slice(0, -2);
-        str += "]";
-
-        str = str.replaceAll('"', "&quot;");
-
-        form.append("ans", str);
-        _axios
-          .post("/api/submit/submitWork", form)
-          .then((res) => {
-            _this.$dialog({
-              content: res.data.msg,
-              btns: [
-                {
-                  label: "确定",
-                  color: "#09f",
-                  // ghost: true,
-                  callback: () => {
-                    _this.goBack();
-                  },
-                },
-              ],
-            });
-          })
-          .catch((err) => {});
+        _this.submitWork();
         return;
       }
       let undo = -1;
@@ -526,46 +687,7 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                let ass = this.myAnss;
-                let str = "[";
-                const form = new FormData();
-                form.append("wid", this.wid);
-
-                // 手动装配arr， 避免直接使用toString拉直成一维 ....
-                for (var i = 0; i < ass.length; i++) {
-                  if (Array.isArray(ass[i])) {
-                    str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
-                  } else {
-                    if (ass[i] == undefined || ass[i] == null) {
-                      ass[i] = "无";
-                    }
-                    str += ass[i] + ", ";
-                  }
-                }
-                str = str.slice(0, -2);
-                str += "]";
-
-                str = str.replaceAll('"', "&quot;");
-
-                form.append("ans", str);
-                _axios
-                  .post("/api/submit/submitWork", form)
-                  .then((res) => {
-                    _this.$dialog({
-                      content: res.data.msg,
-                      btns: [
-                        {
-                          label: "确定",
-                          color: "#09f",
-                          // ghost: true,
-                          callback: () => {
-                            _this.goBack();
-                          },
-                        },
-                      ],
-                    });
-                  })
-                  .catch((err) => {});
+                _this.submitWork();
               },
             },
           ],
@@ -584,46 +706,7 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                let ass = this.myAnss;
-                let str = "[";
-                const form = new FormData();
-                form.append("wid", this.wid);
-
-                // 手动装配arr， 避免直接使用toString拉直成一维 ....
-                for (var i = 0; i < ass.length; i++) {
-                  if (Array.isArray(ass[i])) {
-                    str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
-                  } else {
-                    if (ass[i] == undefined || ass[i] == null) {
-                      ass[i] = "无";
-                    }
-                    str += ass[i] + ", ";
-                  }
-                }
-                str = str.slice(0, -2);
-                str += "]";
-
-                str = str.replaceAll('"', "&quot;");
-
-                form.append("ans", str);
-                _axios
-                  .post("/api/submit/submitWork", form)
-                  .then((res) => {
-                    _this.$dialog({
-                      content: res.data.msg,
-                      btns: [
-                        {
-                          label: "确定",
-                          color: "#09f",
-                          // ghost: true,
-                          callback: () => {
-                            _this.goBack();
-                          },
-                        },
-                      ],
-                    });
-                  })
-                  .catch((err) => {});
+                _this.submitWork();
               },
             },
           ],
