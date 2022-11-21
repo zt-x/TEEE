@@ -1,5 +1,8 @@
 <template>
   <v-card>
+	<v-snackbar v-model="snackbar" top :color="snackbar_color" dense="true" timeout="2000">
+      {{ msg }}
+    </v-snackbar>
     <v-card-title>添加简答题</v-card-title>
     <v-container>
       <v-row>
@@ -20,6 +23,7 @@
             placeholder="点击选择添加附件"
             prepend-icon="mdi-paperclip"
             outlined
+			@change="sout(files)"
           >
             <template v-slot:selection="{ index, text }">
               <v-chip
@@ -73,13 +77,16 @@
 </template>
 
 <script>
+import axios from "axios";
 import CKEditor from "ckeditor4-vue";
-
+let token = window.localStorage.getItem("token");
 export default {
   components: { ckeditor: CKEditor.component },
 
   data() {
     return {
+		snackbar:false,
+		snackbar_color:"success",
       loading_upload: false,
       files: [],
       filesRealPath: [],
@@ -121,7 +128,14 @@ export default {
       msg: "",
     };
   },
-  methods: {
+	methods: {
+		uploadFile() {
+			// 上传File
+			// 返回FIleRealPath
+		},
+		sout(val) {
+			console.log(val);
+	},
     close() {
       this.ans_score = "";
       this.ans_text = "";
@@ -129,32 +143,64 @@ export default {
       this.msg = "";
       this.$emit("closeAddTextQue", false);
     },
-    add() {
+		add() {
+		let _this = this;
+		token = window.localStorage.getItem("token");
+			let param = new FormData();
+			console.log(this.files);
+		for (let i in this.files) {
+			param.append("file", this.files[i]);	
+
+			}
+			console.log(param.getAll("file"));
+
+		this.loading_upload = true;
+		let config = {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+				'Authorization': token
+			}
+		}
+		axios.post("/api/upload/file", param, config).then((res) => {
+
+			_this.msg = res.data.msg;
+			_this.snackbar_color = "success";
+			_this.snackbar = true;
+			_this.loading_upload = false;
+		}).catch((err) => {
+			_this.snackbar_color = "error";
+
+			_this.snackbar = err;
+			_this.loading_upload = false;
+			
+		})
+		// return;
+
       // 返回JSON
       // {qtype: 30012, qscore: 2.0,
       // qtext: "1111", cans: ""}
-      if (this.ans_score == "") {
-        this.msg = "分值不能为空";
-        return;
-      } else if (this.ans_text == "") {
-        this.msg = "题目内容不能为空";
-        return;
-      } else if (isNaN(this.ans_score)) {
-        this.msg = "请输入一个正确的分数!";
-        return;
-      }
-      let newQue = {};
-      newQue.qtype = 30012;
-      newQue.qscore = this.ans_score;
-      newQue.qtext = this.ans_text;
-      newQue.qfiles = this.filesRealPath;
-      //上传附件
+    //   if (this.ans_score == "") {
+    //     this.msg = "分值不能为空";
+    //     return;
+    //   } else if (this.ans_text == "") {
+    //     this.msg = "题目内容不能为空";
+    //     return;
+    //   } else if (isNaN(this.ans_score)) {
+    //     this.msg = "请输入一个正确的分数!";
+    //     return;
+    //   }
+    //   let newQue = {};
+    //   newQue.qtype = 30012;
+    //   newQue.qscore = this.ans_score;
+    //   newQue.qtext = this.ans_text;
+    //   newQue.qfiles = this.filesRealPath;
+    //   //上传附件
 
-      //
-      this.ans_score = "";
-      this.ans_text = "";
-      this.msg = "";
-      this.$emit("addTextQue", newQue);
+    //   //
+    //   this.ans_score = "";
+    //   this.ans_text = "";
+    //   this.msg = "";
+    //   this.$emit("addTextQue", newQue);
     },
   },
 };
