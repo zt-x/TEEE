@@ -224,6 +224,7 @@ export default {
                 .replaceAll("&douhao;", ",") +
               ")"
           );
+          console.log(data.submitContent);
           _this.finishGetAns = true;
         })
         .catch((err) => {

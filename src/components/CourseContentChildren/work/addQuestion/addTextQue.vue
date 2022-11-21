@@ -1,7 +1,14 @@
 <template>
   <v-card>
-	<v-snackbar v-model="snackbar" top :color="snackbar_color" dense="true" timeout="2000">
-      {{ msg }}
+    <v-snackbar
+      v-model="snackbar"
+      v-if="snackbar"
+      top
+      :color="snackbar_color"
+      dense="true"
+      timeout="2000"
+    >
+      {{ snackbar_msg }}
     </v-snackbar>
     <v-card-title>添加简答题</v-card-title>
     <v-container>
@@ -23,7 +30,7 @@
             placeholder="点击选择添加附件"
             prepend-icon="mdi-paperclip"
             outlined
-			@change="sout(files)"
+            @change="sout(files)"
           >
             <template v-slot:selection="{ index, text }">
               <v-chip
@@ -85,8 +92,9 @@ export default {
 
   data() {
     return {
-		snackbar:false,
-		snackbar_color:"success",
+      snackbar: false,
+      snackbar_color: "success",
+      snackbar_msg: "",
       loading_upload: false,
       files: [],
       filesRealPath: [],
@@ -128,14 +136,10 @@ export default {
       msg: "",
     };
   },
-	methods: {
-		uploadFile() {
-			// 上传File
-			// 返回FIleRealPath
-		},
-		sout(val) {
-			console.log(val);
-	},
+  methods: {
+    sout(val) {
+      console.log(val);
+    },
     close() {
       this.ans_score = "";
       this.ans_text = "";
@@ -143,64 +147,75 @@ export default {
       this.msg = "";
       this.$emit("closeAddTextQue", false);
     },
-		add() {
-		let _this = this;
-		token = window.localStorage.getItem("token");
-			let param = new FormData();
-			console.log(this.files);
-		for (let i in this.files) {
-			param.append("file", this.files[i]);	
+    add() {
+      let _this = this;
+      if (this.ans_score == "") {
+        this.msg = "分值不能为空";
+        return;
+      } else if (this.ans_text == "") {
+        this.msg = "题目内容不能为空";
+        return;
+      } else if (isNaN(this.ans_score)) {
+        this.msg = "请输入一个正确的分数!";
+        return;
+      }
+      token = window.localStorage.getItem("token");
+      let param = new FormData();
+      for (let i in this.files) {
+        param.append("file", this.files[i]);
+      }
+      this.loading_upload = true;
+      let config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: token,
+        },
+      };
+      axios
+        .post("/api/upload/file", param, config)
+        .then((res) => {
+          if (res.data.code == 1) {
+            // 上传失败
+            _this.snackbar_msg = res.data.msg;
+            _this.snackbar_color = "error";
+            _this.snackbar = true;
+            console.log(_this.snackbar_color);
+            return;
+          } else {
+            _this.snackbar_msg = res.data.msg;
+            _this.snackbar_color = "success";
+            _this.snackbar = true;
+            console.log(_this.snackbar_color);
 
-			}
-			console.log(param.getAll("file"));
+            //   解析 获得 FileRealPath
+            // _this.filesRealPath
+            console.log(res.data.data);
+            // 返回JSON
+            // {qtype: 30012, qscore: 2.0,
+            // qtext: "1111", cans: "",files:""}
 
-		this.loading_upload = true;
-		let config = {
-			headers: {
-				'Content-Type': 'multipart/form-data',
-				'Authorization': token
-			}
-		}
-		axios.post("/api/upload/file", param, config).then((res) => {
+            let newQue = {};
+            newQue.qtype = 30012;
+            newQue.qscore = this.ans_score;
+            newQue.qtext = this.ans_text;
+            console.log(eval(res.data.data));
+            newQue.qfiles = eval(res.data.data);
+            //上传附件
 
-			_this.msg = res.data.msg;
-			_this.snackbar_color = "success";
-			_this.snackbar = true;
-			_this.loading_upload = false;
-		}).catch((err) => {
-			_this.snackbar_color = "error";
-
-			_this.snackbar = err;
-			_this.loading_upload = false;
-			
-		})
-		// return;
-
-      // 返回JSON
-      // {qtype: 30012, qscore: 2.0,
-      // qtext: "1111", cans: ""}
-    //   if (this.ans_score == "") {
-    //     this.msg = "分值不能为空";
-    //     return;
-    //   } else if (this.ans_text == "") {
-    //     this.msg = "题目内容不能为空";
-    //     return;
-    //   } else if (isNaN(this.ans_score)) {
-    //     this.msg = "请输入一个正确的分数!";
-    //     return;
-    //   }
-    //   let newQue = {};
-    //   newQue.qtype = 30012;
-    //   newQue.qscore = this.ans_score;
-    //   newQue.qtext = this.ans_text;
-    //   newQue.qfiles = this.filesRealPath;
-    //   //上传附件
-
-    //   //
-    //   this.ans_score = "";
-    //   this.ans_text = "";
-    //   this.msg = "";
-    //   this.$emit("addTextQue", newQue);
+            //
+            this.ans_score = "";
+            this.ans_text = "";
+            this.msg = "";
+            this.$emit("addTextQue", newQue);
+            _this.loading_upload = false;
+          }
+        })
+        .catch((err) => {
+          _this.snackbar_color = "error";
+          _this.snackbar_msg = err;
+          _this.loading_upload = false;
+        });
+      // return;
     },
   },
 };
