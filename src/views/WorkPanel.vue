@@ -2,11 +2,12 @@
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
     <v-dialog width="400px" v-if="dialog_upload_info" v-model="dialog_upload_info">
       <v-card loading="brown">
-        <v-card-title>正在上传 ...</v-card-title>
+        <v-card-title v-if="!finishUploadingFile">正在上传 ...</v-card-title>
+        <v-card-title v-if="finishUploadingFile">上传完成!</v-card-title>
         <v-card-text>
           <div v-for="(item, i) in files_realpath" :key="i + 1">
             <span v-for="(f, j) in item" :key="j">
-              {{ f.toString().substr(f.indexOf("_").substr(f.substr(f.indexOf("_")))) }}
+              {{ getFileName(f) }}
               <!-- {{ f.subStr(f.indexOf("_").subStr(f.subStr(f.indexOf("_").indexOf("_")))) }} -->
             </span>
             <br />
