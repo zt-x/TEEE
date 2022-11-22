@@ -117,6 +117,7 @@ export default {
     this.getSubmitContent();
   },
   methods: {
+
     finish() {
       this.overlay = true;
       this.overlay_msg = "提交批改中 ...";

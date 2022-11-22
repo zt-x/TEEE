@@ -1,23 +1,43 @@
 <template>
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
     <v-dialog width="400px" v-if="dialog_upload_info" v-model="dialog_upload_info">
-      <v-card loading="brown">
+      <v-card :loading="!finishUploadingFile">
         <v-card-title v-if="!finishUploadingFile">正在上传 ...</v-card-title>
         <v-card-title v-if="finishUploadingFile">上传完成!</v-card-title>
         <v-card-text>
           <div v-for="(item, i) in files_realpath" :key="i + 1">
             <span v-for="(f, j) in item" :key="j">
-              {{ getFileName(f) }}
-              <!-- {{ f.subStr(f.indexOf("_").subStr(f.subStr(f.indexOf("_").indexOf("_")))) }} -->
+              {{ i + 1 }}.{{ j + 1 }}_{{ getFileName(f) }}
             </span>
             <br />
           </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="dialog_upload_info = false" v-if="finishUploadingFile"
-            >确定</v-btn
+          <v-btn
+            text
+            class="mr-2"
+            v-if="finishUploadingFile"
+            @click="
+              dialog_upload_info = false;
+              files_realpath = [];
+            "
+            >返回</v-btn
           >
+          <v-tooltip v-if="finishUploadingFile" top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                @click="
+                  dialog_upload_info = false;
+                  submitWorkContent();
+                "
+                >继续提交</v-btn
+              >
+            </template>
+            <span>若存在上传失败的附件，请点击返回并重新上传</span>
+          </v-tooltip>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -162,13 +182,14 @@
                         <!-- 简答题 -->
                         <div class="px-8 py-5" v-else-if="item.qtype == 30012">
                           <div>
-                            <div style="100%">
-                              <ckeditor
-                                v-model="myAnss[i]"
-                                :config="editorConfig"
-                                editor-url="/ckeditor/ckeditor.js"
-                              ></ckeditor>
-                            </div>
+                            {{ i }}__{{ myAnss[i] }}
+                            <ckeditor
+                              v-model="myAnss[i]"
+                              :key="i"
+                              :config="editorConfig"
+                              editor-url="/ckeditor/ckeditor.js"
+                            ></ckeditor>
+                            <v-text-field v-model="myAnss[i]"></v-text-field>
                           </div>
                           <div class="mt-2">
                             <v-file-input
@@ -321,8 +342,10 @@ export default {
       snackbar_msg: "",
       dialog_upload_info: false,
       finishUploadingFile: false,
+      //   testArray[]
+      testIndex: 0,
       editorConfig: {
-        removePlugins: "easyimage",
+        removePlugins: "image,easyimage,cloudservices,exportpdf",
         extraPlugins: "image2,uploadimage,uploadfile",
         uploadUrl: "/api/upload/img",
         filebrowserBrowseUrl: "/api/upload/img",
@@ -563,6 +586,7 @@ export default {
       }
     },
     isWrite(val) {
+      //   console.log(this.myAnss);
       if (
         this.myAnss[val] != undefined &&
         this.myAnss[val] != null &&
@@ -591,10 +615,11 @@ export default {
       await axios
         .post("/api/upload/file", param, config)
         .then((res) => {
+          console.log(res.data.data);
+          console.log(res.data.msg);
           if (res.data.code == 1) {
             // 上传失败
-            alert("上传文件失败: " + res.data.msg);
-            ret = [];
+            ret = eval('["\[失败\]' + res.data.msg + '"]');
           } else {
             ret = eval(res.data.data);
           }
@@ -610,21 +635,18 @@ export default {
       for (let i in this.files) {
         this.files_realpath[i] = await this.uploadFile(this.files[i]);
       }
+
       this.finishUploadingFile = true;
     },
-    async submitWork() {
-      let ass = this.myAnss;
-      let str = "[";
-      const form = new FormData();
-      form.append("wid", this.wid);
-      //上传文件
-      console.log("准备上传队列 ...");
-      this.dialog_upload_info = true;
-      await this.prepareUpload();
-      console.log("结束上传队列 ...");
-      return;
+    async submitWorkContent() {
+      let _this = this;
       // 手动装配arr， 避免直接使用toString拉直成一维 ....
+      let ass = this.myAnss;
+      console.log("装配之前: " + ass);
 
+      let str = "[";
+      let fs = this.files_realpath;
+      let str2 = "[";
       for (var i = 0; i < ass.length; i++) {
         if (Array.isArray(ass[i])) {
           str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
@@ -637,10 +659,26 @@ export default {
       }
       str = str.slice(0, -2);
       str += "]";
-
       str = str.replaceAll('"', "&quot;");
 
+      for (var i = 0; i < fs.length; i++) {
+        if (Array.isArray(fs[i])) {
+          str2 += "[" + fs[i].toString() + "], ";
+        } else {
+          if (fs[i] == undefined || fs[i] == null) {
+            fs[i] = "noFile";
+          }
+          str2 += fs[i] + ", ";
+        }
+      }
+      str2 = str2.slice(0, -2);
+      str2 += "]";
+      const form = new FormData();
+
+      return;
+      form.append("wid", this.wid);
       form.append("ans", str);
+      form.append("files", str2);
       _axios
         .post("/api/submit/submitWork", form)
         .then((res) => {
@@ -658,14 +696,26 @@ export default {
             ],
           });
         })
-        .catch((err) => {});
+        .catch((err) => {
+          alert(err);
+          console.log(err);
+        });
+    },
+    async submitWorkFile() {
+      //上传文件
+      console.log("准备上传队列 ...");
+      this.dialog_upload_info = true;
+      await this.prepareUpload();
+      console.log("结束上传队列 ...");
+      console.log(this.files_realpath);
+      return;
     },
     submit(isTimeOver) {
       let _this = this;
 
       if (isTimeOver == 1) {
         alert("跳过UNDO检测");
-        _this.submitWork();
+        _this.submitWorkFile();
         return;
       }
       let undo = -1;
@@ -688,7 +738,7 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                _this.submitWork();
+                _this.submitWorkFile();
               },
             },
           ],
@@ -707,7 +757,7 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                _this.submitWork();
+                _this.submitWorkFile();
               },
             },
           ],
