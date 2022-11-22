@@ -182,14 +182,12 @@
                         <!-- 简答题 -->
                         <div class="px-8 py-5" v-else-if="item.qtype == 30012">
                           <div>
-                            {{ i }}__{{ myAnss[i] }}
                             <ckeditor
                               v-model="myAnss[i]"
                               :key="i"
-                              :config="editorConfig"
+                              :config="editorConfigs[i]"
                               editor-url="/ckeditor/ckeditor.js"
                             ></ckeditor>
-                            <v-text-field v-model="myAnss[i]"></v-text-field>
                           </div>
                           <div class="mt-2">
                             <v-file-input
@@ -336,6 +334,7 @@ export default {
       p_que: 0,
       qs: [],
       myAnss: [],
+      TestArr: [{ value: "666" }, { value: "" }, { value: "" }, { value: "" }],
       flushButton: true,
       snackbar: false,
       snackbar_color: "success",
@@ -344,36 +343,7 @@ export default {
       finishUploadingFile: false,
       //   testArray[]
       testIndex: 0,
-      editorConfig: {
-        removePlugins: "image,easyimage,cloudservices,exportpdf",
-        extraPlugins: "image2,uploadimage,uploadfile",
-        uploadUrl: "/api/upload/img",
-        filebrowserBrowseUrl: "/api/upload/img",
-        filebrowserImageBrowseUrl: "/api/upload/img",
-        filebrowserUploadUrl: "/api/upload/img",
-        filebrowserImageUploadUrl: "/api/upload/img",
-        removeButtons:
-          "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source",
-        toolbarGroups: [
-          { name: "document", groups: ["mode", "document", "doctools"] },
-          { name: "clipboard", groups: ["clipboard", "undo"] },
-          { name: "editing", groups: ["find", "selection", "spellchecker", "editing"] },
-          { name: "forms", groups: ["forms"] },
-          { name: "basicstyles", groups: ["basicstyles", "cleanup"] },
-          "/",
-          {
-            name: "paragraph",
-            groups: ["list", "indent", "blocks", "align", "bidi", "paragraph"],
-          },
-          { name: "links", groups: ["links"] },
-          { name: "insert", groups: ["insert"] },
-          { name: "styles", groups: ["styles"] },
-          { name: "colors", groups: ["colors"] },
-          { name: "tools", groups: ["tools"] },
-          { name: "others", groups: ["others"] },
-          { name: "about", groups: ["about"] },
-        ],
-      },
+      editorConfigs: [],
     };
   },
   mounted() {
@@ -513,9 +483,48 @@ export default {
           _this.qs = eval(questions);
           _this.myAnss.length = _this.qs.length;
           _this.files.length = _this.qs.length;
-          console.log(_this.files);
+          for (let i = 0; i < _this.qs.length; i++) {
+            _this.editorConfigs.push(_this.editTempFactory(i));
+          }
         })
-        .catch((err) => {});
+        .catch((err) => {
+          console.log("Err /api/Work/getWork" + err);
+          alert("Err /api/Work/getWork" + err);
+        });
+    },
+    editTempFactory(i) {
+      let ret = {};
+      ret.id = i;
+      ret.removePlugins = "image,easyimage,cloudservices,exportpdf";
+      ret.extraPlugins = "image2,uploadimage,uploadfile";
+      ret.uploadUrl = "/api/upload/img";
+      ret.filebrowserBrowseUrl = "/api/upload/img";
+      ret.filebrowserImageBrowseUrl = "/api/upload/img";
+      ret.filebrowserUploadUrl = "/api/upload/img";
+      ret.filebrowserImageUploadUrl = "/api/upload/img";
+      ret.removeButtons =
+        "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source";
+
+      ret.toolbarGroups = [
+        { name: "document", groups: ["mode", "document", "doctools"] },
+        { name: "clipboard", groups: ["clipboard", "undo"] },
+        { name: "editing", groups: ["find", "selection", "spellchecker", "editing"] },
+        { name: "forms", groups: ["forms"] },
+        { name: "basicstyles", groups: ["basicstyles", "cleanup"] },
+        "/",
+        {
+          name: "paragraph",
+          groups: ["list", "indent", "blocks", "align", "bidi", "paragraph"],
+        },
+        { name: "links", groups: ["links"] },
+        { name: "insert", groups: ["insert"] },
+        { name: "styles", groups: ["styles"] },
+        { name: "colors", groups: ["colors"] },
+        { name: "tools", groups: ["tools"] },
+        { name: "others", groups: ["others"] },
+        { name: "about", groups: ["about"] },
+      ];
+      return ret;
     },
     toQue(qid) {
       this.p_que = qid;
@@ -675,7 +684,6 @@ export default {
       str2 += "]";
       const form = new FormData();
 
-      return;
       form.append("wid", this.wid);
       form.append("ans", str);
       form.append("files", str2);
