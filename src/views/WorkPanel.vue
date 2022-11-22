@@ -1,6 +1,10 @@
 <template>
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
-    <v-dialog width="400px" v-if="dialog_upload_info" v-model="dialog_upload_info">
+    <v-dialog
+      width="400px"
+      v-if="dialog_upload_info"
+      v-model="dialog_upload_info"
+    >
       <v-card :loading="!finishUploadingFile">
         <v-card-title v-if="!finishUploadingFile">正在上传 ...</v-card-title>
         <v-card-title v-if="finishUploadingFile">上传完成!</v-card-title>
@@ -41,7 +45,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
+    <v-snackbar
+      v-model="snackbar"
+      top
+      :color="snackbar_color"
+      dense
+      timeout="2000"
+    >
       {{ snackbar_msg }}
     </v-snackbar>
     <div style="position: fixed; left: 20px; bottom: 20px">
@@ -55,7 +65,12 @@
     <!-- <v-card fixed dark fab left bottom color="pink"></v-card> -->
     <v-app-bar color="white" app>
       <v-card-title class="text-center">
-        <v-chip @click="goBack()" small class="ma-2" color="#555555" text-color="white"
+        <v-chip
+          @click="goBack()"
+          small
+          class="ma-2"
+          color="#555555"
+          text-color="white"
           ><v-icon small left>fa fa-reply</v-icon>返回</v-chip
         >
         <div style="margin-left: 850px">{{ wname }}</div>
@@ -96,7 +111,9 @@
               >
               <v-divider></v-divider>
               <div class="text-center py-8" style="background: #eeeeee">
-                <span style="font-size: 25px; color: #b97a57">{{ restTimeText }}</span>
+                <span style="font-size: 25px; color: #b97a57">{{
+                  restTimeText
+                }}</span>
               </div>
             </v-card>
           </v-col>
@@ -157,7 +174,11 @@
                           >
                             <div>
                               <v-btn
-                                style="min-width: 44px; height: 44px; width: 44px"
+                                style="
+                                  min-width: 44px;
+                                  height: 44px;
+                                  width: 44px;
+                                "
                                 class="mr-5"
                                 color="blue"
                                 dark
@@ -215,7 +236,12 @@
 
                                 <span
                                   v-else-if="index === 3"
-                                  class="overline grey--text text--darken-3 mx-2"
+                                  class="
+                                    overline
+                                    grey--text
+                                    text--darken-3
+                                    mx-2
+                                  "
                                 >
                                   +{{ files.length - 3 }} File(s)
                                 </span>
@@ -251,7 +277,9 @@
                 <!-- TODO -->
 
                 <v-btn class="mr-1" outlined dark color="blue"> 暂存 </v-btn>
-                <v-btn class="mr-7" dark color="blue" @click="submit()">提交</v-btn>
+                <v-btn class="mr-7" dark color="blue" @click="submit()"
+                  >提交</v-btn
+                >
               </v-card-actions>
             </v-card>
           </v-col>
@@ -438,7 +466,9 @@ export default {
       let str2 = str.substr(str.indexOf("_") + 1);
       return str2.substr(str2.indexOf("_") + 1);
     },
-    downloadFile(file) {
+	  downloadFile(file) {
+		  this.snackbar_msg = "拉取下载链接😀 ... ";
+		  this.snackbar = true;
       let form = new FormData();
       form.append("fileName", file);
       _axios
@@ -483,6 +513,7 @@ export default {
           _this.qs = eval(questions);
           _this.myAnss.length = _this.qs.length;
           _this.files.length = _this.qs.length;
+          _this.files_realpath.length = _this.qs.length;
           for (let i = 0; i < _this.qs.length; i++) {
             _this.editorConfigs.push(_this.editTempFactory(i));
           }
@@ -508,7 +539,10 @@ export default {
       ret.toolbarGroups = [
         { name: "document", groups: ["mode", "document", "doctools"] },
         { name: "clipboard", groups: ["clipboard", "undo"] },
-        { name: "editing", groups: ["find", "selection", "spellchecker", "editing"] },
+        {
+          name: "editing",
+          groups: ["find", "selection", "spellchecker", "editing"],
+        },
         { name: "forms", groups: ["forms"] },
         { name: "basicstyles", groups: ["basicstyles", "cleanup"] },
         "/",
@@ -534,7 +568,10 @@ export default {
       //   alert(_cid);
       this.$router.replace({
         name: "home",
-        params: { targetName: "CourseContent", pars: { pname: "cid", pvalue: _cid } },
+        params: {
+          targetName: "CourseContent",
+          pars: { pname: "cid", pvalue: _cid },
+        },
       });
       //   this.$router.back();
     },
@@ -600,7 +637,11 @@ export default {
         this.myAnss[val] != undefined &&
         this.myAnss[val] != null &&
         this.myAnss[val] != "" &&
-        this.myAnss[val].length != 0
+        this.myAnss[val].length != 0 &&
+        this.files[val] != undefined &&
+        this.files[val] != null &&
+        this.files[val] != "" &&
+        this.files[val].length != 0
       ) {
         return true;
       } else {
@@ -628,7 +669,7 @@ export default {
           console.log(res.data.msg);
           if (res.data.code == 1) {
             // 上传失败
-            ret = eval('["\[失败\]' + res.data.msg + '"]');
+            ret = eval('["[失败]' + res.data.msg + '"]');
           } else {
             ret = eval(res.data.data);
           }
@@ -651,10 +692,10 @@ export default {
       let _this = this;
       // 手动装配arr， 避免直接使用toString拉直成一维 ....
       let ass = this.myAnss;
-      console.log("装配之前: " + ass);
 
       let str = "[";
       let fs = this.files_realpath;
+      console.log("fs.len = " + fs.length);
       let str2 = "[";
       for (var i = 0; i < ass.length; i++) {
         if (Array.isArray(ass[i])) {
@@ -669,21 +710,21 @@ export default {
       str = str.slice(0, -2);
       str += "]";
       str = str.replaceAll('"', "&quot;");
-
       for (var i = 0; i < fs.length; i++) {
         if (Array.isArray(fs[i])) {
           str2 += "[" + fs[i].toString() + "], ";
         } else {
-          if (fs[i] == undefined || fs[i] == null) {
+          if (fs[i] == undefined || fs[i] == null || fs[i] == "") {
             fs[i] = "noFile";
           }
           str2 += fs[i] + ", ";
         }
       }
+      console.log(fs);
       str2 = str2.slice(0, -2);
       str2 += "]";
       const form = new FormData();
-
+      console.log(str2);
       form.append("wid", this.wid);
       form.append("ans", str);
       form.append("files", str2);

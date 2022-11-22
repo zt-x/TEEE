@@ -84,6 +84,15 @@
         <span>{{ overlay_msg }}</span>
       </v-chip>
     </v-overlay>
+	<v-snackbar
+      v-model="snackbar"
+      top
+      :color="snackbar_color"
+      dense
+      timeout="2000"
+    >
+      {{ snackbar_msg }}
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -99,19 +108,61 @@ export default {
     return {
       submitContent: [],
       readover: [],
-      readover_new: [],
+		readover_new: [],
+	  stuFiles:[],
       showChangeScore: false,
       ind_i: 0,
       ind_max: 0,
       overlay: false,
       overlay_msg: "",
-      finishGetAns: false,
+		finishGetAns: false,
+	  		snackbar: false,
+      snackbar_color: "brown",
+      snackbar_msg: "",
     };
   },
   mounted() {
     this.getSubmitContent();
   },
-  methods: {
+	methods: {
+		myEval(data) {
+      return eval(data);
+    },
+    parseArr(arrString) {
+      return arrString.substr(1, arrString.length - 2).split(",");
+    },
+    getFileName(str) {
+      let str2 = str.substr(str.indexOf("_") + 1);
+      return str2.substr(str2.indexOf("_") + 1);
+    },
+    downloadFile(file) {
+      this.snackbar_msg = "拉取下载链接😀 ... ";
+      this.snackbar = true;
+      let form = new FormData();
+      form.append("fileName", file);
+      _axios
+        .post("/api/upload/getFile", form, { responseType: "blob" })
+        .then((res) => {
+          const { data, headers } = res;
+          const fileName = headers["content-disposition"].replace(
+            /\w+;filename=(.*)/,
+            "$1"
+          );
+          // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
+          //const blob = new Blob([JSON.stringify(data)], ...)
+          const blob = new Blob([data], { type: headers["content-type"] });
+          let dom = document.createElement("a");
+          let url = window.URL.createObjectURL(blob);
+          dom.href = url;
+          dom.download = decodeURI(fileName);
+          dom.style.display = "none";
+          document.body.appendChild(dom);
+          dom.click();
+          dom.parentNode.removeChild(dom);
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((err) => {});
+    },
     parseContent(val) {
       let _this = this;
       try {
@@ -178,7 +229,9 @@ export default {
               .replaceAll("\\n", "&[[换行n]]")
               .replaceAll("\\t", "&[[table]]")
           );
-          _this.readover = eval(data.readover);
+			_this.readover = eval(data.readover);
+			_this.stuFiles = eval(data.files);
+		  
           _this.readover.forEach((val, i) => {
             _this.readover_new[i] = val;
           });

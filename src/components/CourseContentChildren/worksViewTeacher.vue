@@ -137,6 +137,11 @@ export default {
     };
   },
   methods: {
+	  editWork(work) {
+		// TODO 编辑已发布的作业
+		  alert("开发中 ... ");
+		  
+	},
     doWork(work) {
       let cid = this.cid;
       if (this.isDelete == false) {

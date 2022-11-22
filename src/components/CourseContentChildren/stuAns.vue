@@ -8,11 +8,8 @@
       </v-chip>
     </v-card-title>
     <v-card-subtitle>
-      已批改的题目以 <v-icon color="green">mdi-check</v-icon> 标记, 未批改的题目以<v-icon
-        color="warning"
-        small
-        >mdi-border-color</v-icon
-      >
+      已批改的题目以 <v-icon color="green">mdi-check</v-icon> 标记,
+      未批改的题目以<v-icon color="warning" small>mdi-border-color</v-icon>
       标记。 下列各题得分均为题目的原始分数，总分为经过百分比计算后的得分
     </v-card-subtitle>
     <v-container>
@@ -36,7 +33,9 @@
             :style="{ color: item == readover_new[i] ? 'black' : '#2196f3' }"
           >
             <div style="width: 25px">
-              <v-icon color="green" v-if="readover_new[i] != -1" small>mdi-check</v-icon>
+              <v-icon color="green" v-if="readover_new[i] != -1" small
+                >mdi-check</v-icon
+              >
               <v-icon color="warning" v-if="readover_new[i] == -1" small
                 >mdi-border-color</v-icon
               >
@@ -58,6 +57,19 @@
               style="max-height: 300px; overflow: auto"
               v-html="parseContent(submitContent[i])"
             ></div>
+
+            <div v-if="stuFiles[i] != 'noFile'">
+              附件(点击下载)
+              <br />
+              <v-chip
+                @click="downloadFile(fp)"
+                v-for="(fp, i) in parseArr(stuFiles[i])"
+                :key="i"
+              >
+                {{ getFileName(fp) }}
+              </v-chip>
+            </div>
+            <div v-else>无附件</div>
             <div class="mt-5" style="float: right">
               <v-spacer></v-spacer>
               <v-chip small dark color="blue" @click="showChangeScoreDialog(i)">
@@ -84,11 +96,24 @@
     </v-dialog>
     <v-overlay v-if="overlay">
       <v-chip>
-        <v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
+        <v-progress-circular
+          indeterminate
+          size="16"
+          class="mr-3"
+        ></v-progress-circular>
         <v-spacer></v-spacer>
         <span>{{ overlay_msg }}</span>
       </v-chip>
     </v-overlay>
+    <v-snackbar
+      v-model="snackbar"
+      top
+      :color="snackbar_color"
+      dense
+      timeout="2000"
+    >
+      {{ snackbar_msg }}
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -102,8 +127,12 @@ export default {
   props: ["SUBMIT", "qscores"],
   data() {
     return {
+      snackbar: false,
+      snackbar_color: "brown",
+      snackbar_msg: "",
       submitContent: [],
       readover: [],
+      stuFiles: [],
       readover_new: [],
       showChangeScore: false,
       ind_i: 0,
@@ -117,7 +146,44 @@ export default {
     this.getSubmitContent();
   },
   methods: {
-
+    myEval(data) {
+      return eval(data);
+    },
+    parseArr(arrString) {
+      return arrString.substr(1, arrString.length - 2).split(",");
+    },
+    getFileName(str) {
+      let str2 = str.substr(str.indexOf("_") + 1);
+      return str2.substr(str2.indexOf("_") + 1);
+    },
+    downloadFile(file) {
+      this.snackbar_msg = "拉取下载链接😀 ... ";
+      this.snackbar = true;
+      let form = new FormData();
+      form.append("fileName", file);
+      _axios
+        .post("/api/upload/getFile", form, { responseType: "blob" })
+        .then((res) => {
+          const { data, headers } = res;
+          const fileName = headers["content-disposition"].replace(
+            /\w+;filename=(.*)/,
+            "$1"
+          );
+          // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
+          //const blob = new Blob([JSON.stringify(data)], ...)
+          const blob = new Blob([data], { type: headers["content-type"] });
+          let dom = document.createElement("a");
+          let url = window.URL.createObjectURL(blob);
+          dom.href = url;
+          dom.download = decodeURI(fileName);
+          dom.style.display = "none";
+          document.body.appendChild(dom);
+          dom.click();
+          dom.parentNode.removeChild(dom);
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((err) => {});
+    },
     finish() {
       this.overlay = true;
       this.overlay_msg = "提交批改中 ...";
@@ -213,6 +279,7 @@ export default {
               .replaceAll("\\t", "&[[table]]")
           );
           _this.readover = eval(data.readover);
+          _this.stuFiles = eval(data.files);
           _this.readover.forEach((val, i) => {
             _this.readover_new[i] = val;
           });
@@ -225,7 +292,7 @@ export default {
                 .replaceAll("&douhao;", ",") +
               ")"
           );
-          console.log(data.submitContent);
+
           _this.finishGetAns = true;
         })
         .catch((err) => {
@@ -238,7 +305,10 @@ export default {
       this.showChangeScore = true;
     },
     saveScore(data) {
-      if (data.score >= 0 && Number(data.score) <= Number(this.qscores[data.i])) {
+      if (
+        data.score >= 0 &&
+        Number(data.score) <= Number(this.qscores[data.i])
+      ) {
         this.readover_new[data.i] = data.score;
         this.showChangeScore = false;
       } else {
