@@ -14,30 +14,40 @@
       <v-img src="logo.png" />
     </v-avatar>
 
-    <v-list flat class="mt-16">
-      <v-list-item-group v-model="selectedItem" color="primary">
-        <v-list-item
-          v-for="(item, i) in items"
-          v-bind:key="i"
-          active-class="border"
-          v-ripple="{ class: `brown--text` }"
-          @click="changePage(item.path)"
-        >
-          <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
-              <v-list-item-icon v-bind="attrs" v-on="on">
-                <v-icon color="white">{{ item.icon }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content class="white--text">{{
-                item.name
-              }}</v-list-item-content>
-            </template>
-            <span>{{ item.name }}</span>
-          </v-tooltip>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
-
+    <div
+      style="
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        text-align: center;
+      "
+    >
+      <v-list flat class="mt-16">
+        <v-list-item-group v-model="selectedItem" color="primary">
+          <v-list-item
+            v-for="(item, i) in items"
+            v-bind:key="i"
+            active-class="border"
+            v-ripple="{ class: `brown--text` }"
+            @click="changePage(item.path)"
+          >
+            <v-tooltip right>
+              <template v-slot:activator="{ on, attrs }">
+                <v-list-item-icon v-bind="attrs" v-on="on">
+                  <v-icon color="white">{{ item.icon }}</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content class="white--text">{{
+                  item.name
+                }}</v-list-item-content>
+              </template>
+              <span>{{ item.name }}</span>
+            </v-tooltip>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </div>
     <div
       style="
         position: absolute;
@@ -60,7 +70,7 @@
 export default {
   data: () => ({
     aboutView: false,
-    mini_variant: true,
+    mini_variant: false,
     selectedItem: 2,
     drawer: null,
     items: [
@@ -76,7 +86,9 @@ export default {
     },
   }),
   methods: {
-    aboutUS() {},
+    aboutUS() {
+      this.mini_variant = !this.mini_variant;
+    },
     changePage(url) {
       this.$router.push(url).catch((err) => {
         if (

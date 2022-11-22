@@ -241,13 +241,13 @@
       </v-col>
       <!-- Course Info -->
       <v-col cols="12" sm="4">
-        <v-card>
+        <v-card :loading="!finishGetCourseInfo">
           <v-card-title>{{ CourseInfo.CourseName }}</v-card-title>
           <v-card-subtitle
             >CourseKey:{{ this.cid }} || {{ CourseInfo.CourseTime }}</v-card-subtitle
           >
           <v-divider class="mb-5"></v-divider>
-          <v-container>
+          <v-container v-if="finishGetCourseInfo">
             <v-row>
               <v-col cols="5">
                 <v-card class="pl-5 pt-6" style="height: 200px">
@@ -342,6 +342,7 @@ export default {
       userinfos: [],
       userinfos_show: [],
       finishGetUser: false,
+      finishGetCourseInfo: true,
       CourseInfo: {},
       search_user: "",
       gotExams: false,
@@ -369,12 +370,15 @@ export default {
     },
     getCourseInfo() {
       let _this = this;
+      _this.finishGetCourseInfo = false;
       const form = new FormData();
       form.append("cid", this.cid);
       _axios
         .post("/api/Course/getCourseInfo", form)
         .then((res) => {
+          _this.finishGetCourseInfo = true;
           _this.CourseInfo = eval(res.data.data);
+          console.log(_this.CourseInfo);
         })
         .catch((err) => {
           alert("获取课程INFO失败：" + err);

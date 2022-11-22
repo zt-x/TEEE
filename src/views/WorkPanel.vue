@@ -1,10 +1,6 @@
 <template>
   <v-card style="min-width: 1520px; background: #b97a57; min-height: 1080px">
-    <v-dialog
-      width="400px"
-      v-if="dialog_upload_info"
-      v-model="dialog_upload_info"
-    >
+    <v-dialog width="400px" v-if="dialog_upload_info" v-model="dialog_upload_info">
       <v-card :loading="!finishUploadingFile">
         <v-card-title v-if="!finishUploadingFile">正在上传 ...</v-card-title>
         <v-card-title v-if="finishUploadingFile">上传完成!</v-card-title>
@@ -45,13 +41,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      v-model="snackbar"
-      top
-      :color="snackbar_color"
-      dense
-      timeout="2000"
-    >
+    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
       {{ snackbar_msg }}
     </v-snackbar>
     <div style="position: fixed; left: 20px; bottom: 20px">
@@ -65,12 +55,7 @@
     <!-- <v-card fixed dark fab left bottom color="pink"></v-card> -->
     <v-app-bar color="white" app>
       <v-card-title class="text-center">
-        <v-chip
-          @click="goBack()"
-          small
-          class="ma-2"
-          color="#555555"
-          text-color="white"
+        <v-chip @click="goBack()" small class="ma-2" color="#555555" text-color="white"
           ><v-icon small left>fa fa-reply</v-icon>返回</v-chip
         >
         <div style="margin-left: 850px">{{ wname }}</div>
@@ -111,9 +96,7 @@
               >
               <v-divider></v-divider>
               <div class="text-center py-8" style="background: #eeeeee">
-                <span style="font-size: 25px; color: #b97a57">{{
-                  restTimeText
-                }}</span>
+                <span style="font-size: 25px; color: #b97a57">{{ restTimeText }}</span>
               </div>
             </v-card>
           </v-col>
@@ -174,11 +157,7 @@
                           >
                             <div>
                               <v-btn
-                                style="
-                                  min-width: 44px;
-                                  height: 44px;
-                                  width: 44px;
-                                "
+                                style="min-width: 44px; height: 44px; width: 44px"
                                 class="mr-5"
                                 color="blue"
                                 dark
@@ -236,12 +215,7 @@
 
                                 <span
                                   v-else-if="index === 3"
-                                  class="
-                                    overline
-                                    grey--text
-                                    text--darken-3
-                                    mx-2
-                                  "
+                                  class="overline grey--text text--darken-3 mx-2"
                                 >
                                   +{{ files.length - 3 }} File(s)
                                 </span>
@@ -277,9 +251,7 @@
                 <!-- TODO -->
 
                 <v-btn class="mr-1" outlined dark color="blue"> 暂存 </v-btn>
-                <v-btn class="mr-7" dark color="blue" @click="submit()"
-                  >提交</v-btn
-                >
+                <v-btn class="mr-7" dark color="blue" @click="submit()">提交</v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -466,9 +438,9 @@ export default {
       let str2 = str.substr(str.indexOf("_") + 1);
       return str2.substr(str2.indexOf("_") + 1);
     },
-	  downloadFile(file) {
-		  this.snackbar_msg = "拉取下载链接😀 ... ";
-		  this.snackbar = true;
+    downloadFile(file) {
+      this.snackbar_msg = "拉取下载链接😀 ... ";
+      this.snackbar = true;
       let form = new FormData();
       form.append("fileName", file);
       _axios
@@ -634,14 +606,14 @@ export default {
     isWrite(val) {
       //   console.log(this.myAnss);
       if (
-        this.myAnss[val] != undefined &&
-        this.myAnss[val] != null &&
-        this.myAnss[val] != "" &&
-        this.myAnss[val].length != 0 &&
-        this.files[val] != undefined &&
-        this.files[val] != null &&
-        this.files[val] != "" &&
-        this.files[val].length != 0
+        (this.myAnss[val] != undefined &&
+          this.myAnss[val] != null &&
+          this.myAnss[val] != "" &&
+          this.myAnss[val].length != 0) ||
+        (this.files[val] != undefined &&
+          this.files[val] != null &&
+          this.files[val] != "" &&
+          this.files[val].length != 0)
       ) {
         return true;
       } else {

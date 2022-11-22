@@ -1,10 +1,10 @@
 <template>
   <v-card class="font-weight-black">
-    <Dialog_msg
+    <!-- <Dialog_msg
       :dialog_msg="dialog_msg"
       :msg="dialog_msg_msg"
       @closeFunc="closeFunc($event)"
-    />
+    /> -->
     <v-dialog persistent v-model="dialog_ifSaveAsWorkBank" width="400px">
       <v-card>
         <v-card-title>保存到作业库</v-card-title>
@@ -241,6 +241,13 @@
         >发布</v-btn
       >
     </v-card-actions>
+    <v-overlay v-if="overlay">
+      <v-chip>
+        <v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
+        <v-spacer></v-spacer>
+        <span>{{ overlay_msg }}</span>
+      </v-chip>
+    </v-overlay>
   </v-card>
 </template>
 
@@ -279,6 +286,8 @@ export default {
   },
   data() {
     return {
+      overlay: false,
+      overlay_msg: "",
       releaseWork_isExam: false,
       workTitle: "",
       workContentRadio: "",
@@ -412,8 +421,23 @@ export default {
         .then((res) => {
           aWork.workId = res.data.data;
           _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
-            _this.dialog_msg_msg = res2.data.msg;
-            _this.dialog_msg = true;
+            _this.overlay = true;
+            _this.overlay_msg = "发布中 ...";
+            _this.$dialog({
+              title: "Msg",
+              content: res2.data.msg,
+              btns: [
+                {
+                  label: "返回课程页面",
+                  color: "red",
+                  ghost: true,
+                  callback: () => {
+                    _this.close();
+                    _this.overlay = false;
+                  },
+                },
+              ],
+            });
           });
         })
         .catch((err) => {

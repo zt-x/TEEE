@@ -217,6 +217,19 @@ export default {
             _this.loading_upload = false;
           });
         // return;
+      } else {
+        let newQue = {};
+        newQue.qtype = 30012;
+        newQue.qscore = this.ans_score;
+        newQue.qtext = this.ans_text;
+        newQue.qfiles = "";
+        //上传附件
+
+        //
+        this.ans_score = "";
+        this.ans_text = "";
+        this.msg = "";
+        this.$emit("addTextQue", newQue);
       }
     },
   },
