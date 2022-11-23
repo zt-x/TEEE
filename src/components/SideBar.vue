@@ -70,7 +70,7 @@
 export default {
   data: () => ({
     aboutView: false,
-    mini_variant: false,
+    mini_variant: true,
     selectedItem: 2,
     drawer: null,
     items: [

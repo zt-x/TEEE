@@ -9,7 +9,6 @@
       v-model="snackbar"
       style="margin-top: 64px"
       top
-      right
       color="success"
       dense="true"
       timeout="1000"

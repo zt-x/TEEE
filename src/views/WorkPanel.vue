@@ -22,7 +22,7 @@
               dialog_upload_info = false;
               files_realpath = [];
             "
-            >返回</v-btn
+            >返回检查附件</v-btn
           >
           <v-tooltip v-if="finishUploadingFile" top>
             <template v-slot:activator="{ on, attrs }">

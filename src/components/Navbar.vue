@@ -171,7 +171,7 @@
 
     <!-- MsgBox模块 -->
     <v-badge dot overlap color="green" class="ml-3 mr-2" dark>
-      <v-avatar color="#ffe9b3">
+      <v-avatar @click="showMyMsgBox()" color="#ffe9b3">
         <v-icon color="#875438">fas fa-bell</v-icon>
       </v-avatar>
     </v-badge>
@@ -184,7 +184,7 @@
         </v-avatar>
       </template>
       <v-list>
-        <v-list-item>
+        <v-list-item @click="showMyUserInfo()">
           <v-list-item-title>个人信息</v-list-item-title>
         </v-list-item>
         <v-list-item @click="logout()">
@@ -289,6 +289,12 @@ export default {
         alert("未知身份错误" + this.role);
         this.$router.replace("/login");
       }
+    },
+    showMyMsgBox() {
+      alert("敬请期待[施工中..] ");
+    },
+    showMyUserInfo() {
+      alert("敬请期待[施工中..] ");
     },
     createCourse() {
       let _this = this;

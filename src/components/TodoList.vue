@@ -4,7 +4,7 @@
 			
 			<v-card-title class="mx-auto overline">
 				<v-icon left small color="black">fa fa-calendar-check</v-icon>
-				 Todo List</v-card-title>
+				 Todo List [施工中...]</v-card-title>
 		</v-row>
 		<v-divider></v-divider>
 		<div class="mx-auto mt-5" style="width:100%;">
