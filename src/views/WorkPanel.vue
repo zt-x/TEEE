@@ -671,12 +671,12 @@ export default {
       let str2 = "[";
       for (var i = 0; i < ass.length; i++) {
         if (Array.isArray(ass[i])) {
-          str += "[" + ass[i].toString().replaceAll(",", "&douhao;") + "], ";
+          str += "[" + ass[i].toString() + "], ";
         } else {
           if (ass[i] == undefined || ass[i] == null) {
             ass[i] = "无";
           }
-          str += ass[i] + ", ";
+          str += ass[i].replaceAll(",", "&douhao;") + ", ";
         }
       }
       str = str.slice(0, -2);
