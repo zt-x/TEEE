@@ -34,20 +34,31 @@
         </v-card>
       </v-col>
       <v-col cols="3">
-        <v-card>
+        <v-card max-height="500px" style="overflow: auto">
           <v-card-title>我的库</v-card-title>
-          <v-card-subtitle>筛选规则: | |</v-card-subtitle>
+          <v-card-subtitle>请在"筛选"选项中选择作业库/题库</v-card-subtitle>
           <v-divider></v-divider>
           <v-card-text>
             <v-list>
               <v-list-item-group v-model="item" color="primary">
-                <v-list-item v-for="(item, i) in items" :key="i" :inactive="inactive">
+                <v-list-item
+                  @click="showBankWork(item.id)"
+                  v-for="item in items"
+                  :key="item.id"
+                >
                   <v-list-item-content>
-                    <v-list-item-title v-html="item.title"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-if="twoLine || threeLine"
-                      v-html="item.subtitle"
-                    ></v-list-item-subtitle>
+                    <v-list-item-title>
+                      <v-chip
+                        small
+                        outlined
+                        dark
+                        :color="Number(item.isPrivate) == 0 ? 'success' : 'warning'"
+                        class="mr-1"
+                        >{{ Number(item.isPrivate) == 0 ? "公开" : "私有" }}</v-chip
+                      >
+
+                      <span style="font-weight: 600">{{ item.bankName }} </span>
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list-item-group>
@@ -56,18 +67,34 @@
         </v-card>
       </v-col>
       <v-col cols="9">
-        <v-fab-transtion>
-          <v-card>666</v-card>
-        </v-fab-transtion>
+        <v-card max-height="500px" style="overflow: auto">
+          <BankWork :bid="bid" v-if="loadBankWork" />
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+import BankWork from "@/components/BankManager/bankWork.vue";
+import axios from "axios";
+let token = window.localStorage.getItem("token");
+const _axios = axios.create();
+let _this;
 export default {
+  components: { BankWork },
   mounted() {
+    _this = this;
     this.$store.commit("updatePageName", "库管理");
+    token = window.localStorage.getItem("token");
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
+
+    this.getWorkBank();
   },
   data() {
     return {
@@ -76,27 +103,34 @@ export default {
       snackbar: false,
       snackbar_color: "warning",
       snackbar_msg: "",
-      item: 5,
-      items: [
-        {
-          title:
-            "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?",
-        },
-        {
-          title:
-            "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend.",
-        },
-        {
-          title: "Oui oui",
-        },
-        {
-          title: "Birthday gift",
-        },
-        {
-          title: "Recipe to try",
-        },
-      ],
+      item: 0,
+      items: [],
+      bid: -1,
+      loadBankWork: false,
     };
+  },
+  methods: {
+    showBankWork(id) {
+      this.loadBankWork = false;
+      this.bid = id;
+      this.$nextTick(() => {
+        this.loadBankWork = true;
+      });
+    },
+    getQueBank() {},
+    getWorkBank() {
+      _axios
+        .post("/api/Bank/getWorkBankByTid")
+        .then((res) => {
+          console.log(res.data);
+          _this.items = eval(res.data.data);
+          _this.bid = _this.items[0].id;
+          _this.loadBankWork = true;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 };
 </script>

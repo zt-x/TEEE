@@ -6,6 +6,13 @@
       @closeFunc="closeFunc($event)"
     /> -->
     <v-dialog persistent v-model="dialog_ifSaveAsWorkBank" width="400px">
+      <v-overlay v-if="overlay" absolute>
+        <v-chip>
+          <v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
+          <v-spacer></v-spacer>
+          <span>{{ overlay_msg }}</span>
+        </v-chip>
+      </v-overlay>
       <v-card>
         <v-card-title>保存到作业库</v-card-title>
         <v-text-field
@@ -241,13 +248,6 @@
         >发布</v-btn
       >
     </v-card-actions>
-    <v-overlay v-if="overlay">
-      <v-chip>
-        <v-progress-circular indeterminate size="16" class="mr-3"></v-progress-circular>
-        <v-spacer></v-spacer>
-        <span>{{ overlay_msg }}</span>
-      </v-chip>
-    </v-overlay>
   </v-card>
 </template>
 
@@ -258,6 +258,7 @@ import AddTextQue from "./addQuestion/addTextQue.vue";
 import axios from "axios";
 import Dialog_msg from "@/components/dialog_msg.vue";
 let token = window.localStorage.getItem("token");
+let _this = this;
 export default {
   components: { addChoicQue, AddFillInQue, AddTextQue, Dialog_msg },
   props: ["cid"],
@@ -416,29 +417,33 @@ export default {
         return config;
       });
       let _this = this;
+      this.overlay = true;
+      this.overlay_msg = "发布中 ...";
       _axios
         .post("/api/Bank/addWorkBank", work)
         .then((res) => {
-          aWork.workId = res.data.data;
-          _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
-            _this.overlay = true;
-            _this.overlay_msg = "发布中 ...";
-            _this.$dialog({
-              title: "Msg",
-              content: res2.data.msg,
-              btns: [
-                {
-                  label: "返回课程页面",
-                  color: "red",
-                  ghost: true,
-                  callback: () => {
-                    _this.close();
-                    _this.overlay = false;
+          if (res.data.code == 2) {
+            aWork.workId = res.data.data;
+            _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
+              _this.$dialog({
+                title: "Msg",
+                content: res2.data.msg,
+                btns: [
+                  {
+                    label: "返回课程页面",
+                    color: "red",
+                    ghost: true,
+                    callback: () => {
+                      _this.close();
+                      _this.overlay = false;
+                    },
                   },
-                },
-              ],
+                ],
+              });
             });
-          });
+          } else {
+            alert("err: " + res.data.msg);
+          }
         })
         .catch((err) => {
           _this.dialog_msg_msg = err;
