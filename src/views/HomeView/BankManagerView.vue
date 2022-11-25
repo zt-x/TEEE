@@ -53,7 +53,7 @@
                         outlined
                         dark
                         :color="Number(item.isPrivate) == 0 ? 'success' : 'warning'"
-                        class="mr-1"
+                        class="mr-2"
                         >{{ Number(item.isPrivate) == 0 ? "公开" : "私有" }}</v-chip
                       >
 

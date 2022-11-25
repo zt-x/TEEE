@@ -6,7 +6,7 @@
         outlined
         dark
         :color="Number(content.isPrivate) == 0 ? 'success' : 'warning'"
-        class="mr-1"
+        class="mr-2"
         >{{ Number(content.isPrivate) == 0 ? "公开" : "私有" }}</v-chip
       >
       {{ content.BankName }}
@@ -17,7 +17,22 @@
     <v-divider></v-divider>
     <v-card-text v-if="finishGetData">
       <!-- TAGS -->
-      <v-chip v-for="(item, i) in tags" :key="i">666</v-chip>
+      <div class="my-2" style="width: 90%; overflow: hidden">
+        标签：
+        <v-chip
+          small
+          label
+          color="purple"
+          dark
+          class="mx-1"
+          v-for="(item, i) in tags"
+          :key="i"
+          >{{ item }}</v-chip
+        >
+      </div>
+      <!-- 题目统计 -->
+      <div class="my-3">题目统计</div>
+      <div class="my-3">选择题:</div>
     </v-card-text>
     <v-skeleton-loader
       v-if="!finishGetData"
