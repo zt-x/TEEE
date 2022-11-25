@@ -31,7 +31,7 @@
         >
       </div>
       <!-- 题目统计 -->
-      <div class="my-3">题目统计</div>
+      <div class="my-3">题目统计_</div>
       <div class="my-3">选择题:</div>
     </v-card-text>
     <v-skeleton-loader
