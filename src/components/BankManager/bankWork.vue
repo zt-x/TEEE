@@ -14,9 +14,13 @@
         作者:{{ content.author }} | 被使用次数:{{ content.usedTimes }}
       </v-card-subtitle>
     </v-card-title>
-
+    <v-divider></v-divider>
+    <v-card-text v-if="finishGetData">
+      <!-- TAGS -->
+      <v-chip v-for="(item, i) in tags" :key="i">666</v-chip>
+    </v-card-text>
     <v-skeleton-loader
-      v-if="finishGetData"
+      v-if="!finishGetData"
       class="mx-auto"
       max-width="100%"
       type="card"
@@ -48,6 +52,7 @@ export default {
       snackbar_msg: "",
       finishGetData: false,
       content: {},
+      tags: [],
     };
   },
   mounted() {
@@ -72,7 +77,8 @@ export default {
         .then((res) => {
           console.log(res.data);
           _this.content = res.data.data;
-          _this.finishGetData = false;
+          _this.tags = eval(res.data.data.tags);
+          _this.finishGetData = true;
         })
         .catch((err) => {
           this.snackbar_msg = err;
