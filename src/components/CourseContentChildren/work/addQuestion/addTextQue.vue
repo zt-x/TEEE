@@ -180,17 +180,13 @@ export default {
               _this.snackbar_msg = res.data.msg;
               _this.snackbar_color = "error";
               _this.snackbar = true;
-              console.log(_this.snackbar_color);
               return;
             } else {
               _this.snackbar_msg = res.data.msg;
               _this.snackbar_color = "success";
               _this.snackbar = true;
-              console.log(_this.snackbar_color);
 
               //   解析 获得 FileRealPath
-              // _this.filesRealPath
-              console.log(res.data.data);
               // 返回JSON
               // {qtype: 30012, qscore: 2.0,
               // qtext: "1111", cans: "",files:""}
@@ -199,7 +195,6 @@ export default {
               newQue.qtype = 30012;
               newQue.qscore = this.ans_score;
               newQue.qtext = this.ans_text;
-              console.log(eval(res.data.data));
               newQue.qfiles = eval(res.data.data);
               //上传附件
 

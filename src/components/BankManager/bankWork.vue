@@ -101,7 +101,6 @@ export default {
       _axios
         .post("/api/Bank/getWorkBankContentByID", form)
         .then((res) => {
-          console.log(res.data);
           _this.content = res.data.data;
           _this.tags = eval(res.data.data.tags);
           _this.numOfQue = eval(res.data.data.numOfQue);

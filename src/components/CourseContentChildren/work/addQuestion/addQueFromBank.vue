@@ -93,7 +93,6 @@ export default {
     parseTags(str) {
       let arr = eval(str);
       let ret = "";
-      console.log(arr);
       if (str == null || str == "") {
         return "";
       }
@@ -125,7 +124,6 @@ export default {
       let ret = {};
       ret.id = this.selected[0].id;
       ret.bn = this.selected[0].bankName;
-      console.log(ret);
       this.$emit("addFormBank", ret);
     },
   },

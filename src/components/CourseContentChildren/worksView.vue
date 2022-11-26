@@ -192,22 +192,26 @@ export default {
     },
     scoreColor(wid) {
       let ret = "";
-      this.finish_status.forEach((val, i) => {
-        if (val.wid == wid) {
-          ret = val.status;
-          if (ret == -1 || ret == 0) {
-            ret = "grey";
-          } else {
-            if (Number(val.score) < 60) {
-              ret = "error";
-            } else if (Number(val.score) < 80) {
-              ret = "warning";
-            } else if (Number(val.score) < 100) {
-              ret = "success";
+      try {
+        this.finish_status.forEach((val, i) => {
+          if (val.wid == wid) {
+            ret = val.status;
+            if (ret == -1 || ret == 0) {
+              ret = "grey";
+            } else {
+              if (Number(val.score) < 60) {
+                ret = "error";
+              } else if (Number(val.score) <= 80) {
+                ret = "warning";
+              } else if (Number(val.score) <= 100) {
+                ret = "success";
+              }
             }
           }
-        }
-      });
+        });
+      } catch {
+        ret = "grey";
+      }
       return ret;
     },
     getScore(wid) {

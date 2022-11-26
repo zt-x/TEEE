@@ -123,7 +123,6 @@ export default {
       _axios
         .post("/api/Bank/getWorkBankByTid")
         .then((res) => {
-          console.log(res.data);
           _this.items = eval(res.data.data);
           _this.bid = _this.items[0].id;
           _this.numOfQue = _this.items[0];

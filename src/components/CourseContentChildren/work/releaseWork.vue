@@ -406,7 +406,6 @@ export default {
     },
     returnTextQue(newQue) {
       this.questions.push(JSON.stringify(newQue));
-      console.log(this.questions);
       this.dialog_addTextQue = false;
     },
     returnWorkFronBank(wb) {

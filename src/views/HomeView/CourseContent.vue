@@ -378,7 +378,6 @@ export default {
         .then((res) => {
           _this.finishGetCourseInfo = true;
           _this.CourseInfo = eval(res.data.data);
-          console.log(_this.CourseInfo);
         })
         .catch((err) => {
           alert("获取课程INFO失败：" + err);
@@ -466,7 +465,6 @@ export default {
           _this.exams.sort((a, b) => {
             return b.id - a.id;
           });
-          console.log(_this.works);
           _this.loading_announcementview = true;
           _this.loading_workview = true;
           _this.loading_examview = true;

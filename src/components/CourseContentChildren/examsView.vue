@@ -201,9 +201,9 @@ export default {
           } else {
             if (Number(val.score) < 60) {
               ret = "error";
-            } else if (Number(val.score) < 80) {
+            } else if (Number(val.score) <= 80) {
               ret = "warning";
-            } else if (Number(val.score) < 100) {
+            } else if (Number(val.score) <= 100) {
               ret = "success";
             }
           }

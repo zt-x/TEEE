@@ -604,7 +604,6 @@ export default {
       }
     },
     isWrite(val) {
-      //   console.log(this.myAnss);
       if (
         (this.myAnss[val] != undefined &&
           this.myAnss[val] != null &&
@@ -637,8 +636,6 @@ export default {
       await axios
         .post("/api/upload/file", param, config)
         .then((res) => {
-          console.log(res.data.data);
-          console.log(res.data.msg);
           if (res.data.code == 1) {
             // 上传失败
             ret = eval('["[失败]' + res.data.msg + '"]');
@@ -667,7 +664,6 @@ export default {
 
       let str = "[";
       let fs = this.files_realpath;
-      console.log("fs.len = " + fs.length);
       let str2 = "[";
       for (var i = 0; i < ass.length; i++) {
         if (Array.isArray(ass[i])) {
@@ -692,11 +688,9 @@ export default {
           str2 += fs[i] + ", ";
         }
       }
-      console.log(fs);
       str2 = str2.slice(0, -2);
       str2 += "]";
       const form = new FormData();
-      console.log(str2);
       form.append("wid", this.wid);
       form.append("ans", str);
       form.append("files", str2);
@@ -728,15 +722,28 @@ export default {
       this.dialog_upload_info = true;
       await this.prepareUpload();
       console.log("结束上传队列 ...");
-      console.log(this.files_realpath);
       return;
+    },
+    isListHaveValue(list) {
+      let ret = false;
+      list.forEach((item) => {
+        if (item.length > 0) {
+          console.log("have value: " + item + "length=" + item.length);
+          ret = true;
+        }
+      });
+      console.log("have value: " + ret);
+      return ret;
     },
     submit(isTimeOver) {
       let _this = this;
-
       if (isTimeOver == 1) {
-        alert("跳过UNDO检测");
-        _this.submitWorkFile();
+        alert("时间截止");
+        if (_this.isListHaveValue(_this.files)) {
+          _this.submitWorkFile();
+        } else {
+          _this.submitWorkContent();
+        }
         return;
       }
       let undo = -1;
@@ -759,7 +766,11 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                _this.submitWorkFile();
+                if (_this.isListHaveValue(_this.files)) {
+                  _this.submitWorkFile();
+                } else {
+                  _this.submitWorkContent();
+                }
               },
             },
           ],
@@ -778,7 +789,11 @@ export default {
               label: "提交",
               color: "#09f",
               callback: () => {
-                _this.submitWorkFile();
+                if (_this.isListHaveValue(_this.files)) {
+                  _this.submitWorkFile();
+                } else {
+                  _this.submitWorkContent();
+                }
               },
             },
           ],
