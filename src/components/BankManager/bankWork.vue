@@ -32,8 +32,15 @@
       </div>
       <!-- 题目统计 -->
       <div class="my-3">题目统计:</div>
-      <div class="my-3">选择题:</div>
+      <div class="pl-2 my-3">选择题: {{ numOfQue[0] }}道</div>
+      <div class="pl-2 my-3">填空题: {{ numOfQue[1] }}道</div>
+      <div class="pl-2 my-3">简答题: {{ numOfQue[2] }}道</div>
     </v-card-text>
+    <v-card-actions v-if="finishGetData">
+      <v-btn color="orange" text> 查看作业库内容 </v-btn>
+      <v-btn color="orange" text> 编辑作业库信息 </v-btn>
+      <v-btn color="orange" text> 生成分享码 </v-btn>
+    </v-card-actions>
     <v-skeleton-loader
       v-if="!finishGetData"
       class="mx-auto"
@@ -68,6 +75,7 @@ export default {
       finishGetData: false,
       content: {},
       tags: [],
+      numOfQue: [],
     };
   },
   mounted() {
@@ -85,6 +93,9 @@ export default {
   methods: {
     getData() {
       _this.finishGetData = false;
+      _this.content = {};
+      _this.tags = [];
+      _this.numOfQue = [];
       let form = new FormData();
       form.append("wbid", this.bid);
       _axios
@@ -93,6 +104,7 @@ export default {
           console.log(res.data);
           _this.content = res.data.data;
           _this.tags = eval(res.data.data.tags);
+          _this.numOfQue = eval(res.data.data.numOfQue);
           _this.finishGetData = true;
         })
         .catch((err) => {

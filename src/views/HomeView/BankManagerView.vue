@@ -105,6 +105,7 @@ export default {
       snackbar_msg: "",
       item: 0,
       items: [],
+      numOfQue: [],
       bid: -1,
       loadBankWork: false,
     };
@@ -125,6 +126,7 @@ export default {
           console.log(res.data);
           _this.items = eval(res.data.data);
           _this.bid = _this.items[0].id;
+          _this.numOfQue = _this.items[0];
           _this.loadBankWork = true;
         })
         .catch((err) => {
