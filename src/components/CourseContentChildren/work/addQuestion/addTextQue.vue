@@ -101,7 +101,7 @@ export default {
       ans_score: "",
       ans_text: "",
       editorConfig: {
-        removePlugins: "easyimage",
+        removePlugins: "easyimage,cloudservices,exportpdf",
         extraPlugins: "image2,uploadimage",
         uploadUrl: "/api/upload/img",
         // filebrowserBrowseUrl: "/api/upload/img",

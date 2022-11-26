@@ -69,6 +69,10 @@ export default {
     // 初始化用户信息
     _axios.post("/api/power").then((res) => {
       let data_ = res.data;
+      if (Number(data_.code) == 0) {
+        _this.$router.replace({ path: "/login" });
+        return;
+      }
       _this.$store.commit(
         "updateUserInfo",
         JSON.stringify({
