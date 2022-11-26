@@ -1,10 +1,5 @@
 <template>
   <v-card class="font-weight-black">
-    <!-- <Dialog_msg
-      :dialog_msg="dialog_msg"
-      :msg="dialog_msg_msg"
-      @closeFunc="closeFunc($event)"
-    /> -->
     <v-dialog persistent v-model="dialog_ifSaveAsWorkBank" width="400px">
       <v-overlay v-if="overlay" absolute>
         <v-chip>
@@ -50,7 +45,17 @@
         @addTextQue="returnTextQue($event)"
       />
     </v-dialog>
-
+    <v-dialog
+      persistent
+      v-if="dialog_addQueFromBank"
+      v-model="dialog_addQueFromBank"
+      width="900px"
+    >
+      <add-que-from-bank
+        @closeQueFromBank="closeQueFromBank($event)"
+        @addFormBank="returnWorkFronBank($event)"
+      />
+    </v-dialog>
     <v-card-title class="headline">
       <v-icon left>fa fa-paper-plane</v-icon>
       <span class="font-weight-black" style="color: #757575">发布作业</span>
@@ -148,6 +153,7 @@
             </v-radio-group>
           </v-col>
           <v-col cols="12">
+            <!-- 添加题目 -->
             <v-menu
               close-on-click
               close-on-content-click
@@ -176,7 +182,7 @@
                 </v-list-item>
               </v-list>
             </v-menu>
-
+            <!-- 选择作业库 -->
             <v-chip
               class="white--text"
               color="green"
@@ -196,11 +202,17 @@
             <v-chip v-if="TextQue != 0" class="ml-3"> 简答题 {{ TextQue }} 题 </v-chip>
           </v-col>
           <v-col cols="12">
-            <v-card class="px-5 py-5" style="background: #eeeeee">
+            <!-- 添加新题目 -->
+            <v-card
+              v-if="workContentRadio == 'createNewWork'"
+              class="px-5 py-5"
+              style="background: #eeeeee"
+            >
               <!-- TODO: 点击后进行二次编辑 -->
               <v-chip
+                label
                 dark
-                color="warning"
+                color="success"
                 class="mx-2 my-1"
                 close
                 v-for="(ques, i) in questions"
@@ -218,6 +230,26 @@
                 】|
                 {{ JSON.parse(ques).qtext.slice(0, 20) }}
               </v-chip>
+            </v-card>
+
+            <!-- 从Bank中获取的 -->
+            <v-card
+              class="px-5 py-5"
+              style="background: #eeeeee"
+              v-if="workContentRadio == 'searchFromBank'"
+            >
+              <!-- TODO: 点击后进行二次编辑 -->
+              <v-chip
+                label
+                dark
+                color="success"
+                class="mx-2 my-1"
+                close
+                v-for="(bk, i) in wb"
+                :key="bk.id"
+                @click:close="wb.splice(i, 1)"
+                >{{ bk.bn }}</v-chip
+              >
             </v-card>
             <v-row class="ml-0">
               <v-checkbox
@@ -257,10 +289,13 @@ import AddFillInQue from "./addQuestion/addFillInQue.vue";
 import AddTextQue from "./addQuestion/addTextQue.vue";
 import axios from "axios";
 import Dialog_msg from "@/components/dialog_msg.vue";
+import AddQueFromBank from "./addQuestion/addQueFromBank.vue";
 let token = window.localStorage.getItem("token");
 let _this = this;
+const _axios = axios.create();
+
 export default {
-  components: { addChoicQue, AddFillInQue, AddTextQue, Dialog_msg },
+  components: { addChoicQue, AddFillInQue, AddTextQue, Dialog_msg, AddQueFromBank },
   props: ["cid"],
   computed: {
     choiceQue() {
@@ -297,8 +332,8 @@ export default {
       totalScore: 100,
       Rate: 0.32,
       deadline: "",
-      autoReadoverChoice: false,
-      autoReadoverFillIn: false,
+      autoReadoverChoice: true,
+      autoReadoverFillIn: true,
       dialog_addChoicQue: false,
       dialog_addFillInQue: false,
       dialog_addTextQue: false,
@@ -307,6 +342,7 @@ export default {
       dialog_msg: false,
       dialog_msg_msg: "",
       questions: [],
+      wb: [],
       files: [],
       work_name: "",
       isTemp: false,
@@ -330,6 +366,7 @@ export default {
         this.releaseWork_isExam = false;
         this.workContentRadio = "";
         this.questions = [];
+        this.wb = "";
         this.files = [];
       }
       this.$emit("close", true);
@@ -344,7 +381,9 @@ export default {
       this.dialog_addTextQue = true;
     },
     addQueFromQBank() {},
-    openWorkBank() {},
+    openWorkBank() {
+      this.dialog_addQueFromBank = true;
+    },
     closeAddChoicQue(val) {
       this.dialog_addChoicQue = val;
     },
@@ -370,6 +409,11 @@ export default {
       console.log(this.questions);
       this.dialog_addTextQue = false;
     },
+    returnWorkFronBank(wb) {
+      this.wb = [];
+      this.wb.push(wb);
+      this.dialog_addQueFromBank = false;
+    },
     saveAsWork() {},
     beforeReleaseWork() {
       if (this.workTitle == "") {
@@ -378,11 +422,57 @@ export default {
       } else if (this.totalScore == "") {
         alert("请输入分数");
         return;
-      } else if (this.questions.length <= 0) {
-        alert("请不要发布空作业");
-        return;
       }
-      this.dialog_ifSaveAsWorkBank = true;
+
+      if (this.workContentRadio == "createNewWork") {
+        if (this.questions.length <= 0) {
+          alert("请不要发布空作业");
+          return;
+        } else {
+          this.dialog_ifSaveAsWorkBank = true;
+        }
+      } else if (this.workContentRadio == "searchFromBank") {
+        if (this.wb.length <= 0) {
+          alert("请不要发布空作业");
+          return;
+        } else {
+          this.releaseWorkWithBankID(this.wb[0].id);
+        }
+      }
+    },
+    releaseWorkWithBankID(bkid) {
+      let aWork = {};
+
+      aWork.cid = this.cid;
+      aWork.deadline = this.deadline;
+      aWork.totalScore = this.totalScore;
+      aWork.workName = this.workTitle;
+      aWork.autoReadoverChoice = this.autoReadoverChoice ? 1 : 0;
+      aWork.autoReadoverFillIn = this.autoReadoverFillIn ? 1 : 0;
+      aWork.workId = bkid;
+      aWork.timeLimit = this.timeLimit;
+      aWork.isExam = this.releaseWork_isExam ? 1 : 0;
+      let _this = this;
+      this.overlay = true;
+      this.overlay_msg = "发布中 ...";
+      _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
+        _this.overlay = false;
+
+        _this.$dialog({
+          title: "Msg",
+          content: res2.data.msg,
+          btns: [
+            {
+              label: "返回课程页面",
+              color: "red",
+              ghost: true,
+              callback: () => {
+                _this.close();
+              },
+            },
+          ],
+        });
+      });
     },
     releaseWork(isTemp) {
       if (isTemp == false) {
@@ -409,13 +499,7 @@ export default {
       work.workName = this.work_name;
       work.questions = "[" + this.questions.toString() + "]";
       work.isTemp = isTemp ? 1 : 0;
-      const _axios = axios.create();
-      _axios.interceptors.request.use(function (config) {
-        config.headers = {
-          Authorization: token,
-        };
-        return config;
-      });
+
       let _this = this;
       this.overlay = true;
       this.overlay_msg = "发布中 ...";
@@ -454,6 +538,14 @@ export default {
       this.dialog_ifSaveAsWorkBank = val;
       this.close();
     },
+  },
+  mounted() {
+    _axios.interceptors.request.use(function (config) {
+      config.headers = {
+        Authorization: token,
+      };
+      return config;
+    });
   },
 };
 </script>
