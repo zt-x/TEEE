@@ -15,9 +15,12 @@ export default {
     data_name() {
       let arr = eval(this.data);
       let ret = [];
+      console.log(arr);
       arr.forEach((element, i) => {
         ret[i] = element.WorkName;
       });
+      console.log(ret);
+
       return ret;
     },
     data_value() {
@@ -30,9 +33,22 @@ export default {
     },
   },
   mounted() {
+    console.log(this.data);
+    this.initData();
     this.initChart();
   },
+  data() {
+    return {};
+  },
   methods: {
+    initData() {
+      //   let arr = eval(this.data);
+      //   let ret = [];
+      //   console.log(arr);
+      //   arr.forEach((element, i) => {
+      //     this.data_name[i] = element.WorkName;
+      //   });
+    },
     initChart() {
       let _this = this;
       myChart = echarts.init(document.getElementById("charts_work"));
@@ -49,6 +65,12 @@ export default {
         xAxis: {
           type: "category",
           data: _this.data_name,
+          axisLabel: {
+            showMaxLabel: true,
+            interval: 0,
+            rotate: 20,
+          },
+          //   data: ["1", "2", "3", "4"],
         },
         series: [
           {
