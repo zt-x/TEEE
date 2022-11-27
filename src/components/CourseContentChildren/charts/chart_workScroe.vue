@@ -15,11 +15,9 @@ export default {
     data_name() {
       let arr = eval(this.data);
       let ret = [];
-      console.log(arr);
       arr.forEach((element, i) => {
         ret[i] = element.WorkName;
       });
-      console.log(ret);
 
       return ret;
     },
@@ -33,7 +31,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.data);
     this.initData();
     this.initChart();
   },
@@ -44,7 +41,6 @@ export default {
     initData() {
       //   let arr = eval(this.data);
       //   let ret = [];
-      //   console.log(arr);
       //   arr.forEach((element, i) => {
       //     this.data_name[i] = element.WorkName;
       //   });

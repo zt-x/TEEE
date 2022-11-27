@@ -728,11 +728,9 @@ export default {
       let ret = false;
       list.forEach((item) => {
         if (item.length > 0) {
-          console.log("have value: " + item + "length=" + item.length);
           ret = true;
         }
       });
-      console.log("have value: " + ret);
       return ret;
     },
     submit(isTimeOver) {
