@@ -258,6 +258,10 @@
         </v-row>
       </v-container>
     </v-card-text>
+    <v-overlay v-if="!finishSubmit">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      <div class="mx-auto">提交中 ...</div>
+    </v-overlay>
   </v-card>
 </template>
 
@@ -275,24 +279,8 @@ export default {
     tab() {
       return this.p_que;
     },
-    wid() {
-      if (this.$route.params.wid == null) {
-        //测试环境
-        return 10;
-      } else {
-        return this.$route.params.wid;
-      }
-    },
     cid() {
       return this.$route.params.cid;
-    },
-    wname() {
-      if (this.$route.params.wname == null) {
-        //测试环境
-        return "测试环境题目";
-      } else {
-        return this.$route.params.wname;
-      }
     },
     restTimeText() {
       let value = this.restTime;
@@ -328,6 +316,8 @@ export default {
   },
   data() {
     return {
+      wid: -1,
+      wname: "",
       files: [],
       files_realpath: [],
       restTime: 0,
@@ -344,13 +334,82 @@ export default {
       //   testArray[]
       testIndex: 0,
       editorConfigs: [],
+      finishSubmit: true,
     };
   },
+  destroyed() {
+    window.removeEventListener("beforeunload", (e) => {
+      this.beforeunloadHandler(e);
+    });
+  },
+  created() {
+    this.stopF5Refresh();
+    if (this.$route.params.wid == null) {
+      let ret = sessionStorage.getItem("wid");
+      if (ret != undefined && ret != null && ret != "") {
+        sessionStorage.removeItem("wid");
+        this.wid = ret;
+      } else {
+        this.wid = -1;
+      }
+    } else {
+      this.wid = this.$route.params.wid;
+    }
+
+    if (this.$route.params.wname == null) {
+      //测试环境
+      let ret = sessionStorage.getItem("wname");
+      if (ret != undefined && ret != null && ret != "") {
+        sessionStorage.removeItem("wname");
+        this.wname = ret;
+      } else {
+        this.wname = -1;
+      }
+    } else {
+      this.wname = this.$route.params.wname;
+    }
+  },
   mounted() {
+    window.addEventListener("beforeunload", (e) => {
+      this.beforeunloadHandler(e);
+    });
     this.getWork();
     this.InitTimer();
   },
   methods: {
+    stopF5Refresh() {
+      document.onkeydown = function (e) {
+        var evt = window.event || e;
+        var code = evt.keyCode || evt.which;
+        //屏蔽F1---F12
+        if (code > 111 && code < 124) {
+          if (evt.preventDefault) {
+            evt.preventDefault();
+          } else {
+            evt.keyCode = 0;
+            evt.returnValue = false;
+          }
+        }
+      };
+      //禁止鼠标右键菜单
+      document.oncontextmenu = function () {
+        return false;
+      };
+      //阻止后退的所有动作，包括 键盘、鼠标手势等产生的后退动作。
+      history.pushState(null, null, window.location.href);
+      window.addEventListener("popstate", function () {
+        history.pushState(null, null, window.location.href);
+      });
+    },
+    beforeunloadHandler(e) {
+      sessionStorage.setItem("wid", this.wid);
+      sessionStorage.setItem("wname", this.wname);
+      e = e || window.event;
+      if (e) {
+        e.returnValue = "您是否确认离开此页面-您输入的数据可能不会被保存";
+      }
+      return "您是否确认离开此页面-您输入的数据可能不会被保存!";
+    },
     sout(val) {
       console.log(val);
     },
@@ -697,6 +756,7 @@ export default {
       _axios
         .post("/api/submit/submitWork", form)
         .then((res) => {
+          _this.finishSubmit = true;
           _this.$dialog({
             content: res.data.msg,
             btns: [
