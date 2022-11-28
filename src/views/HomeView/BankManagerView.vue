@@ -149,9 +149,9 @@ export default {
             _this.items = eval(res.data.data);
             _this.bid = _this.items[0].id;
             _this.numOfQue = _this.items[0];
-            _this.showBankWork(_this.bid);
             _this.loadBankWork = false;
             _this.prepareing_overlay = false;
+            _this.showBankWork(_this.bid);
           } else {
             _this.loadBankWork = false;
             _this.prepareing_overlay = false;

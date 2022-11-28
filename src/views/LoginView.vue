@@ -226,6 +226,7 @@ form .password i {
   cursor: pointer;
 }
 form input.submit {
+  padding-left: 0;
   font-weight: 700;
   color: white;
   background-color: #a36645;
