@@ -40,11 +40,12 @@
           <v-divider></v-divider>
           <v-card-text>
             <v-list>
-              <v-list-item-group v-model="item" color="primary">
+              <v-list-item-group color="orange accent-4" v-model="item">
                 <v-list-item
                   @click="showBankWork(item.id)"
                   v-for="item in items"
                   :key="item.id"
+                  v-ripple="{ class: 'warning--text' }"
                 >
                   <v-list-item-content>
                     <v-list-item-title>
