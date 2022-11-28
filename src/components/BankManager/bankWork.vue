@@ -38,7 +38,9 @@
     </v-card-text>
     <v-card-actions v-if="finishGetData">
       <v-btn color="orange" text> 查看作业库内容 </v-btn>
-      <v-btn color="orange" text> 编辑作业库信息 </v-btn>
+      <v-btn color="orange" text v-if="Number(content.isMine) == 1">
+        编辑作业库信息
+      </v-btn>
       <v-btn color="orange" text> 生成分享码 </v-btn>
     </v-card-actions>
     <v-skeleton-loader
@@ -101,10 +103,15 @@ export default {
       _axios
         .post("/api/Bank/getWorkBankContentByID", form)
         .then((res) => {
+          if (Number(res.data.code) != 1) {
+            console.log(res.data.msg);
+            _this.tags = eval(res.data.data.tags);
+            _this.numOfQue = eval(res.data.data.numOfQue);
+            _this.finishGetData = true;
+          } else {
+            console.log(res.data.msg);
+          }
           _this.content = res.data.data;
-          _this.tags = eval(res.data.data.tags);
-          _this.numOfQue = eval(res.data.data.numOfQue);
-          _this.finishGetData = true;
         })
         .catch((err) => {
           this.snackbar_msg = err;

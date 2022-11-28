@@ -106,10 +106,11 @@ export default {
       _axios
         .post("/api/Bank/getWorkBankByTid")
         .then((res) => {
-          _this.values = eval(res.data.data);
-
-          for (let i = 0; i < _this.values.length; i++) {
-            _this.values[i].tags = this.parseTags(_this.values[i].tags);
+          if (Number(res.data.code) != 1) {
+            _this.values = eval(res.data.data);
+            for (let i = 0; i < _this.values.length; i++) {
+              _this.values[i].tags = this.parseTags(_this.values[i].tags);
+            }
           }
           _this.finishGetData = true;
         })

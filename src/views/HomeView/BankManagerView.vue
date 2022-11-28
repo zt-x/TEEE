@@ -19,10 +19,28 @@
     <v-row justify="center">
       <v-col cols="12">
         <v-card rounded="true" style="padding: 10px">
-          <v-chip label color="#b97a57">
-            <v-icon color="white" x-small left>fa fa-plus</v-icon>
-            <span style="color: white">添加新库</span>
-          </v-chip>
+          <v-menu
+            close-on-click
+            close-on-content-click
+            offset-y
+            transition="slide-x-transition"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-chip label color="#b97a57" v-bind="attrs" v-on="on">
+                <v-icon color="white" x-small left>fa fa-plus</v-icon>
+                <span style="color: white">添加新库</span>
+              </v-chip>
+            </template>
+            <v-list>
+              <v-list-item @click="addWorkBank()">
+                <v-list-item-title> ➕ 添加作业库</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="addQueBank()">
+                <v-list-item-title> ➕ 添加题库</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
           <v-chip label class="ml-3" color="#b97a57">
             <v-icon color="white" x-small left>fa fa-search</v-icon>
             <span style="color: white">筛选</span>
@@ -99,7 +117,7 @@ export default {
   },
   data() {
     return {
-      prepareing_overlay: false,
+      prepareing_overlay: true,
       bankType: ["作业库", "题库"],
       snackbar: false,
       snackbar_color: "warning",
@@ -112,11 +130,14 @@ export default {
     };
   },
   methods: {
+    addWorkBank() {},
+    addQueBank() {},
     showBankWork(id) {
       this.loadBankWork = false;
       this.bid = id;
       this.$nextTick(() => {
         this.loadBankWork = true;
+        _this.prepareing_overlay = false;
       });
     },
     getQueBank() {},
@@ -124,10 +145,17 @@ export default {
       _axios
         .post("/api/Bank/getWorkBankByTid")
         .then((res) => {
-          _this.items = eval(res.data.data);
-          _this.bid = _this.items[0].id;
-          _this.numOfQue = _this.items[0];
-          _this.loadBankWork = true;
+          if (Number(res.data.code) != 1) {
+            _this.items = eval(res.data.data);
+            _this.bid = _this.items[0].id;
+            _this.numOfQue = _this.items[0];
+            _this.showBankWork(_this.bid);
+            _this.loadBankWork = false;
+            _this.prepareing_overlay = false;
+          } else {
+            _this.loadBankWork = false;
+            _this.prepareing_overlay = false;
+          }
         })
         .catch((err) => {
           console.log(err);
