@@ -14,7 +14,7 @@
       <v-img src="logo.png" />
     </v-avatar>
     <v-spacer></v-spacer>
-    <v-list flat style="margin-top: 150px; margin-bottom: 200px">
+    <v-list flat style="margin-top: 150px; margin-bottom: 200px" v-if="flushFlag">
       <v-list-item-group v-model="selectedItem" color="primary">
         <v-list-item
           input-value="true"
@@ -59,6 +59,7 @@
 <script>
 export default {
   data: () => ({
+    flushFlag: true,
     aboutView: false,
     mini_variant: true,
     selectedItem: 2,
@@ -80,13 +81,22 @@ export default {
       this.mini_variant = !this.mini_variant;
     },
     changePage(url) {
-      this.$router.push(url).catch((err) => {
-        if (
-          err.message.indexOf("Avoided redundant navigation to current location") == -1
-        ) {
-          this.$router.push("/404");
-        }
-      });
+      let _this = this;
+      this.$router
+        .push(url)
+        .then(() => {
+          _this.flushFlag = false;
+          _this.$nextTick(() => {
+            _this.flushFlag = true;
+          });
+        })
+        .catch((err) => {
+          if (
+            err.message.indexOf("Avoided redundant navigation to current location") == -1
+          ) {
+            this.$router.push("/404");
+          }
+        });
     },
   },
 
