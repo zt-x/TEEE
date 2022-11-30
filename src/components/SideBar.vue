@@ -4,50 +4,40 @@
     app
     color="#a36645"
     :mini-variant="mini_variant"
-    mini-variant-width="60"
+    mini-variant-width="80"
     permanent
   >
     <div v-if="!mini_variant" class="d-block text-center mx-auto mt-5 mb-16">
       <v-img src="LOG2.jpg" />
     </div>
-    <v-avatar v-else class="d-block text-center mx-auto mt-5 mb-16" size="30">
+    <v-avatar v-else class="d-block text-center mx-auto mt-5 mb-16" size="40">
       <v-img src="logo.png" />
     </v-avatar>
-
-    <div
-      style="
-        position: absolute;
-        margin-left: auto;
-        margin-right: auto;
-        left: 0;
-        right: 0;
-        text-align: center;
-      "
-    >
-      <v-list flat class="mt-16">
-        <v-list-item-group v-model="selectedItem" color="primary">
-          <v-list-item
-            v-for="(item, i) in items"
-            v-bind:key="i"
-            active-class="border"
-            v-ripple="{ class: `brown--text` }"
-            @click="changePage(item.path)"
-          >
-            <v-tooltip right>
-              <template v-slot:activator="{ on, attrs }">
-                <v-list-item-icon v-bind="attrs" v-on="on">
-                  <v-icon color="white">{{ item.icon }}</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content class="white--text">{{
-                  item.name
-                }}</v-list-item-content>
-              </template>
-              <span>{{ item.name }}</span>
-            </v-tooltip>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </div>
+    <v-spacer></v-spacer>
+    <v-list flat style="margin-top: 150px; margin-bottom: 200px">
+      <v-list-item-group v-model="selectedItem" color="primary">
+        <v-list-item
+          input-value="true"
+          v-for="(item, i) in items"
+          v-bind:key="i"
+          active-class="border"
+          :ripple="false"
+          @click="changePage(item.path)"
+        >
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-list-item-icon v-bind="attrs" v-on="on">
+                <v-icon color="white">{{ item.icon }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content class="white--text">{{
+                item.name
+              }}</v-list-item-content>
+            </template>
+            <span>{{ item.name }}</span>
+          </v-tooltip>
+        </v-list-item>
+      </v-list-item-group>
+    </v-list>
     <div
       style="
         position: absolute;
@@ -112,14 +102,21 @@ export default {
 
 <style scoped>
 .border {
-  background-color: #875438;
+  background-color: #b97a57;
+  margin-left: 12px;
+  margin-right: 12px;
+  border-radius: 50%;
+  text-decoration: none;
 }
-.v-list-item {
+.v-list-item-group .v-list-item--active {
+  color: white !important;
+}
+/* .v-list-item {
   margin: 12px;
   text-decoration: none;
 }
 .v-list-item:hover {
   background: #b97a57;
   transition: background 0.7s;
-}
+} */
 </style>
