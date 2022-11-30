@@ -29,9 +29,9 @@
               <v-list-item-icon v-bind="attrs" v-on="on">
                 <v-icon color="white">{{ item.icon }}</v-icon>
               </v-list-item-icon>
-              <!-- <v-list-item-content class="white--text">{{
+              <v-list-item-content class="white--text">{{
                 item.name
-              }}</v-list-item-content> -->
+              }}</v-list-item-content>
             </template>
             <span>{{ item.name }}</span>
           </v-tooltip>
