@@ -97,7 +97,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .course_img {
   display: flex;
   justify-content: center;

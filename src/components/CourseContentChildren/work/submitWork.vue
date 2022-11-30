@@ -69,7 +69,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .hideMore {
   overflow: hidden;
   white-space: nowrap;

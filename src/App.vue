@@ -15,7 +15,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .v-main__wrap{
 	overflow: auto;
 }

@@ -348,7 +348,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+
 .v-btn.withoutupercase {
   text-transform: none !important;
 }
