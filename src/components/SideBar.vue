@@ -123,6 +123,9 @@ export default {
 .v-list-item-group .v-list-item--active {
   color: white !important;
 }
+.v-list-item__icon {
+  padding-left: inherit;
+}
 /* .v-list-item {
   margin: 12px;
   text-decoration: none;
