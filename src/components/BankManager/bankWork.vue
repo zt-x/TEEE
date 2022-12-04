@@ -41,7 +41,6 @@
       <v-btn color="orange" text v-if="Number(content.isMine) == 1">
         编辑作业库信息
       </v-btn>
-      <v-btn color="orange" text> 编辑作业库信息2 </v-btn>
       <v-btn color="orange" text> 生成分享码 </v-btn>
     </v-card-actions>
     <v-skeleton-loader
