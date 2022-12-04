@@ -24,7 +24,7 @@
             <v-select :items="items" v-model="role" label="身份"></v-select>
           </v-col>
           <v-col cols="6">
-            <v-text-field label="密码2" v-model="pwd"></v-text-field>
+            <v-text-field label="密码" v-model="pwd"></v-text-field>
           </v-col>
           <v-col cols="6"></v-col>
           <v-col cols="6"></v-col>

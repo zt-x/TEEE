@@ -21,6 +21,8 @@
           v-for="(item, i) in items"
           v-bind:key="i"
           active-class="border"
+          exact-active-class="border"
+          link="border"
           :ripple="false"
           @click="changePage(item.path)"
         >
