@@ -69,6 +69,18 @@
               style="max-height: 300px; overflow: auto"
               v-html="parseContent(submitContent[i])"
             ></div>
+            <div v-if="stuFiles[i] != 'noFile'">
+              附件(点击下载)
+              <br />
+              <v-chip
+                @click="downloadFile(fp)"
+                v-for="(fp, i) in parseArr(stuFiles[i])"
+                :key="i"
+              >
+                {{ getFileName(fp) }}
+              </v-chip>
+            </div>
+            <div v-else>无附件</div>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -84,13 +96,7 @@
         <span>{{ overlay_msg }}</span>
       </v-chip>
     </v-overlay>
-	<v-snackbar
-      v-model="snackbar"
-      top
-      :color="snackbar_color"
-      dense
-      timeout="2000"
-    >
+    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
       {{ snackbar_msg }}
     </v-snackbar>
   </v-card>
@@ -108,15 +114,15 @@ export default {
     return {
       submitContent: [],
       readover: [],
-		readover_new: [],
-	  stuFiles:[],
+      readover_new: [],
+      stuFiles: [],
       showChangeScore: false,
       ind_i: 0,
       ind_max: 0,
       overlay: false,
       overlay_msg: "",
-		finishGetAns: false,
-	  		snackbar: false,
+      finishGetAns: false,
+      snackbar: false,
       snackbar_color: "brown",
       snackbar_msg: "",
     };
@@ -124,8 +130,8 @@ export default {
   mounted() {
     this.getSubmitContent();
   },
-	methods: {
-		myEval(data) {
+  methods: {
+    myEval(data) {
       return eval(data);
     },
     parseArr(arrString) {
@@ -229,9 +235,9 @@ export default {
               .replaceAll("\\n", "&[[换行n]]")
               .replaceAll("\\t", "&[[table]]")
           );
-			_this.readover = eval(data.readover);
-			_this.stuFiles = eval(data.files);
-		  
+          _this.readover = eval(data.readover);
+          _this.stuFiles = eval(data.files);
+
           _this.readover.forEach((val, i) => {
             _this.readover_new[i] = val;
           });

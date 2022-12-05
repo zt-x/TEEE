@@ -565,15 +565,11 @@ export default {
       ret.filebrowserUploadUrl = "/api/upload/img";
       ret.filebrowserImageUploadUrl = "/api/upload/img";
       ret.removeButtons =
-        "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source";
-
+        "Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Scayt,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,RemoveFormat,Outdent,Indent,Blockquote,CreateDiv,BidiLtr,BidiRtl,Language,Link,Unlink,Anchor,Table,PageBreak,Iframe,ShowBlocks,About,Source";
       ret.toolbarGroups = [
         { name: "document", groups: ["mode", "document", "doctools"] },
         { name: "clipboard", groups: ["clipboard", "undo"] },
-        {
-          name: "editing",
-          groups: ["find", "selection", "spellchecker", "editing"],
-        },
+        { name: "editing", groups: ["find", "selection", "spellchecker", "editing"] },
         { name: "forms", groups: ["forms"] },
         { name: "basicstyles", groups: ["basicstyles", "cleanup"] },
         "/",

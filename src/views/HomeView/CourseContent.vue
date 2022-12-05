@@ -3,6 +3,16 @@
     <v-dialog persistent v-model="releaseWorkDialog" width="800px">
       <release-work :cid="cid" @close="close($event)" />
     </v-dialog>
+    <v-dialog
+      transition="dialog-bottom-transition"
+      content-class="trans"
+      persistent
+      v-model="releaseAnnDialog"
+      width="800px"
+    >
+      <Announcement_release @close="close($event)" />
+    </v-dialog>
+
     <v-row>
       <!-- Course WorkPlace -->
       <v-col cols="12" sm="8">
@@ -14,7 +24,7 @@
                 <span style="color: white">发布新作业 / 考试</span>
               </v-chip>
 
-              <v-chip label color="#b97a57" class="ml-5">
+              <v-chip label @click="releaseAnnDialog = true" color="#b97a57" class="ml-5">
                 <v-icon color="white" x-small left>mdi-clipboard-outline</v-icon>
                 <span style="color: white">发布公告</span>
               </v-chip>
@@ -308,6 +318,7 @@ import Chart_sex from "@/components/CourseContentChildren/charts/chart_sex.vue";
 import Chart_workScroe from "@/components/CourseContentChildren/charts/chart_workScroe.vue";
 import WorksViewTeacher from "@/components/CourseContentChildren/worksViewTeacher.vue";
 import ExamsViewTeacher from "@/components/CourseContentChildren/examsViewTeacher.vue";
+import Announcement_release from "@/components/CourseContentChildren/announcement_release.vue";
 
 let token = window.localStorage.getItem("token");
 const _axios = axios.create();
@@ -322,6 +333,7 @@ export default {
     Chart_workScroe,
     WorksViewTeacher,
     ExamsViewTeacher,
+    Announcement_release,
   },
   data() {
     return {
@@ -336,6 +348,7 @@ export default {
       announcement: [],
       isTeacher: false,
       releaseWorkDialog: false,
+      releaseAnnDialog: false,
       loading: false,
       loadingText: "",
       searchIcon: "fa fa-user",
@@ -364,6 +377,7 @@ export default {
     },
     async close() {
       this.releaseWorkDialog = false;
+      this.releaseAnnDialog = false;
       this.flushContent();
       this.getCourseInfo();
       this.getCourseStatsitics();
@@ -465,10 +479,18 @@ export default {
           _this.exams.sort((a, b) => {
             return b.id - a.id;
           });
-          _this.loading_announcementview = true;
+          _axios
+            .post("/api/Announcement/getAllByCid", form)
+            .then((res) => {
+              _this.loading_announcementview = true;
+              _this.$vuetify.goTo(0);
+            })
+            .catch((err) => {
+              _this.loading_announcementview = false;
+              _this.$vuetify.goTo(0);
+            });
           _this.loading_workview = true;
           _this.loading_examview = true;
-          _this.$vuetify.goTo(0);
           _this.loading = false;
           _this.loading_summary = false;
         })
@@ -508,7 +530,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .hideMore {
   overflow: hidden;
   white-space: nowrap;

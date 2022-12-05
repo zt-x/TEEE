@@ -61,10 +61,10 @@
       <span class="font-weight-black" style="color: #757575">发布作业</span>
       <v-spacer></v-spacer>
       <v-chip small color="grey" @click="close('minus')">
-        <v-icon x-small center color="white">fa fa-minus</v-icon>
+        <!-- <v-icon x-small center color="white">fa fa-minus</v-icon> -->
       </v-chip>
       <v-chip class="ml-2" small color="red" @click="close('close')">
-        <v-icon x-small center color="white">fa fa-times</v-icon>
+        <!-- <v-icon x-small center color="white">fa fa-times</v-icon> -->
       </v-chip>
     </v-card-title>
     <v-card-text>
