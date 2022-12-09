@@ -67,212 +67,234 @@
         <!-- <v-icon x-small center color="white">fa fa-times</v-icon> -->
       </v-chip>
     </v-card-title>
-    <v-card-text>
-      <v-form>
-        <v-row>
-          <v-col cols="3">
-            <v-text-field
-              required
-              clearable
-              color="#875438"
-              label="作业标题"
-              :rules="[rules.required]"
-              v-model="workTitle"
-            ></v-text-field>
-          </v-col>
-          <v-col :cols="releaseWork_isExam ? 2 : 3">
-            <v-text-field
-              required
-              clearable
-              color="#875438"
-              label="分数"
-              v-model="totalScore"
-              :rules="[rules.required, rules.mustNum]"
-            ></v-text-field>
-          </v-col>
-          <v-col :cols="releaseWork_isExam ? 2 : 0" v-if="releaseWork_isExam">
-            <v-text-field
-              required
-              clearable
-              color="#875438"
-              label="作答限时"
-              hint="单位为分钟"
-              v-model="timeLimit"
-              :rules="[rules.required, rules.mustNum]"
-            ></v-text-field>
-          </v-col>
-          <v-col :cols="releaseWork_isExam ? 2 : 3">
-            <v-menu
-              style="font-size: small"
-              v-model="TimeMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              min-width="290px"
-              offset-y
-            >
-              <template v-slot:activator="{ on, attrs }">
+    <v-tabs height="0px" v-model="tab" background-color="primary" dark></v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item>
+        <v-card-text>
+          <v-form>
+            <v-row>
+              <v-col cols="3">
                 <v-text-field
+                  required
                   clearable
                   color="#875438"
-                  v-model="deadline"
-                  readonly
-                  label="作业截止时间"
-                  v-bind="attrs"
-                  v-on="on"
+                  label="作业标题"
+                  :rules="[rules.required]"
+                  v-model="workTitle"
                 ></v-text-field>
-              </template>
-              <v-date-picker
-                color="brown lighten-1"
-                locale="zh-cn"
-                :first-day-of-week="0"
-                v-model="deadline"
-                scrollable
-              >
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="TimeMenu = false">OK</v-btn>
-              </v-date-picker>
-            </v-menu>
-          </v-col>
-          <v-col cols="3">
-            <v-checkbox
-              v-model="releaseWork_isExam"
-              color="#875438"
-              label="设为考试"
-            ></v-checkbox>
-          </v-col>
+              </v-col>
+              <v-col :cols="releaseWork_isExam ? 2 : 3">
+                <v-text-field
+                  required
+                  clearable
+                  color="#875438"
+                  label="分数"
+                  v-model="totalScore"
+                  :rules="[rules.required, rules.mustNum]"
+                ></v-text-field>
+              </v-col>
+              <v-col :cols="releaseWork_isExam ? 2 : 0" v-if="releaseWork_isExam">
+                <v-text-field
+                  required
+                  clearable
+                  color="#875438"
+                  label="作答限时"
+                  hint="单位为分钟"
+                  v-model="timeLimit"
+                  :rules="[rules.required, rules.mustNum]"
+                ></v-text-field>
+              </v-col>
+              <v-col :cols="releaseWork_isExam ? 2 : 3">
+                <v-menu
+                  style="font-size: small"
+                  v-model="TimeMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  min-width="290px"
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      clearable
+                      color="#875438"
+                      v-model="deadline"
+                      readonly
+                      label="作业截止时间"
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    color="brown lighten-1"
+                    locale="zh-cn"
+                    :first-day-of-week="0"
+                    v-model="deadline"
+                    scrollable
+                  >
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="TimeMenu = false">OK</v-btn>
+                  </v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="3">
+                <v-checkbox
+                  v-model="releaseWork_isExam"
+                  color="#875438"
+                  label="设为考试"
+                ></v-checkbox>
+              </v-col>
 
-          <v-col cols="12">
-            作业内容:
-            <v-radio-group mandatory dense row v-model="workContentRadio">
-              <v-radio label="创建新作业" color="#875438" value="createNewWork"></v-radio>
-              <v-radio
-                label="从作业库中选取"
-                color="#875438"
-                value="searchFromBank"
-              ></v-radio>
-            </v-radio-group>
-          </v-col>
-          <v-col cols="12">
-            <!-- 添加题目 -->
-            <v-menu
-              close-on-click
-              close-on-content-click
-              offset-y
-              transition="slide-x-transition"
-              v-if="workContentRadio == 'createNewWork'"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-chip class="white--text" color="green" v-bind="attrs" v-on="on">
-                  <v-icon small left>fa fa-plus</v-icon>
-                  添加题目
+              <v-col cols="12">
+                作业内容:
+                <v-radio-group mandatory dense row v-model="workContentRadio">
+                  <v-radio
+                    label="创建新作业"
+                    color="#875438"
+                    value="createNewWork"
+                  ></v-radio>
+                  <v-radio
+                    label="从作业库中选取"
+                    color="#875438"
+                    value="searchFromBank"
+                  ></v-radio>
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12">
+                <!-- 添加题目 -->
+                <v-menu
+                  close-on-click
+                  close-on-content-click
+                  offset-y
+                  transition="slide-x-transition"
+                  v-if="workContentRadio == 'createNewWork'"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-chip class="white--text" color="green" v-bind="attrs" v-on="on">
+                      <v-icon small left>fa fa-plus</v-icon>
+                      添加题目
+                    </v-chip>
+                  </template>
+                  <v-list>
+                    <v-list-item @click="addChoicQue()">
+                      <v-list-item-title> > 添加选择题</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="addFillInQue()">
+                      <v-list-item-title> > 添加填空题</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="addTextQue()">
+                      <v-list-item-title> > 添加简答题</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="addQueFromQBank()">
+                      <v-list-item-title> > 从题库中选取</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+                <!-- 选择作业库 -->
+                <v-chip
+                  class="white--text"
+                  color="green"
+                  v-if="workContentRadio == 'searchFromBank'"
+                  @click="openWorkBank()"
+                >
+                  <v-icon small left>fa fa-folder-open</v-icon>
+                  打开作业库
                 </v-chip>
-              </template>
-              <v-list>
-                <v-list-item @click="addChoicQue()">
-                  <v-list-item-title> > 添加选择题</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="addFillInQue()">
-                  <v-list-item-title> > 添加填空题</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="addTextQue()">
-                  <v-list-item-title> > 添加简答题</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="addQueFromQBank()">
-                  <v-list-item-title> > 从题库中选取</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-            <!-- 选择作业库 -->
-            <v-chip
-              class="white--text"
-              color="green"
-              v-if="workContentRadio == 'searchFromBank'"
-              @click="openWorkBank()"
-            >
-              <v-icon small left>fa fa-folder-open</v-icon>
-              打开作业库
-            </v-chip>
-            <v-chip class="ml-5"> 总分 {{ totalScore }}分 </v-chip>
-            <v-chip v-if="choiceQue != 0" class="ml-3">
-              选择题 {{ choiceQue }} 题
-            </v-chip>
-            <v-chip v-if="FillInQue != 0" class="ml-3">
-              填空题 {{ FillInQue }} 题
-            </v-chip>
-            <v-chip v-if="TextQue != 0" class="ml-3"> 简答题 {{ TextQue }} 题 </v-chip>
-          </v-col>
-          <v-col cols="12">
-            <!-- 添加新题目 -->
-            <v-card
-              v-if="workContentRadio == 'createNewWork'"
-              class="px-5 py-5"
-              style="background: #eeeeee"
-            >
-              <!-- TODO: 点击后进行二次编辑 -->
-              <v-chip
-                label
-                dark
-                color="success"
-                class="mx-2 my-1"
-                close
-                v-for="(ques, i) in questions"
-                :key="ques.id"
-                @click:close="questions.splice(i, 1)"
-              >
-                {{ i + 1 }}、 【
-                {{
-                  JSON.parse(ques).qtype == "30010"
-                    ? "选择题"
-                    : JSON.parse(ques).qtype == "30011"
-                    ? "填空题"
-                    : "简答题"
-                }}
-                】|
-                {{ JSON.parse(ques).qtext.slice(0, 20) }}
-              </v-chip>
-            </v-card>
+                <v-chip class="ml-5"> 总分 {{ totalScore }}分 </v-chip>
+                <v-chip v-if="choiceQue != 0" class="ml-3">
+                  选择题 {{ choiceQue }} 题
+                </v-chip>
+                <v-chip v-if="FillInQue != 0" class="ml-3">
+                  填空题 {{ FillInQue }} 题
+                </v-chip>
+                <v-chip v-if="TextQue != 0" class="ml-3">
+                  简答题 {{ TextQue }} 题
+                </v-chip>
+              </v-col>
+              <v-col cols="12">
+                <!-- 添加新题目 -->
+                <v-card
+                  v-if="workContentRadio == 'createNewWork'"
+                  class="px-5 py-5"
+                  style="background: #eeeeee"
+                >
+                  <!-- TODO: 点击后进行二次编辑 -->
+                  <v-chip
+                    label
+                    dark
+                    color="success"
+                    class="mx-2 my-1"
+                    close
+                    v-for="(ques, i) in questions"
+                    :key="ques.id"
+                    @click:close="questions.splice(i, 1)"
+                  >
+                    {{ i + 1 }}、 【
+                    {{
+                      JSON.parse(ques).qtype == "30010"
+                        ? "选择题"
+                        : JSON.parse(ques).qtype == "30011"
+                        ? "填空题"
+                        : "简答题"
+                    }}
+                    】|
+                    {{ JSON.parse(ques).qtext.slice(0, 20) }}
+                  </v-chip>
+                </v-card>
 
-            <!-- 从Bank中获取的 -->
-            <v-card
-              class="px-5 py-5"
-              style="background: #eeeeee"
-              v-if="workContentRadio == 'searchFromBank'"
-            >
-              <!-- TODO: 点击后进行二次编辑 -->
-              <v-chip
-                label
-                dark
-                color="success"
-                class="mx-2 my-1"
-                close
-                v-for="(bk, i) in wb"
-                :key="bk.id"
-                @click:close="wb.splice(i, 1)"
-                >{{ bk.bn }}</v-chip
-              >
-            </v-card>
-            <v-row class="ml-0">
-              <v-checkbox
-                row
-                v-model="autoReadoverChoice"
-                color="#875438"
-                label="自动批改选择题"
-              ></v-checkbox>
-              <v-checkbox
-                class="ml-5"
-                v-model="autoReadoverFillIn"
-                color="#875438"
-                label="自动批改填空题"
-              ></v-checkbox>
+                <!-- 从Bank中获取的 -->
+                <v-card
+                  class="px-5 py-5"
+                  style="background: #eeeeee"
+                  v-if="workContentRadio == 'searchFromBank'"
+                >
+                  <!-- TODO: 点击后进行二次编辑 -->
+                  <v-chip
+                    label
+                    dark
+                    color="success"
+                    class="mx-2 my-1"
+                    close
+                    v-for="(bk, i) in wb"
+                    :key="bk.id"
+                    @click:close="wb.splice(i, 1)"
+                    >{{ bk.bn }}</v-chip
+                  >
+                </v-card>
+                <v-row class="ml-0">
+                  <v-checkbox
+                    row
+                    v-model="autoReadoverChoice"
+                    color="#875438"
+                    label="自动批改选择题"
+                  ></v-checkbox>
+                  <v-checkbox
+                    class="ml-5"
+                    v-model="autoReadoverFillIn"
+                    color="#875438"
+                    label="自动批改填空题"
+                  ></v-checkbox>
+                </v-row>
+              </v-col>
             </v-row>
-          </v-col>
-        </v-row>
-      </v-form>
-    </v-card-text>
+          </v-form>
+        </v-card-text>
+      </v-tab-item>
+      <v-tab-item> 123456 </v-tab-item>
+    </v-tabs-items>
+
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="green darken-1" text @click="close()">算了</v-btn>
       <v-btn
+        v-if="tab == 0"
+        color="green darken-1"
+        min-width="60px"
+        class="white--text"
+        @click="tab = 1"
+        >继续-></v-btn
+      >
+      <v-btn
+        v-if="tab == 1"
         color="green darken-1"
         min-width="60px"
         class="white--text"
@@ -322,6 +344,7 @@ export default {
   },
   data() {
     return {
+      tab: 0,
       overlay: false,
       overlay_msg: "",
       releaseWork_isExam: false,

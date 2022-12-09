@@ -344,6 +344,12 @@ export default {
   },
   created() {
     this.stopF5Refresh();
+    console.clear();
+    console.log("😡%c请诸位同学遵守考试秩序");
+    console.log("😡%c请诸位同学遵守考试秩序");
+    console.log("😡%c不要抖机灵");
+    console.log("😡%c不要耍个性");
+    console.log("😡%c不要以为找不到你");
     if (this.$route.params.wid == null) {
       let ret = sessionStorage.getItem("wid");
       if (ret != undefined && ret != null && ret != "") {
@@ -373,8 +379,11 @@ export default {
     window.addEventListener("beforeunload", (e) => {
       this.beforeunloadHandler(e);
     });
-    this.getWork();
-    this.InitTimer();
+    this.getWork()
+      .then(() => {
+        this.InitTimer();
+      })
+      .catch((err) => {});
   },
   methods: {
     stopF5Refresh() {
@@ -550,8 +559,10 @@ export default {
           }
         })
         .catch((err) => {
-          console.log("Err /api/Work/getWork" + err);
+          console.error("Err /api/Work/getWork" + err);
           alert("Err /api/Work/getWork" + err);
+          _this.goBack();
+          throw "ERR";
         });
     },
     editTempFactory(i) {
