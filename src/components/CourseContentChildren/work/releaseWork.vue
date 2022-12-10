@@ -58,7 +58,11 @@
     </v-dialog>
     <v-card-title class="headline">
       <v-icon left>fa fa-paper-plane</v-icon>
-      <span class="font-weight-black" style="color: #757575">发布作业</span>
+      <span class="font-weight-black" style="color: #757575">
+        发布作业 |
+        <span class="font-weight-thin" v-if="tab == 0"> 作业信息</span>
+        <span class="font-weight-thin" v-if="tab == 1"> 考试规则设置</span>
+      </span>
       <v-spacer></v-spacer>
       <v-chip small color="grey" @click="close('minus')">
         <!-- <v-icon x-small center color="white">fa fa-minus</v-icon> -->
@@ -279,7 +283,33 @@
           </v-form>
         </v-card-text>
       </v-tab-item>
-      <v-tab-item> 123456 </v-tab-item>
+      <v-tab-item>
+        <v-card-text>
+          <v-card>
+            <v-card-title>进入考试前的验证</v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="12">
+                    <v-checkbox
+                      row
+                      v-model="rule_pre_FACECHECK"
+                      color="#875438"
+                      label="人脸验证"
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-textarea v-model="rule_pre_TEXT"></v-textarea>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+          </v-card>
+          <v-card>
+            <v-card-title></v-card-title>
+          </v-card>
+        </v-card-text>
+      </v-tab-item>
     </v-tabs-items>
 
     <v-card-actions>
@@ -291,7 +321,10 @@
         color="green darken-1"
         min-width="60px"
         class="white--text"
-        @click="tab = 1"
+        @click="
+          tab = 1;
+          rule_pre_TEXT = '';
+        "
         >下一步</v-btn
       >
       <v-btn
@@ -365,6 +398,8 @@ export default {
       totalScore: 100,
       Rate: 0.32,
       deadline: "",
+      rule_pre_FACECHECK: false,
+      rule_pre_TEXT: "",
       autoReadoverChoice: true,
       autoReadoverFillIn: true,
       dialog_addChoicQue: false,
