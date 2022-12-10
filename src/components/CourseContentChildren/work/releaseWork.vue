@@ -286,15 +286,25 @@
       <v-spacer></v-spacer>
       <v-btn color="green darken-1" text @click="close()">算了</v-btn>
       <v-btn
-        v-if="tab == 0"
+        v-if="tab == 0 && releaseWork_isExam == true"
+        text
         color="green darken-1"
         min-width="60px"
         class="white--text"
         @click="tab = 1"
-        >继续-></v-btn
+        >下一步</v-btn
       >
       <v-btn
         v-if="tab == 1"
+        text
+        color="green darken-1"
+        min-width="60px"
+        class="white--text"
+        @click="tab = 0"
+        >返回上一步</v-btn
+      >
+      <v-btn
+        v-if="tab == 1 || releaseWork_isExam == false"
         color="green darken-1"
         min-width="60px"
         class="white--text"
