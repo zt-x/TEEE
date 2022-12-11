@@ -8,6 +8,7 @@
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 10px;
+            background: red;
           "
         >
           摄像头
@@ -52,7 +53,7 @@ export default {
     tackPhoto: {
       //父组件传过来的状态
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   data() {

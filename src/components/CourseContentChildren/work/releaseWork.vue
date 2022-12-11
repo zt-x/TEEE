@@ -73,6 +73,7 @@
     </v-card-title>
     <v-tabs height="0px" v-model="tab" background-color="primary" dark></v-tabs>
     <v-tabs-items v-model="tab">
+      <!-- 基础设置 -->
       <v-tab-item>
         <v-card-text>
           <v-form>
@@ -283,6 +284,7 @@
           </v-form>
         </v-card-text>
       </v-tab-item>
+      <!-- 考试设置 -->
       <v-tab-item>
         <v-card-text>
           <v-card>
@@ -299,14 +301,39 @@
                     ></v-checkbox>
                   </v-col>
                   <v-col cols="12">
-                    <v-textarea v-model="rule_pre_TEXT"></v-textarea>
+                    <v-textarea v-model="rule_pre_TEXT" label="考前提醒信息"></v-textarea>
                   </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
           </v-card>
-          <v-card>
-            <v-card-title></v-card-title>
+          <v-card class="mt-2">
+            <v-card-title>监考设置</v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="4">
+                    <v-checkbox
+                      row
+                      v-model="rule_enter_TRACKIP"
+                      color="#875438"
+                      label="记录考试IP"
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-checkbox
+                      row
+                      v-model="rule_enter_TAKEPHOTO"
+                      color="#875438"
+                      label="考试中随机拍照"
+                    >
+                    </v-checkbox>
+                  </v-col>
+                  <v-col cols="4"></v-col>
+                  <v-col cols="4"></v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
           </v-card>
         </v-card-text>
       </v-tab-item>
@@ -393,13 +420,16 @@ export default {
       releaseWork_isExam: false,
       workTitle: "",
       workContentRadio: "",
+      timeLimit: "",
       createNewWork: "",
       searchFromBank: "",
       totalScore: 100,
       Rate: 0.32,
       deadline: "",
       rule_pre_FACECHECK: false,
-      rule_pre_TEXT: "",
+      rule_pre_TEXT: "请同学们认真作答!",
+      rule_enter_TRACKIP: false,
+      rule_enter_TAKEPHOTO: false,
       autoReadoverChoice: true,
       autoReadoverFillIn: true,
       dialog_addChoicQue: false,
@@ -414,7 +444,6 @@ export default {
       files: [],
       work_name: "",
       isTemp: false,
-      timeLimit: "",
       rules: {
         required: (value) => !!value || "不能为空！",
         mustNum: (val) => !isNaN(val) || "不是有效数字!",
@@ -481,7 +510,6 @@ export default {
       this.wb.push(wb);
       this.dialog_addQueFromBank = false;
     },
-    saveAsWork() {},
     beforeReleaseWork() {
       if (this.workTitle == "") {
         alert("请输入作业标题");
@@ -522,24 +550,59 @@ export default {
       let _this = this;
       this.overlay = true;
       this.overlay_msg = "发布中 ...";
-      _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
-        _this.overlay = false;
+      _axios
+        .post("/api/Course/releaseAWork", aWork)
+        .then((res2) => {
+          let setRulesForm = {};
+          setRulesForm.wid = res2.data.data;
+          let rulePre = [];
+          let ruleEnter = [];
 
-        _this.$dialog({
-          title: "Msg",
-          content: res2.data.msg,
-          btns: [
-            {
-              label: "返回课程页面",
-              color: "red",
-              ghost: true,
-              callback: () => {
-                _this.close();
-              },
-            },
-          ],
+          if (_this.rule_pre_FACECHECK == true) {
+            rulePre.push("FACECHECK");
+          }
+          if (_this.rule_enter_TRACKIP == true) {
+            ruleEnter.push("TRACKIP");
+          }
+          if (_this.rule_enter_TAKEPHOTO == true) {
+            ruleEnter.push("TAKEPHOTO");
+          }
+          setRulesForm.rulePre = "[" + rulePre.toString() + "]";
+          setRulesForm.ruleText = _this.rule_pre_TEXT;
+          setRulesForm.ruleEnter = "[" + ruleEnter.toString() + "]";
+          _axios
+            .post("/api/Exam/setRules", setRulesForm)
+            .then((res3) => {
+              console.log(res3);
+              _this.overlay = false;
+              _this.$dialog({
+                title: "Msg",
+                content: res2.data.msg,
+                btns: [
+                  {
+                    label: "返回课程页面",
+                    color: "red",
+                    ghost: true,
+                    callback: () => {
+                      _this.close();
+                    },
+                  },
+                ],
+              });
+            })
+            .catch((err) => {
+              _this.overlay = false;
+
+              alert(err);
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          _this.overlay = false;
+
+          alert(err);
+          console.error(err);
         });
-      });
     },
     releaseWork(isTemp) {
       if (isTemp == false) {
@@ -547,8 +610,6 @@ export default {
         if (this.work_name == "") {
           alert("请输入本次作业在作业库中的名称");
           return;
-        } else {
-          this.isTemp = false;
         }
       }
 
@@ -570,36 +631,64 @@ export default {
       let _this = this;
       this.overlay = true;
       this.overlay_msg = "发布中 ...";
-      _axios
-        .post("/api/Bank/addWorkBank", work)
-        .then((res) => {
-          if (res.data.code == 2) {
-            aWork.workId = res.data.data;
-            _axios.post("/api/Course/releaseAWork", aWork).then((res2) => {
-              _this.$dialog({
-                title: "Msg",
-                content: res2.data.msg,
-                btns: [
-                  {
-                    label: "返回课程页面",
-                    color: "red",
-                    ghost: true,
-                    callback: () => {
-                      _this.close();
-                      _this.overlay = false;
-                    },
-                  },
-                ],
-              });
+      _axios.post("/api/Bank/addWorkBank", work).then((res) => {
+        if (res.data.code == 2) {
+          aWork.workId = res.data.data;
+          _axios
+            .post("/api/Course/releaseAWork", aWork)
+            .then((res2) => {
+              let setRulesForm = {};
+              setRulesForm.wid = aWork.workId;
+              let rulePre = [];
+              let ruleEnter = [];
+
+              if (_this.rule_pre_FACECHECK == true) {
+                rulePre.push("FACECHECK");
+              }
+              if (_this.rule_enter_TRACKIP == true) {
+                ruleEnter.push("TRACKIP");
+              }
+              if (_this.rule_enter_TAKEPHOTO == true) {
+                ruleEnter.push("TAKEPHOTO");
+              }
+              setRulesForm.rulePre = "[" + rulePre.toString() + "]";
+              setRulesForm.ruleText = _this.rule_pre_TEXT;
+              setRulesForm.ruleEnter = "[" + ruleEnter.toString() + "]";
+              _axios
+                .post("/api/Exam/setRules", setRulesForm)
+                .then((res3) => {
+                  console.log(res3);
+                  _this.overlay = false;
+                  _this.$dialog({
+                    title: "Msg",
+                    content: res2.data.msg,
+                    btns: [
+                      {
+                        label: "返回课程页面",
+                        color: "red",
+                        ghost: true,
+                        callback: () => {
+                          _this.close();
+                        },
+                      },
+                    ],
+                  });
+                })
+                .catch((err) => {
+                  alert(err);
+                  console.error(err);
+                  _this.dialog_msg_msg = err;
+                  _this.dialog_msg = true;
+                });
+            })
+            .catch((err) => {
+              alert(err);
+              console.error(err);
+              _this.dialog_msg_msg = err;
+              _this.dialog_msg = true;
             });
-          } else {
-            alert("err: " + res.data.msg);
-          }
-        })
-        .catch((err) => {
-          _this.dialog_msg_msg = err;
-          _this.dialog_msg = true;
-        });
+        }
+      });
     },
     closeFunc(val) {
       this.dialog_ifSaveAsWorkBank = val;

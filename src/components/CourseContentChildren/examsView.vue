@@ -66,8 +66,9 @@
       </v-card>
       <div style="height: 5px"></div>
     </div>
+
     <v-dialog width="550px" v-model="dialog_stuAnsStu">
-      <!-- 666 -->
+      <!-- 答题卡 -->
       <stuAnsStu
         v-if="dialog_stuAnsStu"
         @closeSubmitCard="close($event)"
@@ -75,6 +76,16 @@
         :qscores="qscores"
       />
     </v-dialog>
+
+    <!-- 验证 -->
+    <v-dialog v-if="dialog_preValidate" v-model="dialog_preValidate" width="750px">
+      <ExamsViewValidate
+        @close="dialog_preValidate = false"
+        v-if="dialog_preValidate"
+        :work="work"
+      />
+    </v-dialog>
+
     <v-overlay v-if="loading">
       <v-progress-circular small indeterminate color="primary"></v-progress-circular>
       <div class="mx-auto">{{ loadingText }}</div>
@@ -88,17 +99,26 @@
 <script>
 import axios from "axios";
 import stuAnsStu from "./stuAnsStu.vue";
+import ExamsViewValidate from "./examsViewValidate.vue";
 
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  components: { stuAnsStu },
+  components: { stuAnsStu, ExamsViewValidate },
 
   props: ["exams", "cid"],
   computed: {},
   methods: {
     close(val) {
       this.dialog_stuAnsStu = false;
+    },
+    enterPreValidate(work) {
+      this.work = work;
+      this.dialog_preValidate = true;
+      // this.$router.push({
+      //     name: "doWork",
+      //     params: { wid: work.id, wname: work.workName, cid: _this.cid },
+      //   });
     },
     doWork(work) {
       let _this = this;
@@ -121,10 +141,10 @@ export default {
             });
             return;
           }
-          this.$router.push({
-            name: "doWork",
-            params: { wid: work.id, wname: work.workName, cid: _this.cid },
-          });
+          //
+          //
+          //
+          _this.enterPreValidate(work);
         } else if (this.status(work.id) == "批改中" || this.status(work.id) == "已批改") {
           this.loading = true;
           this.loadingText = "获取答题卡中 ... ";
@@ -133,27 +153,35 @@ export default {
           _axios
             .post("/api/Work/getWork", form)
             .then((res) => {
-              let questions = res.data.data;
-              _this.qs = eval(questions);
-              _this.qs.forEach((val, i) => {
-                _this.qscores[i] = val.qscore;
-              });
-              const form2 = new FormData();
-              form2.append("wid", work.id);
-              _axios
-                .post("/api/submit/getSubmitByWorkId", form2)
-                .then((res) => {
-                  _this.submits = JSON.parse(res.data.data);
-                  _this.dialog_stuAnsStu = true;
-                  _this.loading = false;
-                })
-                .catch((err) => {
-                  // TODO
-                  _this.msg = "发生了错误" + err;
-                  _this.loading = false;
-
-                  _this.snackbar = true;
+              if (Number(res.data.code) == 1) {
+                _this.msg = res.data.msg;
+                _this.loading = false;
+                _this.snackbar = true;
+                alert("CANT");
+                return;
+              } else {
+                let questions = res.data.data;
+                _this.qs = eval(questions);
+                _this.qs.forEach((val, i) => {
+                  _this.qscores[i] = val.qscore;
                 });
+                const form2 = new FormData();
+                form2.append("wid", work.id);
+                _axios
+                  .post("/api/submit/getSubmitByWorkId", form2)
+                  .then((res) => {
+                    _this.submits = JSON.parse(res.data.data);
+                    _this.dialog_stuAnsStu = true;
+                    _this.loading = false;
+                  })
+                  .catch((err) => {
+                    // TODO
+                    _this.msg = "发生了错误" + err;
+                    _this.loading = false;
+
+                    _this.snackbar = true;
+                  });
+              }
             })
             .catch((err) => {});
         }
@@ -264,10 +292,12 @@ export default {
       msg: "",
       snackbar: "",
       dialog_stuAnsStu: false,
+      dialog_preValidate: false,
+      tabs_validate: 0,
       qs: [],
       qscores: [],
       submits: [],
-      wid: 0,
+      work: {},
       loading: false,
       loadingText: "",
     };

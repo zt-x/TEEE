@@ -424,19 +424,21 @@ export default {
     },
     InitTimer() {
       let _this = this;
-      if (_this.restTime <= -10) {
-        return;
-      }
+
       _this.checkTime().then(() => {
-        restTimerID = setInterval(() => {
-          _this.restTime--;
-          if (_this.restTime < 0 && _this.restTime > -5) {
-            clearInterval(restTimerID);
-            clearInterval(restTimerCheckID);
-            _this.submit(1);
-            alert("时间结束咯");
-          }
-        }, 1000);
+        if (_this.restTime <= -10) {
+          return;
+        } else {
+          restTimerID = setInterval(() => {
+            _this.restTime--;
+            if (_this.restTime < 0 && _this.restTime > -5) {
+              clearInterval(restTimerID);
+              clearInterval(restTimerCheckID);
+              _this.submit(1);
+              alert("时间结束咯");
+            }
+          }, 1000);
+        }
       });
       // 倒计时计时器
 
@@ -461,7 +463,7 @@ export default {
         .post("/api/Work/getWorkTimer", form)
         .then((res) => {
           let code = res.data.code;
-          if (code == "00001") {
+          if (Number(code) == 1) {
             alert(res.data.msg);
             _this.goBack();
             return;
@@ -551,6 +553,9 @@ export default {
         .then((res) => {
           let questions = res.data.data;
           _this.qs = eval(questions);
+          if (_this.qs == null) {
+          }
+          console.log(_this.qs);
           _this.myAnss.length = _this.qs.length;
           _this.files.length = _this.qs.length;
           _this.files_realpath.length = _this.qs.length;
@@ -559,8 +564,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.error("Err /api/Work/getWork" + err);
-          alert("Err /api/Work/getWork" + err);
+          console.error("Err /api/Work/getWork：" + err);
+          alert("该作业有误！请联系教师确认作业内容");
           _this.goBack();
           throw "ERR";
         });
@@ -602,6 +607,8 @@ export default {
       this.p_que = qid;
     },
     goBack() {
+      clearInterval(restTimerID);
+      clearInterval(restTimerCheckID);
       let _cid = this.cid;
       //   alert(_cid);
       this.$router.replace({
@@ -741,7 +748,7 @@ export default {
           str += ass[i].replaceAll(",", "&douhao;") + ", ";
         }
       }
-      str = str.slice(0, -2);
+      str = str.slice(0, str.indexOf(",") >= 0 ? -2 : 1);
       str += "]";
       str = str.replaceAll('"', "&quot;");
       for (var i = 0; i < fs.length; i++) {
