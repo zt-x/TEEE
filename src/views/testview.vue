@@ -136,10 +136,26 @@ export default {
     this.canvas = document.getElementById("canvas");
   },
   methods: {
+    /**
+     * DataUrl转为File
+     * @param {String} dataUrl - dataUrl地址
+     * @param {String} fileName - file文件名
+     */
+    dataURLtoFile(dataUrl, fileName) {
+      var arr = dataUrl.split(","),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], fileName, { type: mime });
+    },
     takePhone() {
       //点击拍照截图画面
       let that = this;
-      that.canvas.getContext("2d").drawImage(this.video, 0, 0, 400, 300);
+      that.canvas.getContext("2d").drawImage(this.video.childNodes[0], 0, 0, 400, 300);
       let dataurl = that.canvas.toDataURL("image/jpeg");
       //   that.blobFile = that.dataURLtoFile(dataurl, "camera.jpg");
       that.preViewVisible = true;

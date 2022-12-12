@@ -345,11 +345,13 @@ export default {
   created() {
     this.stopF5Refresh();
     console.clear();
-    console.log("😡%c请诸位同学遵守考试秩序");
-    console.log("😡%c请诸位同学遵守考试秩序");
-    console.log("😡%c不要抖机灵");
-    console.log("😡%c不要耍个性");
-    console.log("😡%c不要以为找不到你");
+    console.log("😡😡😡😡😡😡😡😡😡😡😡");
+    console.log("😡 请诸位同学遵守考试秩序 😡");
+    console.log("😡      不要抖机灵       😡");
+    console.log("😡      不要耍个性       😡");
+    console.log("😡   不要以为找不到你     😡");
+    console.log("😡😡😡😡😡😡😡😡😡😡😡");
+
     if (this.$route.params.wid == null) {
       let ret = sessionStorage.getItem("wid");
       if (ret != undefined && ret != null && ret != "") {
@@ -424,22 +426,28 @@ export default {
     },
     InitTimer() {
       let _this = this;
-
-      _this.checkTime().then(() => {
-        if (_this.restTime <= -10) {
-          return;
-        } else {
-          restTimerID = setInterval(() => {
-            _this.restTime--;
-            if (_this.restTime < 0 && _this.restTime > -5) {
-              clearInterval(restTimerID);
-              clearInterval(restTimerCheckID);
-              _this.submit(1);
-              alert("时间结束咯");
-            }
-          }, 1000);
-        }
-      });
+      _this
+        .checkTime()
+        .then((res) => {
+          if (_this.restTime <= -10) {
+            return;
+          } else {
+            restTimerID = setInterval(() => {
+              _this.restTime--;
+              if (_this.restTime < 0 && _this.restTime > -5) {
+                clearInterval(restTimerID);
+                clearInterval(restTimerCheckID);
+                _this.submit(1);
+                alert("时间结束咯");
+              }
+            }, 1000);
+          }
+        })
+        .catch((err) => {
+          clearInterval(restTimerID);
+          clearInterval(restTimerCheckID);
+          _this.goBack();
+        });
       // 倒计时计时器
 
       // 倒计时校验
@@ -466,7 +474,7 @@ export default {
           if (Number(code) == 1) {
             alert(res.data.msg);
             _this.goBack();
-            return;
+            return Promise.reject(new Error("err"));
           }
           let data = res.data.data;
           if (isNaN(data)) {
@@ -475,7 +483,9 @@ export default {
             _this.restTime = Number(data);
           }
         })
-        .catch((err) => {});
+        .catch((err) => {
+          return Promise.reject(new Error("err"));
+        });
     },
     getRestTimeText(value) {
       var secondTime = parseInt(value); // 秒
@@ -567,7 +577,7 @@ export default {
           console.error("Err /api/Work/getWork：" + err);
           alert("该作业有误！请联系教师确认作业内容");
           _this.goBack();
-          throw "ERR";
+          return Promise.reject(new Error("err"));
         });
     },
     editTempFactory(i) {
