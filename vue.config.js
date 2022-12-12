@@ -5,7 +5,7 @@ module.exports = defineConfig({
 	'vuetify'
 	],
 	devServer: {
-		port: 80,
+		port: 443,
 		proxy: {
 			'/api': {
 				target: 'http://localhost:8080',
