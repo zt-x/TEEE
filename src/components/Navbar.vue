@@ -176,6 +176,10 @@
       </v-avatar>
     </v-badge>
 
+    <v-dialog v-model="dialog_info" v-if="dialog_info" max-width="500">
+      <personal-info @closeInfo="closeInfo" />
+    </v-dialog>
+
     <!-- 头像模块 -->
     <v-menu offset-y transition="slide-y-transition">
       <template v-slot:activator="{ on, attrs }">
@@ -210,12 +214,15 @@
 import axios from "axios";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
+import PersonalInfo from "./PersonalInfo.vue";
 
 export default {
+  components: { PersonalInfo },
   props: ["role", "_avatar"],
   data: () => ({
     dialog_stu: false,
     dialog_tea: false,
+    dialog_info: false,
     CourseKey: "",
     loading: false,
     loadingText: "",
@@ -237,6 +244,9 @@ export default {
     token = localStorage.getItem("token");
   },
   methods: {
+    closeInfo() {
+      this.dialog_info = false;
+    },
     logout() {
       localStorage.clear();
       sessionStorage.clear();
@@ -294,7 +304,7 @@ export default {
       alert("敬请期待[施工中..] ");
     },
     showMyUserInfo() {
-      alert("敬请期待[施工中..] ");
+      this.dialog_info = true;
     },
     createCourse() {
       let _this = this;

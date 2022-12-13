@@ -1,25 +1,42 @@
 <template>
-  <v-card :loading="!getValidate">
-    <v-card-title
-      >{{ tabs_validate == 0 ? "考前须知" : "人脸验证" }}
+  <v-card :loading="!gotInfo">
+    <v-card-title class="headline">
+      <span style="color: #757575"> 个人信息 </span>
       <v-spacer></v-spacer>
-      <v-chip v-if="getValidate" class="ml-2" small color="red" @click="close()"></v-chip>
+      <v-chip class="ml-2" small color="red" @click="close('close')"> </v-chip>
     </v-card-title>
-    <v-card-text style="font-size: large">
-      <v-tabs-items v-model="tabs_validate">
+    <v-card-text class="mt-3">
+      <v-tabs-items v-model="tabs_takeFace">
         <v-tab-item>
-          <p v-if="facecheck">😘人脸识别已开启</p>
-          <p>{{ rules.text }}</p>
+          <v-list-item>
+            <v-list-item-avatar color="grey">
+              <v-img :src="avatar"></v-img>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title class="headline"
+                >{{ username }}
+                <v-chip small @click="tabs_takeFace = 1">
+                  <v-icon color="success" class="mr-1" small v-if="haveFace"
+                    >fa fa-check-circle</v-icon
+                  >
+                  <v-icon color="error" class="mr-1" small v-if="!haveFace"
+                    >fa fa-close</v-icon
+                  >
+                  {{ haveFace == true ? "已录入人脸" : "未录入人脸，点击开始录制" }}
+                </v-chip>
+              </v-list-item-title>
+              <v-list-item-subtitle> {{ uid }}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
         </v-tab-item>
-        <!-- 人脸识别 -->
-        <v-tab-item v-if="facecheck">
+        <!-- 录入人脸-->
+        <v-tab-item>
           <v-container fluid>
             <v-row>
               <v-col cols="12">
                 <div class="mx-auto" v-if="!submtiFace">
                   请打开浏览器摄像头权限, 面对摄像头
                 </div>
-                <div class="mx-auto" :color="facecheck_color">{{ facecheck_msg }}</div>
               </v-col>
             </v-row>
             <v-row align="center">
@@ -49,30 +66,10 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn
-        :disabled="!getValidate"
-        v-if="tab_num == 0 || (facecheck == true && pass_facecheck == true)"
-        @click="enterWork"
-        dark
-        color="blue lighten-1"
-        >进入考试</v-btn
-      >
-      <v-btn
-        :disabled="!getValidate"
-        v-if="tabs_validate == 0 && tab_num != 0"
-        @click="
-          tabs_validate += tabs_validate < tab_num ? 1 : 0;
-          tackPhoto = true;
-        "
-        dark
-        color="blue lighten-1"
-        >开始验证</v-btn
-      >
-      <v-btn
         text
-        :disabled="!getValidate"
-        v-if="tabs_validate == 1 && !(facecheck == true && pass_facecheck == true)"
+        v-if="tabs_takeFace == 1"
         @click="
-          tabs_validate -= tabs_validate > 0 ? 1 : 0;
+          tabs_takeFace = 0;
           tackPhoto = false;
         "
         dark
@@ -80,17 +77,17 @@
         >返回上一页</v-btn
       >
       <v-btn
-        :disabled="!getValidate"
-        v-if="tabs_validate == 1 && !(facecheck == true && pass_facecheck == true)"
-        @click="checkFace"
+        :disabled="!gotInfo"
+        v-if="tabs_takeFace == 1"
+        @click="subFace"
         dark
         color="blue lighten-1"
-        >提交人脸</v-btn
+        >拍照提交</v-btn
       >
       <v-btn
         text
-        :disabled="!getValidate"
-        v-if="tabs_validate == 1 && !(facecheck == true && pass_facecheck == true)"
+        :disabled="!gotInfo"
+        v-if="tabs_takeFace == 1"
         @click="changeCamara"
         dark
         color="blue lighten-1"
@@ -106,7 +103,6 @@ import axios from "axios";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 export default {
-  props: ["work", "cid"],
   watch: {
     tackPhoto: {
       immediate: false,
@@ -177,14 +173,13 @@ export default {
   },
   data() {
     return {
-      tabs_validate: 0,
-      tab_num: 0,
-      rules: {},
-      getValidate: false,
-      facecheck: false,
-      pass_facecheck: false,
-      facecheck_color: "green",
-      facecheck_msg: "",
+      gotInfo: false,
+      username: "",
+      uid: "",
+      avatar: "",
+      role: "",
+      haveFace: false,
+      tabs_takeFace: 0,
       submtiFace: false,
       // Camara
       canvas: null,
@@ -192,13 +187,48 @@ export default {
       mediaStreamTrack: "",
       tackPhoto: false,
       fMode: "user",
-
       //loading
       loading: true,
       loadingText: "",
     };
   },
   methods: {
+    flush() {
+      this.gotInfo = false;
+      token = window.localStorage.getItem("token");
+      _axios.interceptors.request.use(function (config) {
+        config.headers = {
+          Authorization: token,
+        };
+        return config;
+      });
+      let _this = this;
+      _axios
+        .post("/api/power/getInfo")
+        .then((res) => {
+          if (Number(res.data.code) == 1) {
+            alert(res.data.msg);
+            _this.close();
+            return;
+          }
+          let data = JSON.parse(res.data.data);
+          console.log(res.data.data);
+          console.log(data);
+
+          _this.uid = data.uid;
+          _this.username = data.username;
+          _this.role = data.role;
+          _this.avatar = data.avatar;
+          _this.gotInfo = true;
+          _this.haveFace = data.face == "yes" ? true : false;
+        })
+        .catch((err) => {});
+    },
+    close(value) {
+      this.$emit("closeInfo");
+    },
+
+    // COPY
     changeCamara() {
       this.tackPhoto = false;
       if (this.fMode == "user") {
@@ -207,18 +237,6 @@ export default {
         this.fMode = "user";
       }
       this.tackPhoto = true;
-    },
-    close() {
-      this.tackPhoto = false;
-      this.$emit("close");
-    },
-    enterWork(myWork) {
-      console.log(this.work);
-      let _this = this;
-      this.$router.push({
-        name: "doWork",
-        params: { wid: myWork.id, wname: myWork.workName, cid: _this.cid },
-      });
     },
     dataURLtoFile(dataUrl, fileName) {
       var arr = dataUrl.split(","),
@@ -231,9 +249,9 @@ export default {
       }
       return new File([u8arr], fileName, { type: mime });
     },
-    checkFace() {
+    subFace() {
       let _this = this;
-      this.getValidate = false;
+      this.gotInfo = false;
       this.canvas = document.getElementById("canvas");
       this.video = document.getElementById("video");
       this.canvas.getContext("2d").drawImage(this.video, 0, 0, 400, 300);
@@ -244,78 +262,25 @@ export default {
       formData.append("file", this.dataURLtoFile(dataurl, "face.jpeg")); //图片内容
       this.submtiFace = true;
       _axios
-        .post("/api/upload/checkFace", formData)
+        .post("/api/upload/uploadFacePic", formData)
         .then((res) => {
           let data = res.data;
           let code = data.code;
-          _this.facecheck_msg = data.msg;
           if (Number(code) == 1) {
-            // 验证不通过
-            _this.facecheck_color = "red";
-            _this.pass_facecheck = false;
-            _this.loading = false;
-            _this.getValidate = true;
-            var img = new Image();
-            img.src = "error.png";
-            img.onload = function () {
-              _this.canvas.getContext("2d").clearRect(0, 0, 400, 400);
-              _this.canvas.getContext("2d").drawImage(img, 0, 0, 380, 380);
-            };
+            console.error(data);
+            alert(data);
           } else {
-            _this.facecheck_color = "green";
-            _this.pass_facecheck = true;
-            _this.loading = false;
-            _this.getValidate = true;
-            var img = new Image();
-            img.src = "success.png";
-            img.onload = function () {
-              _this.canvas.getContext("2d").clearRect(0, 0, 400, 400);
-              _this.canvas.getContext("2d").drawImage(img, 0, 0, 380, 380);
-            };
+            _this.flush();
+            _this.tabs_takeFace = 0;
           }
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     },
   },
   mounted() {
-    // 摄像头
-    this.video = document.getElementById("video");
-    this.canvas = document.getElementById("canvas");
-  },
-  created() {
-    let _this = this;
-    this.loading = true;
-    this.getValidate = false;
-    token = window.localStorage.getItem("token");
-    // init axios
-    _axios.interceptors.request.use(function (config) {
-      config.headers = {
-        Authorization: token,
-      };
-      return config;
-    });
-    const form = new FormData();
-    form.append("wid", _this.work.id);
-    _axios
-      .post("/api/Exam/getExamRulePre", form)
-      .then((res) => {
-        _this.rules = res.data.data;
-        _this.tab_num = 0;
-        _this.rules.rules = _this.rules.rules.slice(1, -1).split(",");
-        if (_this.rules.rules.includes("FACECHECK")) {
-          _this.facecheck = true;
-          _this.tab_num++;
-        }
-        _this.getValidate = true;
-        _this.loading = false;
-      })
-      .catch((err) => {
-        console.error(err);
-        _this.getValidate = true;
-        _this.loading = false;
-      });
+    this.flush();
   },
 };
 </script>
