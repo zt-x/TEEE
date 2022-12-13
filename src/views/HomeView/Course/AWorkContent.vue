@@ -275,7 +275,7 @@ export default {
         body: form,
       }).then(async (res) => {
         const fileStream = streamSaver.createWriteStream(
-          res.headers.get("Content-Disposition"),
+          decodeURI(res.headers.get("Content-Disposition")),
           {
             size: res.headers.get("content-length"),
           }
