@@ -78,7 +78,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense>
+    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
       {{ snackbar_msg }}
     </v-snackbar>
   </v-container>
@@ -90,6 +90,8 @@ import axios from "axios";
 import Chart_score_statistics from "@/components/CourseContentChildren/charts/SubmitStatic/chart_score_statistics.vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
+const streamSaver = require("streamsaver");
+
 export default {
   components: { SubmitWork, Chart_score_statistics },
   computed: {
@@ -221,45 +223,81 @@ export default {
       let _this = this;
       let form = new FormData();
       form.append("wid", this.wid);
-      _axios
-        .post("/api/Work/downloadFiles", form, { responseType: "blob" })
-        .then((res) => {
-          _this.snackbar_msg = "文件已整理完成! 正在唤醒下载链接...";
-          try {
-            const { data, headers } = res;
-            const fileName = headers["content-disposition"].replace(
-              /\w+;filename=(.*)/,
-              "$1"
-            );
-            // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
-            //const blob = new Blob([JSON.stringify(data)], ...)
-            const blob = new Blob([data], { type: headers["content-type"] });
-            let dom = document.createElement("a");
-            let url = window.URL.createObjectURL(blob);
-            dom.href = url;
-            dom.download = decodeURI(fileName);
-            dom.style.display = "none";
-            document.body.appendChild(dom);
-            dom.click();
-            dom.parentNode.removeChild(dom);
-            window.URL.revokeObjectURL(url);
-            _this.snackbar = false;
-            return;
-          } catch {
-            _this.snackbar = true;
+      //   _axios
+      //     .post("/api/Work/downloadFiles", form, { responseType: "blob" })
+      //     .then((res) => {
+      //       _this.snackbar_msg = "文件已整理完成! 正在唤醒下载链接...";
+      //       try {
+      //         const { data, headers } = res;
+      //         const fileName = headers["content-disposition"].replace(
+      //           /\w+;filename=(.*)/,
+      //           "$1"
+      //         );
+      //         // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
+      //         //const blob = new Blob([JSON.stringify(data)], ...)
+      //         const blob = new Blob([data], { type: headers["content-type"] });
+      //         let dom = document.createElement("a");
+      //         let url = window.URL.createObjectURL(blob);
+      //         dom.href = url;
+      //         dom.download = decodeURI(fileName);
+      //         dom.style.display = "none";
+      //         document.body.appendChild(dom);
+      //         dom.click();
+      //         dom.parentNode.removeChild(dom);
+      //         window.URL.revokeObjectURL(url);
+      //         _this.snackbar = false;
+      //         return;
+      //       } catch {
+      //         _this.snackbar = true;
 
-            _this.snackbar_msg = res.data.msg;
-            _this.snackbar_color = "error";
-            _this.setTimeout(() => {
-              _this.snackbar = true;
-            }, 2000);
-            console.log(res.data.msg);
+      //         _this.snackbar_msg = res.data.msg;
+      //         _this.snackbar_color = "error";
+      //         _this.setTimeout(() => {
+      //           _this.snackbar = true;
+      //         }, 2000);
+      //         console.log(res.data.msg);
+      //       }
+      //     })
+      //     .catch((err) => {
+      //       console.log(err);
+      //       alert("下载失败, 请查看log信息");
+      //     });
+
+      // 替换方案: streamsaver + fetch
+      fetch(url, {
+        method: "GET",
+        cache: "no-cache",
+        headers: {
+          Authorization: token,
+        },
+      }).then((res) => {
+        const fileStream = streamSaver.createWriteStream(
+          res.headers.get("Content-Disposition"),
+          {
+            size: res.headers.get("content-length"),
           }
-        })
-        .catch((err) => {
-          console.log(err);
-          alert("下载失败, 请查看log信息");
-        });
+        );
+
+        const readableStream = res.body;
+
+        // more optimized
+        if (window.WritableStream && readableStream.pipeTo) {
+          return readableStream
+            .pipeTo(fileStream)
+            .then(() => console.log("done writing"));
+        }
+        window.writer = fileStream.getWriter();
+
+        const reader = res.body.getReader();
+        const pump = () =>
+          reader
+            .read()
+            .then((res) =>
+              res.done ? window.writer.close() : window.writer.write(res.value).then(pump)
+            );
+
+        pump();
+      });
     },
   },
   mounted() {
