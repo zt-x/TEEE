@@ -264,6 +264,8 @@ export default {
       //     });
 
       // 替换方案: streamsaver + fetch
+
+      // 尝试使用fetch
       fetch(url, {
         method: "GET",
         cache: "no-cache",
