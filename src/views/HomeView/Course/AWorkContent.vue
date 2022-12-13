@@ -266,13 +266,14 @@ export default {
       // 替换方案: streamsaver + fetch
 
       // 尝试使用fetch
-      fetch(url, {
-        method: "GET",
+      fetch("/api/Work/downloadFiles", {
+        method: "POST",
         cache: "no-cache",
         headers: {
           Authorization: token,
         },
-      }).then((res) => {
+        body: form,
+      }).then(async (res) => {
         const fileStream = streamSaver.createWriteStream(
           res.headers.get("Content-Disposition"),
           {
@@ -284,9 +285,8 @@ export default {
 
         // more optimized
         if (window.WritableStream && readableStream.pipeTo) {
-          return readableStream
-            .pipeTo(fileStream)
-            .then(() => console.log("done writing"));
+          await readableStream.pipeTo(fileStream);
+          return console.log("done writing");
         }
         window.writer = fileStream.getWriter();
 
