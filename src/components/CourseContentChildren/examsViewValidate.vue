@@ -212,12 +212,12 @@ export default {
       this.tackPhoto = false;
       this.$emit("close");
     },
-    enterWork(myWork) {
+    enterWork() {
       console.log(this.work);
       let _this = this;
       this.$router.push({
         name: "doWork",
-        params: { wid: myWork.id, wname: myWork.workName, cid: _this.cid },
+        params: { wid: _this.work.id, wname: _this.work.id, cid: _this.cid },
       });
     },
     dataURLtoFile(dataUrl, fileName) {
