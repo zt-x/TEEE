@@ -638,7 +638,7 @@ export default {
             .post("/api/Course/releaseAWork", aWork)
             .then((res2) => {
               let setRulesForm = {};
-              setRulesForm.wid = aWork.workId;
+              setRulesForm.wid = res2.data.data;
               let rulePre = [];
               let ruleEnter = [];
 
