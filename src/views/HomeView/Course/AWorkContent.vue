@@ -78,7 +78,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
+    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense>
       {{ snackbar_msg }}
     </v-snackbar>
   </v-container>
@@ -216,7 +216,7 @@ export default {
       this.sta.push({ value: statistic.NOP_fail, name: "不及格(分数<60%)" });
     },
     downloadFiles() {
-      this.snackbar_msg = "拉取下载链接😀 ... ";
+      this.snackbar_msg = "后台正在整理文件并进行打包中, 打包完成后会自动唤醒下载😀 ... ";
       this.snackbar = true;
       let _this = this;
       let form = new FormData();
@@ -224,6 +224,7 @@ export default {
       _axios
         .post("/api/Work/downloadFiles", form, { responseType: "blob" })
         .then((res) => {
+          _this.snackbar_msg = "文件已整理完成! 正在唤醒下载链接...";
           try {
             const { data, headers } = res;
             const fileName = headers["content-disposition"].replace(
@@ -242,11 +243,16 @@ export default {
             dom.click();
             dom.parentNode.removeChild(dom);
             window.URL.revokeObjectURL(url);
+            _this.snackbar = false;
             return;
           } catch {
+            _this.snackbar = true;
+
             _this.snackbar_msg = res.data.msg;
             _this.snackbar_color = "error";
-            _this.snackbar = true;
+            _this.setTimeout(() => {
+              _this.snackbar = true;
+            }, 2000);
             console.log(res.data.msg);
           }
         })
