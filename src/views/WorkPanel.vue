@@ -565,7 +565,6 @@ export default {
           _this.qs = eval(questions);
           if (_this.qs == null) {
           }
-          console.log(_this.qs);
           _this.myAnss.length = _this.qs.length;
           _this.files.length = _this.qs.length;
           _this.files_realpath.length = _this.qs.length;

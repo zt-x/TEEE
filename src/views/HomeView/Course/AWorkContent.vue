@@ -14,6 +14,9 @@
               <v-chip small color="success">{{ numOfFinish }}</v-chip>
               <span class="pl-2">已批改</span>
             </v-tab>
+            <v-tab>
+              <span class="pl-2">打包下载附件</span>
+            </v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item>
@@ -39,6 +42,13 @@
                   :qscores="qscores"
                   class="mb-1"
                 />
+              </v-card>
+            </v-tab-item>
+            <v-tab-item>
+              <v-card class="mx-auto">
+                <div class="mx-auto">
+                  <v-btn class="my-5 mx-auto" @click="downloadFiles">打包下载</v-btn>
+                </div>
               </v-card>
             </v-tab-item>
           </v-tabs-items>
@@ -68,6 +78,9 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
+      {{ snackbar_msg }}
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -114,6 +127,9 @@ export default {
       submitCard: false,
       qs: [],
       qscores: [],
+      snackbar_msg: "",
+      snackbar: false,
+      snackbar_color: "success",
     };
   },
   methods: {
@@ -198,6 +214,46 @@ export default {
       this.sta.push({ value: statistic.NOP_good, name: "良好(分数在90%~75%)" });
       this.sta.push({ value: statistic.NOP_NTB, name: "及格(分数在60%~75%)" });
       this.sta.push({ value: statistic.NOP_fail, name: "不及格(分数<60%)" });
+    },
+    downloadFiles() {
+      this.snackbar_msg = "拉取下载链接😀 ... ";
+      this.snackbar = true;
+      let _this = this;
+      let form = new FormData();
+      form.append("wid", this.wid);
+      _axios
+        .post("/api/Work/downloadFiles", form, { responseType: "blob" })
+        .then((res) => {
+          try {
+            const { data, headers } = res;
+            const fileName = headers["content-disposition"].replace(
+              /\w+;filename=(.*)/,
+              "$1"
+            );
+            // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
+            //const blob = new Blob([JSON.stringify(data)], ...)
+            const blob = new Blob([data], { type: headers["content-type"] });
+            let dom = document.createElement("a");
+            let url = window.URL.createObjectURL(blob);
+            dom.href = url;
+            dom.download = decodeURI(fileName);
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            dom.click();
+            dom.parentNode.removeChild(dom);
+            window.URL.revokeObjectURL(url);
+            return;
+          } catch {
+            _this.snackbar_msg = res.data.msg;
+            _this.snackbar_color = "error";
+            _this.snackbar = true;
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("下载失败, 请查看log信息");
+        });
     },
   },
   mounted() {
