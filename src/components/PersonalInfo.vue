@@ -212,8 +212,6 @@ export default {
             return;
           }
           let data = JSON.parse(res.data.data);
-          console.log(res.data.data);
-          console.log(data);
 
           _this.uid = data.uid;
           _this.username = data.username;

@@ -56,6 +56,7 @@
       :color="snackbar_color"
       dense="true"
       timeout="2000"
+      rounded="pill"
     >
       {{ snackbar_msg }}
     </v-snackbar>
@@ -107,9 +108,7 @@ export default {
             _this.tags = eval(res.data.data.tags);
             _this.numOfQue = eval(res.data.data.numOfQue);
             _this.finishGetData = true;
-            console.log(res.data.data);
           } else {
-            console.log(res.data.msg);
           }
           _this.content = res.data.data;
         })

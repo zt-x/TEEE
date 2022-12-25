@@ -165,24 +165,6 @@ export default {
       this.loadingbut = true;
       let formData = new FormData();
       formData.append("file", this.blobFile); //图片内容
-      // 上传图片
-      //   putFileAttach(formData).then(
-      //     (res) => {
-      //       //后台接口
-      //       this.loadingbut = false;
-      //       this.$emit("picture", res.data.data);
-      //       this.tackPhoto = false;
-      //       this.canvas.getContext("2d").clearRect(0, 0, 400, 300); //清除画布
-      //       // 关闭摄像头
-      //       this.mediaStreamTrack.getVideoTracks().forEach(function (track) {
-      //         track.stop();
-      //       });
-      //     },
-      //     (error) => {
-      //       this.loadingbut = false;
-      //       window.console.log(error);
-      //     }
-      //   );
     },
   },
 };

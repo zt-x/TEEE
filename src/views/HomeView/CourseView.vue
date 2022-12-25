@@ -10,11 +10,23 @@
         <v-spacer></v-spacer>
         <span>正在准备内容 ...</span>
       </v-chip>
-
-      <!-- <v-text>正在准备内容 ... </v-text> -->
     </v-overlay>
     <v-row style="min-width: 980px">
       <v-col cols="12" sm="8">
+        <v-row>
+          <v-col cols="12">
+            <v-alert
+              color="success"
+              border="left"
+              colored-border
+              elevation="2"
+              dismissible
+              class="success--text pl-5"
+            >
+              <b> 点击进入课程按钮，查看课程内容 </b>
+            </v-alert>
+          </v-col>
+        </v-row>
         <v-row>
           <v-col v-for="(course, i) in courses" v-bind:key="i" cols="12" sm="4">
             <Course :Course="course"></Course>

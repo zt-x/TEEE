@@ -56,7 +56,7 @@
           <v-card-title>我的库</v-card-title>
           <v-card-subtitle>请在"筛选"选项中选择作业库/题库</v-card-subtitle>
           <v-divider></v-divider>
-          <v-card-text>
+          <v-card-text style="overflow-y: auto">
             <v-list>
               <v-list-item-group color="orange accent-4" v-model="item">
                 <v-list-item
@@ -147,6 +147,7 @@ export default {
         .then((res) => {
           if (Number(res.data.code) != 1) {
             _this.items = eval(res.data.data);
+            _this.items = _this.items.sort();
             _this.bid = _this.items[0].id;
             _this.numOfQue = _this.items[0];
             _this.loadBankWork = false;

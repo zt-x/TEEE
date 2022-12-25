@@ -97,6 +97,7 @@
       color="success"
       dense="true"
       timeout="1000"
+	  rounded="pill"
     >
       {{ msg }}
     </v-snackbar>

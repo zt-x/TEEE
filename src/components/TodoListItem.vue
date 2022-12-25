@@ -1,5 +1,5 @@
 <template>
-  <v-list >
+  <v-list>
     <!-- <v-divider></v-divider> -->
     <v-subheader
       v-text="TodoData.CourseName"

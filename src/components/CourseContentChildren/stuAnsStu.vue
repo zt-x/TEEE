@@ -96,7 +96,14 @@
         <span>{{ overlay_msg }}</span>
       </v-chip>
     </v-overlay>
-    <v-snackbar v-model="snackbar" top :color="snackbar_color" dense timeout="2000">
+    <v-snackbar
+      v-model="snackbar"
+      top
+      :color="snackbar_color"
+      dense
+      timeout="2000"
+      rounded="pill"
+    >
       {{ snackbar_msg }}
     </v-snackbar>
   </v-card>

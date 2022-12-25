@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="white" app dark>
+  <v-app-bar color="white" app dark elevate-on-scroll>
     <v-chip @click="$router.go(-1)" small class="ma-2" color="warn" text-color="white"
       ><v-icon x-small left>fa fa-reply</v-icon>返回上一级</v-chip
     >
@@ -170,18 +170,15 @@
     </v-dialog>
 
     <!-- MsgBox模块 -->
-    <v-badge dot overlap color="green" class="ml-3 mr-2" dark>
-      <v-avatar @click="showMyMsgBox()" color="#ffe9b3">
-        <v-icon color="#875438">fas fa-bell</v-icon>
-      </v-avatar>
-    </v-badge>
+
+    <Notification />
 
     <v-dialog v-model="dialog_info" v-if="dialog_info" max-width="500">
       <personal-info @closeInfo="closeInfo" />
     </v-dialog>
 
     <!-- 头像模块 -->
-    <v-menu offset-y transition="slide-y-transition">
+    <v-menu :nudge-bottom="10" offset-y transition="slide-y-transition">
       <template v-slot:activator="{ on, attrs }">
         <v-avatar color="#e5f1ff" v-bind="attrs" v-on="on">
           <v-img :src="_avatar" width="40px"></v-img>
@@ -204,6 +201,7 @@
       :color="snackbar_color"
       dense="true"
       timeout="2000"
+      rounded="pill"
     >
       {{ msg }}
     </v-snackbar>
@@ -212,12 +210,13 @@
 
 <script>
 import axios from "axios";
+import Notification from "./Notification.vue";
 const _axios = axios.create();
 let token = window.localStorage.getItem("token");
 import PersonalInfo from "./PersonalInfo.vue";
 
 export default {
-  components: { PersonalInfo },
+  components: { PersonalInfo, Notification },
   props: ["role", "_avatar"],
   data: () => ({
     dialog_stu: false,

@@ -573,7 +573,6 @@ export default {
           _axios
             .post("/api/Exam/setRules", setRulesForm)
             .then((res3) => {
-              console.log(res3);
               _this.overlay = false;
               _this.$dialog({
                 title: "Msg",
@@ -657,7 +656,6 @@ export default {
               _axios
                 .post("/api/Exam/setRules", setRulesForm)
                 .then((res3) => {
-                  console.log(res3);
                   _this.overlay = false;
                   _this.$dialog({
                     title: "Msg",
@@ -696,6 +694,7 @@ export default {
     },
   },
   mounted() {
+    let token = window.localStorage.getItem("token");
     _axios.interceptors.request.use(function (config) {
       config.headers = {
         Authorization: token,

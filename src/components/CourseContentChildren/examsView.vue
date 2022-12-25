@@ -90,7 +90,14 @@
       <v-progress-circular small indeterminate color="primary"></v-progress-circular>
       <div class="mx-auto">{{ loadingText }}</div>
     </v-overlay>
-    <v-snackbar v-model="snackbar" top color="error" dense="true" timeout="2000">
+    <v-snackbar
+      v-model="snackbar"
+      top
+      color="error"
+      dense="true"
+      timeout="2000"
+      rounded="pill"
+    >
       {{ msg }}
     </v-snackbar>
   </v-container>

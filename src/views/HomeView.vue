@@ -9,9 +9,10 @@
       v-model="snackbar"
       style="margin-top: 64px"
       top
-      color="success"
+      color="blue-grey"
       dense="true"
       timeout="1000"
+      rounded="pill"
     >
       欢迎回来，{{ user.username }}
     </v-snackbar>

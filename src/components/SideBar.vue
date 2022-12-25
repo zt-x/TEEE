@@ -22,9 +22,8 @@
           v-bind:key="i"
           active-class="border"
           exact-active-class="border"
-          link="border"
-          :ripple="false"
-          @click="changePage(item.path)"
+          :ripple="true"
+          :to="item.path"
         >
           <v-tooltip right>
             <template v-slot:activator="{ on, attrs }">
@@ -124,14 +123,14 @@ export default {
   color: white !important;
 }
 .v-list-item__icon {
-  padding-left: inherit;
+  /* padding-left: inherit; */
 }
 /* .v-list-item {
-  margin: 12px;
-  text-decoration: none;
-}
-.v-list-item:hover {
-  background: #b97a57;
-  transition: background 0.7s;
-} */
+	margin: 12px;
+	text-decoration: none;
+  }
+  .v-list-item:hover {
+	background: #b97a57;
+	transition: background 0.7s;
+  } */
 </style>
